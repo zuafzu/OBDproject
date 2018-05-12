@@ -2,8 +2,8 @@ package com.cy.obdproject.net;
 
 import android.util.Log;
 
-import com.cy.obdproject.obd_ecu.ECUagreement;
-import com.cy.obdproject.obd_ecu.OBDagreement;
+import com.cy.obdproject.agreement.ECUagreement;
+import com.cy.obdproject.agreement.OBDagreement;
 import com.cy.obdproject.tools.StringTools;
 
 import java.io.IOException;
@@ -16,7 +16,7 @@ import java.net.SocketAddress;
 /**
  * socket连接工具
  */
-public class SocketClient {
+public class MySocketClient {
 
     private Socket mClient;
     /**
@@ -31,7 +31,7 @@ public class SocketClient {
     private ConnectLinstener mListener;
 
 
-    public SocketClient(String dstName, int dstPort) {
+    public MySocketClient(String dstName, int dstPort) {
         this.mDstName = dstName;
         this.mDesPort = dstPort;
     }
@@ -48,7 +48,6 @@ public class SocketClient {
             mClient.connect(socAddress, 3000);
             boolean flag = mClient.isConnected();
             Log.e("cyf", "是否连接上 ： " + flag);
-            // ---------------------------------需要测试多条数据--------------------------------
             if (flag) {
                 index = 0;
                 next();

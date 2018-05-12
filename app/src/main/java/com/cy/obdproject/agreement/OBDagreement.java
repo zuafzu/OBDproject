@@ -1,4 +1,4 @@
-package com.cy.obdproject.obd_ecu;
+package com.cy.obdproject.agreement;
 
 public class OBDagreement {
 

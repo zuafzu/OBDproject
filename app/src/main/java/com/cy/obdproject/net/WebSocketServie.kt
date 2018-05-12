@@ -12,7 +12,7 @@ import java.net.URI
 
 class WebSocketServie : Service() {
 
-    var msgClient: WebSocketClient? = null
+    private var msgClient: MyWebSocketClient? = null
 
     companion object {
 
@@ -24,25 +24,25 @@ class WebSocketServie : Service() {
     }
 
     override fun onBind(intent: Intent): IBinder? {
-        Log.e("cyf", "onBind")
+        Log.e("cyf", "WebSocketServie onBind")
         return null
     }
 
     override fun onCreate() {
         super.onCreate()
-        Log.e("cyf", "开始服务")
+        Log.e("cyf", "WebSocketServie 开始服务")
         webSocketServie = this
         createWebSocket()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Log.e("cyf", "onStartCommand")
+        Log.e("cyf", "WebSocketServie onStartCommand")
         return super.onStartCommand(intent, flags, startId)
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.e("cyf", "onDestroy")
+        Log.e("cyf", "WebSocketServie onDestroy")
         webSocketServie = null
         if (msgClient != null) {
             msgClient!!.close()
@@ -54,7 +54,7 @@ class WebSocketServie : Service() {
      */
     private fun createWebSocket() {
         val map = HashMap<String, String>()
-        msgClient = object : WebSocketClient(URI("ws://10.133.73.119:8883/websocket"), Draft_17(), map, 12000) {
+        msgClient = object : MyWebSocketClient(URI("ws://10.133.73.119:8883/websocket"), Draft_17(), map, 12000) {
 
             override fun onMessage(message: String?) {
                 super.onMessage(message)
@@ -69,11 +69,11 @@ class WebSocketServie : Service() {
             }
         }
         msgClient!!.connect()
-        Log.e("cyf", "开始连接")
+        Log.e("cyf", "WebSocketServie 开始连接")
     }
 
     fun sendMsg(msg: String) {
-        Log.e("cyf", "msg : $msg")
+        Log.e("cyf", "WebSocketServie msg : $msg")
         if (msgClient != null && msgClient!!.readyState == WebSocket.READYSTATE.OPEN) {
             msgClient!!.sendMsg(msg)
         }
