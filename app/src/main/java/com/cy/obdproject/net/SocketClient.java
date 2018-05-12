@@ -16,7 +16,7 @@ import java.net.SocketAddress;
 /**
  * socket连接工具
  */
-public class SocketTools {
+public class SocketClient {
 
     private Socket mClient;
     /**
@@ -31,7 +31,7 @@ public class SocketTools {
     private ConnectLinstener mListener;
 
 
-    public SocketTools(String dstName, int dstPort) {
+    public SocketClient(String dstName, int dstPort) {
         this.mDstName = dstName;
         this.mDesPort = dstPort;
     }

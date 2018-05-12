@@ -11,13 +11,13 @@ import java.net.URI;
 import java.nio.channels.NotYetConnectedException;
 import java.util.Map;
 
-public class CyfMsgClient extends WebSocketClient {
+public class WebSocketClient extends org.java_websocket.client.WebSocketClient {
 
-    public CyfMsgClient(URI serverURI) {
+    public WebSocketClient(URI serverURI) {
         super(serverURI, new Draft_17());
     }
 
-    public CyfMsgClient(URI serverUri, Draft draft, Map<String, String> headers, int connecttimeout) {
+    public WebSocketClient(URI serverUri, Draft draft, Map<String, String> headers, int connecttimeout) {
         super(serverUri, draft, headers, connecttimeout);
     }
 

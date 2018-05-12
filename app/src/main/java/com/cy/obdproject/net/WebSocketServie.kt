@@ -12,7 +12,7 @@ import java.net.URI
 
 class WebSocketServie : Service() {
 
-    var msgClient: CyfMsgClient? = null
+    var msgClient: WebSocketClient? = null
 
     companion object {
 
@@ -54,7 +54,7 @@ class WebSocketServie : Service() {
      */
     private fun createWebSocket() {
         val map = HashMap<String, String>()
-        msgClient = object : CyfMsgClient(URI("ws://10.133.73.119:8883/websocket"), Draft_17(), map, 12000) {
+        msgClient = object : WebSocketClient(URI("ws://10.133.73.119:8883/websocket"), Draft_17(), map, 12000) {
 
             override fun onMessage(message: String?) {
                 super.onMessage(message)

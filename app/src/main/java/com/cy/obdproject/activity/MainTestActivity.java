@@ -14,7 +14,7 @@ import com.cy.obdproject.R;
 import com.cy.obdproject.base.BaseActivity;
 import com.cy.obdproject.constant.Constant;
 import com.cy.obdproject.net.WebSocketServie;
-import com.cy.obdproject.net.SocketTools;
+import com.cy.obdproject.net.SocketClient;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.FileCallBack;
 
@@ -25,7 +25,7 @@ import okhttp3.Call;
 
 public class MainTestActivity extends BaseActivity implements BaseActivity.ClickMethoListener {
 
-    private SocketTools obdStart;
+    private SocketClient obdStart;
     private Intent mIntent;
 
     private Button btn_1, btn_2, btn_3, btn_4;
@@ -52,8 +52,8 @@ public class MainTestActivity extends BaseActivity implements BaseActivity.Click
 
     private void initConnector() {
         mIntent = new Intent(this, WebSocketServie.class);
-        obdStart = new SocketTools(Constant.mDstName, Constant.mDstPort);
-        obdStart.setOnConnectLinstener(new SocketTools.ConnectLinstener() {
+        obdStart = new SocketClient(Constant.mDstName, Constant.mDstPort);
+        obdStart.setOnConnectLinstener(new SocketClient.ConnectLinstener() {
             @Override
             public void onReceiveData(final String data) {
                 runOnUiThread(new Runnable() {
