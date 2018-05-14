@@ -36,6 +36,7 @@ public class ReadBaseInfoWorker {
     private Runnable runnable;
 
     public void start() {
+        baseInfoBeanList.clear();
         index = 0;
         next();
     }
@@ -43,6 +44,7 @@ public class ReadBaseInfoWorker {
     public void start(Activity activity, SocketCallBack socketCallBack) {
         this.activity = activity;
         this.socketCallBack = socketCallBack;
+        baseInfoBeanList.clear();
         index = 0;
         handler = new android.os.Handler();
         runnable = new Runnable() {
