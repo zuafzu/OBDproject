@@ -1,5 +1,6 @@
 package com.cy.obdproject.activity
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -56,20 +57,31 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
         recyclerview.adapter = HomeAdapter()
     }
 
+    @SuppressLint("SetTextI18n")
     override fun doMethod(string: String?) {
         when (string) {
             "tv_connnect_obd" -> {//连接obd
                 showProgressDialog()
-                if ("连接成功" == tv_obd_state.text) {
+                if ("断开OBD" == tv_connnect_obd.text) {
+                    tv_connnect_obd.text = "连接OBD"
                     tv_obd_state.text = "未连接"
                     stopService(mIntent2)
+                    dismissProgressDialog()
                 } else {
                     startService(mIntent2)
+                    startWorker!!.init(this@MainActivity, { data ->
+                        dismissProgressDialog()
+                        tv_connnect_obd.text = "断开OBD"
+                        tv_obd_state.text = data
+                    })
                     Handler().postDelayed({
-                        startWorker!!.start(this@MainActivity, { data ->
-                            dismissProgressDialog()
-                            tv_obd_state.text = data
-                        })
+                        if (SocketService.getIntance() != null && SocketService.getIntance()!!.isConnected()) {
+                            startWorker!!.start()
+                        } else {
+                            tv_connnect_obd.text = "连接OBD"
+                            tv_obd_state.text = "未连接"
+                            stopService(mIntent2)
+                        }
                     }, 2000)
                 }
             }

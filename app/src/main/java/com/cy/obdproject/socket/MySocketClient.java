@@ -56,6 +56,9 @@ public class MySocketClient {
             if (mListener != null) {
                 String data = StringTools.byte2hex(buffer);
                 data = data.substring(0, StringTools.byte2hex(buffer).lastIndexOf("AA") + 2);
+                int length = Integer.parseInt(Integer.parseInt(data.substring(2, 4), 16) + ""
+                        + Integer.parseInt(data.substring(4, 6), 16));
+                data = data.substring(0, 6 + (length * 2) + 2);
                 Log.i("cyf", "收到信息 : " + data);
                 mListener.onReceiveData(data);
             }

@@ -26,7 +26,7 @@ public class StartWorker {
     private Handler handler;
     private Runnable runnable;
 
-    public void start(Activity activity, SocketCallBack socketCallBack) {
+    public void init(Activity activity, SocketCallBack socketCallBack) {
         this.activity = activity;
         this.socketCallBack = socketCallBack;
         handler = new android.os.Handler();
@@ -57,6 +57,9 @@ public class StartWorker {
                 }
             }
         };
+    }
+
+    public void start(){
         next();
     }
 

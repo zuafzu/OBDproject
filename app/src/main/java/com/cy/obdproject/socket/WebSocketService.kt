@@ -79,4 +79,11 @@ class WebSocketService : Service() {
         }
     }
 
+    fun isConnected(): Boolean {
+        if (msgClient != null &&  msgClient!!.readyState == WebSocket.READYSTATE.OPEN) {
+            return true
+        }
+        return false
+    }
+
 }

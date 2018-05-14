@@ -19,7 +19,7 @@ import java.util.List;
 
 public class ReadBaseInfoWorker {
 
-    private String name = "";
+    public static String[] names = {"vin：", "硬件版本号：", "软件版本号："};
     private String key = "";
     private int type = 1;
     private List<BaseInfoBean> baseInfoBeanList = new ArrayList<>();
@@ -35,17 +35,9 @@ public class ReadBaseInfoWorker {
     private Handler handler;
     private Runnable runnable;
 
-    public void start() {
-        baseInfoBeanList.clear();
-        index = 0;
-        next();
-    }
-
-    public void start(Activity activity, SocketCallBack socketCallBack) {
+    public void init(Activity activity, SocketCallBack socketCallBack) {
         this.activity = activity;
         this.socketCallBack = socketCallBack;
-        baseInfoBeanList.clear();
-        index = 0;
         handler = new android.os.Handler();
         runnable = new Runnable() {
             @Override
@@ -64,31 +56,41 @@ public class ReadBaseInfoWorker {
                     String msg = ECUTools.getData(data, type, key);
                     if (msg.equals(ECUTools.ERR)) {
                         putData("返回数据异常");
-                        return;
+                    } else if (msg.equals(ECUTools.WAIT)) {
+                        startTime();
+                    } else {
+                        BaseInfoBean baseInfoBean = new BaseInfoBean();
+                        baseInfoBean.setName(names[index - 1]);
+                        baseInfoBean.setValue(msg);
+                        baseInfoBeanList.add(baseInfoBean);
+                        next();
                     }
-                    BaseInfoBean baseInfoBean = new BaseInfoBean();
-                    baseInfoBean.setName(name);
-                    baseInfoBean.setValue(msg);
-                    baseInfoBeanList.add(baseInfoBean);
-                    next();
                 } else {
                     putData("返回数据超时");
                 }
             }
         };
+    }
+
+    public void start() {
+        baseInfoBeanList.clear();
+        index = 0;
         next();
     }
 
     private void replay() {
-        Log.e("cyf", "发送信息 : " + msg);
+        Log.e("cyf", "发送信息 : " + msg + "  " + index);
         SocketService.Companion.getIntance().sendMsg(StringTools.hex2byte(msg), connectLinstener);
+        startTime();
+    }
+
+    private void startTime() {
         sysTime1 = new Date().getTime();
         sysTime2 = 0L;
         handler.postDelayed(runnable, timeOut);
     }
 
     private void putData(final String msg) {
-        index = 0;
         ReadBaseInfoWorker.this.activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -101,21 +103,18 @@ public class ReadBaseInfoWorker {
         msg = "";
         switch (index) {
             case 0:
-                name = "vin：";
                 key = "62F190";
                 type = 3;
                 msg = ECUagreement.a("10", "18da00fa", "0003", "22F190");
                 replay();
                 break;
             case 1:
-                name = "硬件版本号：";
                 key = "62F1A6";
                 type = 3;
                 msg = ECUagreement.a("10", "18da00fa", "0003", "22F1A6");
                 replay();
                 break;
             case 2:
-                name = "软件版本号：";
                 key = "62F1A5";
                 type = 3;
                 msg = ECUagreement.a("10", "18da00fa", "0003", "22F1A5");

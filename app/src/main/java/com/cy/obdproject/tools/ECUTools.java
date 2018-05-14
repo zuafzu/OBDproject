@@ -2,9 +2,13 @@ package com.cy.obdproject.tools;
 
 public class ECUTools {
 
-    public static final String ERR="err";
+    public static final String ERR = "err";
+    public static final String WAIT = "wait";
 
     public static String getData(String data, int type, String key) {
+        if (data.contains("7F2278")) {
+            return WAIT;
+        }
         StringBuilder mData = new StringBuilder();
         int index = data.indexOf(key);
         if (index != -1) {

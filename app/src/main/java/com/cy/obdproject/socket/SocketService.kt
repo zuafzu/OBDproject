@@ -68,5 +68,12 @@ class SocketService : Service() {
         }
     }
 
+    fun isConnected(): Boolean {
+        if (msgClient != null && msgClient!!.isConnected) {
+            return true
+        }
+        return false
+    }
+
 }
 
