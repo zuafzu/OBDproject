@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".activity.ReadBaseInfoActivity">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="44dp"
@@ -16,6 +17,7 @@
 
         <ImageView
             android:id="@+id/iv_back"
+            android:tag="iv_back"
             android:layout_width="44dp"
             android:layout_height="44dp"
             android:background="?android:attr/selectableItemBackground"
@@ -34,23 +36,24 @@
             android:textSize="18sp" />
 
         <TextView
+            android:tag="tv_refresh"
             android:id="@+id/tv_refresh"
             android:layout_width="wrap_content"
             android:layout_height="44dp"
             android:padding="12dp"
-            android:textColor="@android:color/white"
-            android:text="@string/refresh"/>
+            android:text="@string/refresh"
+            android:textColor="@android:color/white" />
 
     </LinearLayout>
 
-    <ScrollView
+    <ListView
+        android:id="@+id/listView"
+        android:tag="listView"
+        android:listSelector="@android:color/transparent"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="0dp"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
 
-        </LinearLayout>
-    </ScrollView>
 </LinearLayout>

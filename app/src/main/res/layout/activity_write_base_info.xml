@@ -17,6 +17,7 @@
 
         <ImageView
             android:id="@+id/iv_back"
+            android:tag="iv_back"
             android:layout_width="44dp"
             android:layout_height="44dp"
             android:background="?android:attr/selectableItemBackground"
@@ -30,11 +31,12 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="@string/xjbxx"
+            android:text="@string/djbxx"
             android:textColor="@android:color/white"
             android:textSize="18sp" />
 
         <TextView
+            android:tag="tv_refresh"
             android:id="@+id/tv_refresh"
             android:layout_width="wrap_content"
             android:layout_height="44dp"
@@ -44,16 +46,14 @@
 
     </LinearLayout>
 
-    <ScrollView
+    <ListView
+        android:id="@+id/listView"
+        android:tag="listView"
+        android:listSelector="@android:color/transparent"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="0dp"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-
-        </LinearLayout>
-    </ScrollView>
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
 
 </LinearLayout>

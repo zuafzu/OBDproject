@@ -95,6 +95,8 @@
 
 
                 <TextView
+                    android:id="@+id/tv_connnect_obd"
+                    android:tag="tv_connnect_obd"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
@@ -133,6 +135,8 @@
                 </LinearLayout>
 
                 <TextView
+                    android:id="@+id/tv_ycxz"
+                    android:tag="tv_ycxz"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
@@ -149,6 +153,7 @@
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerview"
+        android:tag="recyclerview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/iv_head"
@@ -197,6 +202,7 @@
 
                 <LinearLayout
                     android:id="@+id/ll_main1"
+                    android:tag="ll_main1"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_marginBottom="8dp"
@@ -230,6 +236,7 @@
 
                 <LinearLayout
                     android:id="@+id/ll_main2"
+                    android:tag="ll_main2"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_marginBottom="8dp"
@@ -270,6 +277,7 @@
 
                 <LinearLayout
                     android:id="@+id/ll_main3"
+                    android:tag="ll_main3"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_marginBottom="8dp"
@@ -304,6 +312,7 @@
 
                 <LinearLayout
                     android:id="@+id/ll_main4"
+                    android:tag="ll_main4"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_marginBottom="8dp"
@@ -345,6 +354,7 @@
 
                 <LinearLayout
                     android:id="@+id/ll_main5"
+                    android:tag="ll_main5"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_marginBottom="8dp"
@@ -386,6 +396,7 @@
 
                 <LinearLayout
                     android:id="@+id/ll_main6"
+                    android:tag="ll_main6"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_marginBottom="8dp"

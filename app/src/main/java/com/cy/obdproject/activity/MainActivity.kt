@@ -129,6 +129,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         // super.onBackPressed()
         AlertDialog.Builder(this).setTitle("提示").setMessage("确认退出吗？").setPositiveButton("确认", object : DialogInterface.OnClickListener {
             override fun onClick(p0: DialogInterface?, p1: Int) {
+                finish()
             }
         }).setNegativeButton("取消", object : DialogInterface.OnClickListener {
             override fun onClick(p0: DialogInterface?, p1: Int) {
