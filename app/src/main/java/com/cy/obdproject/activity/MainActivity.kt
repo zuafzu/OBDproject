@@ -190,7 +190,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                     holder.imageView!!.setBackgroundColor(Color.parseColor("#76c2af"))
                 }
                 "226" -> {
-                    holder.ll_main!!.setOnClickListener { onClick(ll_main5) }
+                    holder.ll_main!!.setOnClickListener { onClick(ll_main6) }
                     holder.textView!!.text = "刷写数据"
                     holder.imageView!!.setImageResource(R.mipmap.ic_launcher_round)
                     holder.imageView!!.setBackgroundColor(Color.parseColor("#76c2af"))
