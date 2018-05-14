@@ -48,7 +48,7 @@
     <LinearLayout
         android:id="@+id/iv_head"
         android:layout_width="match_parent"
-        android:layout_height="90dp"
+        android:layout_height="100dp"
         android:layout_below="@+id/ll_toolsbar"
         android:layout_marginBottom="8dp"
         android:layout_marginLeft="16dp"
@@ -93,19 +93,18 @@
                         android:text="张三" />
                 </LinearLayout>
 
-
                 <TextView
-                    android:id="@+id/tv_connnect_obd"
-                    android:tag="tv_connnect_obd"
+                    android:id="@+id/tv_ycxz"
+                    android:tag="tv_ycxz"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
-                    android:padding="4dp"
-                    android:textColor="@android:color/white"
-                    android:textSize="12sp"
                     android:layout_margin="4dp"
+                    android:padding="4dp"
+                    android:textSize="12sp"
+                    android:textColor="@android:color/white"
                     android:background="@drawable/shape_corner_accent"
-                    android:text="连接OBD" />
+                    android:text="远程协助" />
             </LinearLayout>
 
             <LinearLayout
@@ -136,18 +135,20 @@
                         android:text="未连接" />
                 </LinearLayout>
 
+
                 <TextView
-                    android:id="@+id/tv_ycxz"
-                    android:tag="tv_ycxz"
+                    android:id="@+id/tv_connnect_obd"
+                    android:tag="tv_connnect_obd"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
-                    android:layout_margin="4dp"
                     android:padding="4dp"
-                    android:textSize="12sp"
                     android:textColor="@android:color/white"
+                    android:textSize="12sp"
+                    android:layout_margin="4dp"
                     android:background="@drawable/shape_corner_accent"
-                    android:text="远程协助" />
+                    android:text="连接OBD" />
+
             </LinearLayout>
         </LinearLayout>
 
@@ -230,7 +231,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_margin="8dp"
-                        android:text="读基本信息"
+                        android:text="@string/djbxx"
                         android:textColor="@android:color/black"
                         android:textSize="12sp" />
 
@@ -264,7 +265,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_margin="8dp"
-                        android:text="写基本信息"
+                        android:text="@string/xjbxx"
                         android:textColor="@android:color/black"
                         android:textSize="12sp" />
 
@@ -306,7 +307,7 @@
                         android:layout_height="wrap_content"
                         android:layout_margin="8dp"
                         android:gravity="center"
-                        android:text="故障代码"
+                        android:text="@string/gzdm"
                         android:textColor="@android:color/black"
                         android:textSize="12sp" />
 
@@ -340,7 +341,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_margin="8dp"
-                        android:text="动态数据"
+                        android:text="@string/dtsj"
                         android:textColor="@android:color/black"
                         android:textSize="12sp" />
 
@@ -382,7 +383,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_margin="8dp"
-                        android:text="IO测试"
+                        android:text="@string/iotest"
                         android:textColor="@android:color/black"
                         android:textSize="12sp" />
 
@@ -424,7 +425,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_margin="8dp"
-                        android:text="刷写数据"
+                        android:text="@string/sxwj"
                         android:textColor="@android:color/black"
                         android:textSize="12sp" />
 

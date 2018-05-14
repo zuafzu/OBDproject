@@ -1,12 +1,12 @@
 <resources>
     <string name="app_name">OBDproject</string>
 
-    <string name="djbxx">读基本信息</string>
-    <string name="xjbxx">写基本信息</string>
-    <string name="gzdm">故障代码</string>
+    <string name="djbxx">基本信息</string>
+    <string name="xjbxx">参数修改</string>
+    <string name="gzdm">故障信息</string>
     <string name="dtsj">动态数据</string>
-    <string name="iotest">IO测试</string>
-    <string name="sxwj">刷写文件</string>
+    <string name="iotest">输入输出控制</string>
+    <string name="sxwj">刷写</string>
 
     <string name="refresh">刷新</string>
     <string name="clean">清空数据</string>

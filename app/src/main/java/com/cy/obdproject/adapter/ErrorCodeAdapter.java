@@ -39,13 +39,15 @@ public class ErrorCodeAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
         Holder holder = null;
         if (convertView == null) {
             holder = new Holder();
             convertView = LayoutInflater.from(context).inflate(R.layout.list_item_error_code, parent, false);
             holder.tv_code = (TextView) convertView.findViewById(R.id.tv_code);
             holder.tv_msg = (TextView) convertView.findViewById(R.id.tv_msg);
+            holder.tv_freeze = (TextView) convertView.findViewById(R.id.tv_freeze);
+
             holder.view_line = (View) convertView.findViewById(R.id.view_line);
             convertView.setTag(holder);
         } else {
@@ -53,6 +55,14 @@ public class ErrorCodeAdapter extends BaseAdapter {
         }
         holder.tv_code.setText(items.get(position).getCode());
         holder.tv_msg.setText(items.get(position).getMsg());
+
+        holder.tv_freeze.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onErrorCodeClick.setOnErrorCodeClick("", position);
+
+            }
+        });
 
 //        if (position != (getCount() - 1)) {
 //            holder.view_line.setVisibility(View.VISIBLE);
@@ -62,8 +72,18 @@ public class ErrorCodeAdapter extends BaseAdapter {
         return convertView;
     }
 
+    OnErrorCodeClick onErrorCodeClick;
+
+    public interface OnErrorCodeClick {
+        void setOnErrorCodeClick(String id, int position);
+    }
+
+    public void setOnErrorCodeClick(OnErrorCodeClick onErrorCodeClick) {
+        this.onErrorCodeClick = onErrorCodeClick;
+    }
+
     public class Holder {
-        public TextView tv_code, tv_msg;
+        public TextView tv_code, tv_msg,tv_freeze;
         public View view_line;
     }
 

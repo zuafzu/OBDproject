@@ -143,37 +143,37 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
             when (homes!![position]) {
                 "221" -> {
                     holder.ll_main!!.setOnClickListener { doMethod("ll_main1") }
-                    holder.textView!!.text = "读基本信息"
+                    holder.textView!!.text = getString(R.string.djbxx)
                     holder.imageView!!.setImageResource(R.mipmap.ic_launcher_round)
                     holder.imageView!!.setBackgroundColor(Color.parseColor("#77b3d4"))
                 }
                 "222" -> {
                     holder.ll_main!!.setOnClickListener { doMethod("ll_main2") }
-                    holder.textView!!.text = "写基本信息"
+                    holder.textView!!.text = getString(R.string.xjbxx)
                     holder.imageView!!.setImageResource(R.mipmap.ic_launcher_round)
                     holder.imageView!!.setBackgroundColor(Color.parseColor("#4f5d73"))
                 }
                 "223" -> {
                     holder.ll_main!!.setOnClickListener { doMethod("ll_main3") }
-                    holder.textView!!.text = "故障代码"
+                    holder.textView!!.text = getString(R.string.gzdm)
                     holder.imageView!!.setImageResource(R.mipmap.ic_launcher_round)
                     holder.imageView!!.setBackgroundColor(Color.parseColor("#76c2af"))
                 }
                 "224" -> {
                     holder.ll_main!!.setOnClickListener { doMethod("ll_main4") }
-                    holder.textView!!.text = "动态数据"
+                    holder.textView!!.text = getString(R.string.dtsj)
                     holder.imageView!!.setImageResource(R.mipmap.ic_launcher_round)
                     holder.imageView!!.setBackgroundColor(Color.parseColor("#77b3d4"))
                 }
                 "225" -> {
                     holder.ll_main!!.setOnClickListener { doMethod("ll_main5") }
-                    holder.textView!!.text = "IO测试"
+                    holder.textView!!.text = getString(R.string.iotest)
                     holder.imageView!!.setImageResource(R.mipmap.ic_launcher_round)
                     holder.imageView!!.setBackgroundColor(Color.parseColor("#76c2af"))
                 }
                 "226" -> {
                     holder.ll_main!!.setOnClickListener { doMethod("ll_main6") }
-                    holder.textView!!.text = "刷写数据"
+                    holder.textView!!.text = getString(R.string.sxwj)
                     holder.imageView!!.setImageResource(R.mipmap.ic_launcher_round)
                     holder.imageView!!.setBackgroundColor(Color.parseColor("#76c2af"))
                 }
