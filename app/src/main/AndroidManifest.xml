@@ -31,7 +31,8 @@
         <activity android:name=".activity.ErrorCodeActivity" />
         <activity android:name=".activity.DynamicDataActivity" />
         <activity android:name=".activity.IOTestActivity" />
-        <activity android:name=".activity.MainActivity"/>
+        <activity android:name=".activity.MainActivity" />
+        <activity android:name=".activity.WriteDataActivity"></activity>
     </application>
 
 </manifest>

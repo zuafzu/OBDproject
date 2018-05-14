@@ -92,7 +92,7 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                 startActivity(Intent(this@MainActivity, IOTestActivity::class.java))
             }
             "ll_main6" -> {
-
+                startActivity(Intent(this@MainActivity, WriteDataActivity::class.java))
             }
         }
     }

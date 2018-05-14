@@ -18,7 +18,8 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:gravity="left|center_vertical"
-            android:text="项目1："
+            android:text=""
+            android:textColor="@color/colorPrimary"
             android:textSize="14sp" />
 
         <TextView
@@ -27,7 +28,7 @@
             android:layout_weight="1"
             android:layout_height="match_parent"
             android:gravity="left|center_vertical"
-            android:text="项目1"
+            android:text=""
             android:textSize="14sp" />
 
         <ImageView
@@ -40,7 +41,7 @@
     <View
         android:id="@+id/view_line"
         android:layout_width="match_parent"
-        android:layout_height="1sp"
+        android:layout_height="1px"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:background="@color/line" />

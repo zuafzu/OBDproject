@@ -5,8 +5,11 @@
     <string name="xjbxx">写基本信息</string>
     <string name="gzdm">故障代码</string>
     <string name="dtsj">动态数据</string>
+    <string name="iotest">IO测试</string>
+    <string name="sxwj">刷写文件</string>
 
     <string name="refresh">刷新</string>
+    <string name="clean">清空数据</string>
 
     <string name="yhm">登录名</string>
     <string name="yhm2">用户名</string>

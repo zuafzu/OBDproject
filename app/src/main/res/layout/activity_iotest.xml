@@ -32,7 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="@string/dtsj"
+            android:text="@string/iotest"
             android:textColor="@android:color/white"
             android:textSize="18sp" />
 
@@ -47,4 +47,14 @@
             android:visibility="invisible" />
 
     </LinearLayout>
+
+    <ListView
+        android:id="@+id/listView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="0dp"
+        android:listSelector="@android:color/transparent"
+        android:tag="listView" />
 </LinearLayout>
