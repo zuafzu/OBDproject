@@ -4,6 +4,10 @@ public class BaseInfoBean {
     private String name;
     private String value;
 
+    public BaseInfoBean() {
+        super();
+    }
+
     public BaseInfoBean(String name, String value) {
         this.name = name;
         this.value = value;

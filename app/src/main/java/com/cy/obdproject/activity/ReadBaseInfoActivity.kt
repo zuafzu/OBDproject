@@ -1,15 +1,20 @@
 package com.cy.obdproject.activity
 
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
-
 import com.cy.obdproject.R
 import com.cy.obdproject.adapter.BaseInfoAdapter
+import com.cy.obdproject.base.BaseActivity
 import com.cy.obdproject.bean.BaseInfoBean
+import com.cy.obdproject.worker.ReadBaseInfoWorker
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.activity_read_base_info.*
+import org.jetbrains.anko.toast
 
-class ReadBaseInfoActivity : AppCompatActivity() , View.OnClickListener{
+class ReadBaseInfoActivity : BaseActivity(), View.OnClickListener {
+
+    private var readBaseInfoWorker: ReadBaseInfoWorker? = null
     private var list: ArrayList<BaseInfoBean>? = null
     private var baseInfoAdapter: BaseInfoAdapter? = null
 
@@ -21,23 +26,28 @@ class ReadBaseInfoActivity : AppCompatActivity() , View.OnClickListener{
     }
 
     private fun initView() {
+        list = ArrayList()
+        readBaseInfoWorker = ReadBaseInfoWorker()
+
         iv_back.setOnClickListener(this)
         tv_refresh.setOnClickListener(this)
     }
 
     private fun initData() {
-        list = ArrayList()
-        for (i in 0 until 10){
-
-            var bean = BaseInfoBean("水温"+i+"：","65摄氏度")
-            list!!.add(bean)
-        }
-
-        if (baseInfoAdapter == null) {
-            baseInfoAdapter = BaseInfoAdapter(list!!, this,1)
-            listView!!.adapter = baseInfoAdapter
-        } else {
-            baseInfoAdapter!!.notifyDataSetChanged()
+        readBaseInfoWorker!!.start(this) { data ->
+            try {
+                val mlist = Gson().fromJson<List<BaseInfoBean>>(data, object : TypeToken<ArrayList<BaseInfoBean>>() {}.type) as ArrayList<BaseInfoBean>?
+                list!!.clear()
+                list!!.addAll(mlist!!)
+                if (baseInfoAdapter == null) {
+                    baseInfoAdapter = BaseInfoAdapter(list!!, this@ReadBaseInfoActivity, 1)
+                    listView!!.adapter = baseInfoAdapter
+                } else {
+                    baseInfoAdapter!!.notifyDataSetChanged()
+                }
+            } catch (e: Exception) {
+                toast(data!!)
+            }
         }
     }
 
@@ -47,7 +57,7 @@ class ReadBaseInfoActivity : AppCompatActivity() , View.OnClickListener{
                 finish()
             }
             tv_refresh.id -> {
-
+                readBaseInfoWorker!!.start()
             }
         }
     }

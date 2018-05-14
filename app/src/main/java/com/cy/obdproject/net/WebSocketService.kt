@@ -6,6 +6,7 @@ import android.os.IBinder
 import android.util.Log
 import com.cy.obdproject.activity.MainTestActivity
 import com.cy.obdproject.app.MyApp
+import com.cy.obdproject.socket.MyWebSocketClient
 import org.java_websocket.WebSocket
 import org.java_websocket.drafts.Draft_17
 import java.net.URI

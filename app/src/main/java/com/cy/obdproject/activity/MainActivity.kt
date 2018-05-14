@@ -1,12 +1,10 @@
 package com.cy.obdproject.activity
 
-import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.support.v7.app.AlertDialog
-import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -15,23 +13,21 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-
 import com.cy.obdproject.R
-import com.google.gson.Gson
-import com.zhy.http.okhttp.OkHttpUtils
-import com.zhy.http.okhttp.callback.Callback
+import com.cy.obdproject.base.BaseActivity
+import com.cy.obdproject.socket.SocketService
+import com.cy.obdproject.socket.WebSocketService
+import com.cy.obdproject.worker.StartWorker
 import kotlinx.android.synthetic.main.activity_main.*
-import okhttp3.Call
-import okhttp3.Request
-import okhttp3.Response
-
 import org.jetbrains.anko.dip
 import org.jetbrains.anko.matchParent
-import org.jetbrains.anko.toast
 
-class MainActivity : AppCompatActivity(), View.OnClickListener {
+class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
 
-    //    var loginBean: LoginBean? = null
+    private var mIntent1: Intent? = null
+    private var mIntent2: Intent? = null
+    private var startWorker: StartWorker? = null
+
     var items = "221,222,223,224,225,226"
     var homes: List<String>? = null
 
@@ -39,100 +35,76 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         initView()
-
-
-        //        findViewById(R.id.btn).setOnClickListener(new View.OnClickListener() {
-        //            @Override
-        //            public void onClick(View view) {
-        //                startActivity(new Intent(MainActivity.this, MainTestActivity.class));
-        //            }
-        //        });
     }
 
     private fun initView() {
-        ll_main1.setOnClickListener(this)
-        ll_main2.setOnClickListener(this)
-        ll_main3.setOnClickListener(this)
-        ll_main4.setOnClickListener(this)
-        ll_main5.setOnClickListener(this)
-        ll_main6.setOnClickListener(this)
-
-
-//        var data = SPTools.get(this, "login", "").toString()
-//        loginBean = Gson().fromJson<LoginBean>(data, LoginBean::class.java)
-
+        mIntent1 = Intent(this, WebSocketService::class.java)
+        mIntent2 = Intent(this, SocketService::class.java)
+        startWorker = StartWorker()
+        setClickMethod(tv_connnect_obd)
+        setClickMethod(tv_ycxz)
+        setClickMethod(ll_main1)
+        setClickMethod(ll_main2)
+        setClickMethod(ll_main3)
+        setClickMethod(ll_main4)
+        setClickMethod(ll_main5)
+        setClickMethod(ll_main6)
         tv_title.text = getString(R.string.app_name)
-
-
         homes = ArrayList()
         homes = items.split(",")
         recyclerview.layoutManager = GridLayoutManager(this, 2)
         recyclerview.adapter = HomeAdapter()
-
     }
 
-    override fun onClick(p0: View?) {
-        when (p0!!.id) {
-//            ibtn_setting.id -> {
-//                AlertDialog.Builder(this).setItems(R.array.setting, object : DialogInterface.OnClickListener {
-//                    override fun onClick(p0: DialogInterface?, p1: Int) {
-//                        when (p1) {
-//                            0 -> {
-//                                startActivity(Intent(this@MainActivity, SettingActivity::class.java))
-//                            }
-//                            1 -> {
-//                                AlertDialog.Builder(this@MainActivity).
-//                                        setTitle("提示").
-//                                        setMessage("确认退出当前账号吗？").
-//                                        setPositiveButton("确认", object : DialogInterface.OnClickListener {
-//                                            override fun onClick(p0: DialogInterface?, p1: Int) {
-//                                                finish()
-//                                            }
-//                                        }).setNegativeButton("取消", object : DialogInterface.OnClickListener {
-//                                    override fun onClick(p0: DialogInterface?, p1: Int) {
-//
-//                                    }
-//                                }).show()
-//                            }
-//                        }
-//                    }
-//                }).show()
-//            }
-            ll_main1.id -> {//读基本信息
-                startActivity(Intent(this@MainActivity, ReadBaseInfoActivity::class.java))
+    override fun doMethod(string: String?) {
+        when (string) {
+            "tv_connnect_obd" -> {//连接obd
+                showProgressDialog()
+                if ("连接成功" == tv_obd_state.text) {
+                    tv_obd_state.text = "未连接"
+                    stopService(mIntent2)
+                } else {
+                    startService(mIntent2)
+                    Handler().postDelayed({
+                        startWorker!!.start(this@MainActivity, { data ->
+                            dismissProgressDialog()
+                            tv_obd_state.text = data
+                        })
+                    }, 2000)
+                }
             }
-            ll_main2.id -> {//写基本信息
-                startActivity(Intent(this@MainActivity, WriteBaseInfoActivity::class.java))
-            }
-            ll_main3.id -> {//故障代码
-                    startActivity(Intent(this@MainActivity, ErrorCodeActivity::class.java))
-            }
-            ll_main4.id -> {//动态数据
-                    startActivity(Intent(this@MainActivity, DynamicDataActivity::class.java))
-            }
-            ll_main5.id -> {//IO测试
-                startActivity(Intent(this@MainActivity, IOTestActivity::class.java))
+            "tv_ycxz" -> {//远程协作
 
             }
-            ll_main6.id -> {
-                startActivity(Intent(this@MainActivity, MainTestActivity::class.java))
+            "ll_main1" -> {//读基本信息
+                startActivity(Intent(this@MainActivity, ReadBaseInfoActivity::class.java))
+            }
+            "ll_main2" -> {//写基本信息
+                startActivity(Intent(this@MainActivity, WriteBaseInfoActivity::class.java))
+            }
+            "ll_main3" -> {//故障代码
+                startActivity(Intent(this@MainActivity, ErrorCodeActivity::class.java))
+            }
+            "ll_main4" -> {//动态数据
+                startActivity(Intent(this@MainActivity, DynamicDataActivity::class.java))
+            }
+            "ll_main5" -> {//IO测试
+                startActivity(Intent(this@MainActivity, IOTestActivity::class.java))
+            }
+            "ll_main6" -> {
 
             }
         }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        stopService(mIntent1)
+        stopService(mIntent2)
+    }
 
     override fun onBackPressed() {
-        // super.onBackPressed()
-        AlertDialog.Builder(this).setTitle("提示").setMessage("确认退出吗？").setPositiveButton("确认", object : DialogInterface.OnClickListener {
-            override fun onClick(p0: DialogInterface?, p1: Int) {
-                finish()
-            }
-        }).setNegativeButton("取消", object : DialogInterface.OnClickListener {
-            override fun onClick(p0: DialogInterface?, p1: Int) {
-
-            }
-        }).show()
+        AlertDialog.Builder(this).setTitle("提示").setMessage("确认退出吗？").setPositiveButton("确认") { _, _ -> finish() }.setNegativeButton("取消") { _, _ -> }.show()
     }
 
     internal inner class HomeAdapter : RecyclerView.Adapter<HomeAdapter.MyViewHolder>() {
@@ -158,37 +130,37 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             holder.ll_main!!.layoutParams = lp
             when (homes!![position]) {
                 "221" -> {
-                    holder.ll_main!!.setOnClickListener { onClick(ll_main1) }
+                    holder.ll_main!!.setOnClickListener { doMethod("ll_main1") }
                     holder.textView!!.text = "读基本信息"
                     holder.imageView!!.setImageResource(R.mipmap.ic_launcher_round)
                     holder.imageView!!.setBackgroundColor(Color.parseColor("#77b3d4"))
                 }
                 "222" -> {
-                    holder.ll_main!!.setOnClickListener { onClick(ll_main2) }
+                    holder.ll_main!!.setOnClickListener { doMethod("ll_main2") }
                     holder.textView!!.text = "写基本信息"
                     holder.imageView!!.setImageResource(R.mipmap.ic_launcher_round)
                     holder.imageView!!.setBackgroundColor(Color.parseColor("#4f5d73"))
                 }
                 "223" -> {
-                    holder.ll_main!!.setOnClickListener { onClick(ll_main3) }
+                    holder.ll_main!!.setOnClickListener { doMethod("ll_main3") }
                     holder.textView!!.text = "故障代码"
                     holder.imageView!!.setImageResource(R.mipmap.ic_launcher_round)
                     holder.imageView!!.setBackgroundColor(Color.parseColor("#76c2af"))
                 }
                 "224" -> {
-                    holder.ll_main!!.setOnClickListener { onClick(ll_main4) }
+                    holder.ll_main!!.setOnClickListener { doMethod("ll_main4") }
                     holder.textView!!.text = "动态数据"
                     holder.imageView!!.setImageResource(R.mipmap.ic_launcher_round)
                     holder.imageView!!.setBackgroundColor(Color.parseColor("#77b3d4"))
                 }
                 "225" -> {
-                    holder.ll_main!!.setOnClickListener { onClick(ll_main5) }
+                    holder.ll_main!!.setOnClickListener { doMethod("ll_main5") }
                     holder.textView!!.text = "IO测试"
                     holder.imageView!!.setImageResource(R.mipmap.ic_launcher_round)
                     holder.imageView!!.setBackgroundColor(Color.parseColor("#76c2af"))
                 }
                 "226" -> {
-                    holder.ll_main!!.setOnClickListener { onClick(ll_main6) }
+                    holder.ll_main!!.setOnClickListener { doMethod("ll_main6") }
                     holder.textView!!.text = "刷写数据"
                     holder.imageView!!.setImageResource(R.mipmap.ic_launcher_round)
                     holder.imageView!!.setBackgroundColor(Color.parseColor("#76c2af"))
