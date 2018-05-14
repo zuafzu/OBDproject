@@ -24,7 +24,9 @@
 
         <service android:name=".net.WebSocketServie" />
 
-        <activity android:name=".activity.MainTestActivity"></activity>
+        <activity android:name=".activity.MainTestActivity" />
+        <activity android:name=".activity.ReadBaseInfoActivity" />
+        <activity android:name=".activity.WriteBaseInfoActivity"></activity>
     </application>
 
 </manifest>
