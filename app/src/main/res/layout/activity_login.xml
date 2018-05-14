@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
+    tools:context=".activity.LoginActivity">
+
+    <ImageView
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:src="@mipmap/ic_launcher_round"
+        android:visibility="visible" />
+
+    <com.cy.obdproject.view.GradientTextView
+        android:id="@+id/gradientTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/app_name"
+        android:textColor="@color/colorPrimary"
+        android:textSize="30sp"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/et_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="32dp"
+        android:layout_marginRight="32dp"
+        android:layout_marginTop="24dp"
+        android:drawableLeft="@mipmap/ic_yonghu"
+        android:drawablePadding="8dp"
+        android:hint="@string/yhm"
+        android:lines="1"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:textSize="14sp" />
+
+    <EditText
+        android:id="@+id/et_pw"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="32dp"
+        android:layout_marginRight="32dp"
+        android:drawableLeft="@mipmap/ic_yaoshi"
+        android:drawablePadding="8dp"
+        android:hint="@string/mm"
+        android:inputType="textPassword"
+        android:lines="1"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:textSize="14sp" />
+
+    <CheckBox
+        android:id="@+id/cb_auto"
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="32dp"
+        android:text="@string/zddl" />
+
+    <Button
+        android:textAllCaps="false"
+        android:id="@+id/btn_login"
+        android:layout_width="match_parent"
+        android:layout_height="38dp"
+        android:layout_marginBottom="64dp"
+        android:layout_marginLeft="32dp"
+        android:layout_marginRight="32dp"
+        android:background="@drawable/shape_btn_colorprimary"
+        android:text="@string/dl"
+        android:textColor="@android:color/white"
+        android:textSize="14sp" />
+
+</LinearLayout>

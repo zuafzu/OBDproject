@@ -104,17 +104,14 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             ll_main2.id -> {//写基本信息
                 startActivity(Intent(this@MainActivity, WriteBaseInfoActivity::class.java))
             }
-            ll_main3.id -> {
-
-//                    startActivity(Intent(this@MainActivity, MainLL3Activity::class.java))
+            ll_main3.id -> {//故障代码
+                    startActivity(Intent(this@MainActivity, ErrorCodeActivity::class.java))
             }
-            ll_main4.id -> {
-
-//                    startActivity(Intent(this@MainActivity, MainLL4Activity::class.java))
-
+            ll_main4.id -> {//动态数据
+                    startActivity(Intent(this@MainActivity, DynamicDataActivity::class.java))
             }
-            ll_main5.id -> {
-//                startActivity(Intent(this@MainActivity, MainLL5Activity::class.java))
+            ll_main5.id -> {//IO测试
+                startActivity(Intent(this@MainActivity, IOTestActivity::class.java))
 
             }
             ll_main6.id -> {

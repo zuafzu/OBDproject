@@ -14,7 +14,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.MainActivity">
+        <activity android:name=".activity.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -26,7 +26,11 @@
 
         <activity android:name=".activity.MainTestActivity" />
         <activity android:name=".activity.ReadBaseInfoActivity" />
-        <activity android:name=".activity.WriteBaseInfoActivity"></activity>
+        <activity android:name=".activity.WriteBaseInfoActivity" />
+        <activity android:name=".activity.ErrorCodeActivity" />
+        <activity android:name=".activity.DynamicDataActivity" />
+        <activity android:name=".activity.IOTestActivity" />
+        <activity android:name=".activity.MainActivity"/>
     </application>
 
 </manifest>

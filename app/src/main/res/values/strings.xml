@@ -3,6 +3,14 @@
 
     <string name="djbxx">读基本信息</string>
     <string name="xjbxx">写基本信息</string>
+    <string name="gzdm">故障代码</string>
+    <string name="dtsj">动态数据</string>
+
     <string name="refresh">刷新</string>
 
+    <string name="yhm">登录名</string>
+    <string name="yhm2">用户名</string>
+    <string name="mm">密码</string>
+    <string name="zddl">自动登录</string>
+    <string name="dl">登录</string>
 </resources>
