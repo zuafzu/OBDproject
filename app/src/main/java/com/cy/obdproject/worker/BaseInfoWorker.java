@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.cy.obdproject.agreement.ECUagreement;
 import com.cy.obdproject.bean.BaseInfoBean;
+import com.cy.obdproject.bean.SocketBean;
 import com.cy.obdproject.callback.SocketCallBack;
 import com.cy.obdproject.socket.MySocketClient;
 import com.cy.obdproject.socket.SocketService;
@@ -17,11 +18,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class ReadBaseInfoWorker {
+public class BaseInfoWorker {
 
-    public static String[] names = {"vin：", "硬件版本号：", "软件版本号："};
-    private String key = "";
-    private int type = 1;
+    private List<SocketBean> socketBeanList;
     private List<BaseInfoBean> baseInfoBeanList = new ArrayList<>();
 
     private final int timeOut = 3000;// 超时时间
@@ -35,8 +34,9 @@ public class ReadBaseInfoWorker {
     private Handler handler;
     private Runnable runnable;
 
-    public void init(Activity activity, SocketCallBack socketCallBack) {
+    public void init(Activity activity, List<SocketBean> socketBeanList,SocketCallBack socketCallBack) {
         this.activity = activity;
+        this.socketBeanList = socketBeanList;
         this.socketCallBack = socketCallBack;
         handler = new android.os.Handler();
         runnable = new Runnable() {
@@ -53,16 +53,19 @@ public class ReadBaseInfoWorker {
                 handler.removeCallbacks(runnable);
                 sysTime2 = new Date().getTime();
                 if (sysTime2 - sysTime1 <= timeOut) {
-                    String msg = ECUTools.getData(data, type, key);
+                    String msg = ECUTools.getData(data,
+                            BaseInfoWorker.this.socketBeanList.get(index).getType(),
+                            BaseInfoWorker.this.socketBeanList.get(index).getKey());
                     if (msg.equals(ECUTools.ERR)) {
                         putData("返回数据异常");
                     } else if (msg.equals(ECUTools.WAIT)) {
                         startTime();
                     } else {
                         BaseInfoBean baseInfoBean = new BaseInfoBean();
-                        baseInfoBean.setName(names[index - 1]);
+                        baseInfoBean.setName(BaseInfoWorker.this.socketBeanList.get(index).getName());
                         baseInfoBean.setValue(msg);
                         baseInfoBeanList.add(baseInfoBean);
+                        index++;
                         next();
                     }
                 } else {
@@ -91,40 +94,24 @@ public class ReadBaseInfoWorker {
     }
 
     private void putData(final String msg) {
-        ReadBaseInfoWorker.this.activity.runOnUiThread(new Runnable() {
+        BaseInfoWorker.this.activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                ReadBaseInfoWorker.this.socketCallBack.getData(msg);
+                BaseInfoWorker.this.socketCallBack.getData(msg);
             }
         });
     }
 
     private void next() {
-        msg = "";
-        switch (index) {
-            case 0:
-                key = "62F190";
-                type = 3;
-                msg = ECUagreement.a("10", "18da00fa", "0003", "22F190");
-                replay();
-                break;
-            case 1:
-                key = "62F1A6";
-                type = 3;
-                msg = ECUagreement.a("10", "18da00fa", "0003", "22F1A6");
-                replay();
-                break;
-            case 2:
-                key = "62F1A5";
-                type = 3;
-                msg = ECUagreement.a("10", "18da00fa", "0003", "22F1A5");
-                replay();
-                break;
-            default:
-                putData(new Gson().toJson(baseInfoBeanList));
-                break;
+        if (index < socketBeanList.size()) {
+            msg = ECUagreement.a(socketBeanList.get(index).getCanLinkNum(),
+                    socketBeanList.get(index).getCanId(),
+                    socketBeanList.get(index).getLength(),
+                    socketBeanList.get(index).getData());
+            replay();
+        }else{
+            putData(new Gson().toJson(baseInfoBeanList));
         }
-        index++;
     }
 
 }

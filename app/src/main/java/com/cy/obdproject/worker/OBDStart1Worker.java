@@ -12,7 +12,7 @@ import com.cy.obdproject.tools.StringTools;
 
 import java.util.Date;
 
-public class StartWorker {
+public class OBDStart1Worker {
 
     private final int timeOut = 3000;// 超时时间
     private Activity activity;
@@ -73,10 +73,10 @@ public class StartWorker {
 
     private void putData(final String msg) {
         index = 0;
-        StartWorker.this.activity.runOnUiThread(new Runnable() {
+        OBDStart1Worker.this.activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                StartWorker.this.socketCallBack.getData(msg);
+                OBDStart1Worker.this.socketCallBack.getData(msg);
             }
         });
     }

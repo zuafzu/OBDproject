@@ -16,7 +16,7 @@ import com.cy.obdproject.socket.SocketService;
 import com.cy.obdproject.socket.WebSocketService;
 import com.cy.obdproject.tools.ECUTools;
 import com.cy.obdproject.tools.StringTools;
-import com.cy.obdproject.worker.StartWorker;
+import com.cy.obdproject.worker.OBDStart1Worker;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.FileCallBack;
 
@@ -27,7 +27,7 @@ import okhttp3.Call;
 public class MainTestActivity extends BaseActivity implements BaseActivity.ClickMethoListener {
 
     private Intent mIntent1, mIntent2;
-    private StartWorker startWorker;
+    private OBDStart1Worker startWorker;
 
     private Button btn_1, btn_2, btn_3, btn_4;
     private TextView tv_1;
@@ -54,7 +54,7 @@ public class MainTestActivity extends BaseActivity implements BaseActivity.Click
     private void initConnector() {
         mIntent1 = new Intent(this, WebSocketService.class);
         mIntent2 = new Intent(this, SocketService.class);
-        startWorker = new StartWorker();
+        startWorker = new OBDStart1Worker();
     }
 
     private void initData() {

@@ -5,8 +5,9 @@ import com.cy.obdproject.R
 import com.cy.obdproject.adapter.BaseInfoAdapter
 import com.cy.obdproject.base.BaseActivity
 import com.cy.obdproject.bean.BaseInfoBean
+import com.cy.obdproject.constant.ECUConstant
 import com.cy.obdproject.socket.SocketService
-import com.cy.obdproject.worker.ReadBaseInfoWorker
+import com.cy.obdproject.worker.BaseInfoWorker
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.activity_read_base_info.*
@@ -14,7 +15,7 @@ import org.jetbrains.anko.toast
 
 class ReadBaseInfoActivity : BaseActivity(), BaseActivity.ClickMethoListener {
 
-    private var readBaseInfoWorker: ReadBaseInfoWorker? = null
+    private var readBaseInfoWorker: BaseInfoWorker? = null
     private var list: ArrayList<BaseInfoBean>? = null
     private var baseInfoAdapter: BaseInfoAdapter? = null
 
@@ -27,8 +28,8 @@ class ReadBaseInfoActivity : BaseActivity(), BaseActivity.ClickMethoListener {
 
     private fun initView() {
         list = ArrayList()
-        readBaseInfoWorker = ReadBaseInfoWorker()
-        readBaseInfoWorker!!.init(this) { data ->
+        readBaseInfoWorker = BaseInfoWorker()
+        readBaseInfoWorker!!.init(this, ECUConstant.getReadBaseInfoData()) { data ->
             try {
                 val mlist = Gson().fromJson<List<BaseInfoBean>>(data, object : TypeToken<ArrayList<BaseInfoBean>>() {}.type) as ArrayList<BaseInfoBean>?
                 list!!.clear()
@@ -48,9 +49,9 @@ class ReadBaseInfoActivity : BaseActivity(), BaseActivity.ClickMethoListener {
             readBaseInfoWorker!!.start()
         } else {
             list!!.clear()
-            for (i in 0 until ReadBaseInfoWorker.names.size) {
+            for (i in 0 until ECUConstant.getReadBaseInfoData().size) {
                 val bean = BaseInfoBean()
-                bean.name = ReadBaseInfoWorker.names[i]
+                bean.name = ECUConstant.getReadBaseInfoData()[i].name
                 list!!.add(bean)
             }
             setData()

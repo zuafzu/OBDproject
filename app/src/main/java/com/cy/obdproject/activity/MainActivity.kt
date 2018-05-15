@@ -18,7 +18,7 @@ import com.cy.obdproject.R
 import com.cy.obdproject.base.BaseActivity
 import com.cy.obdproject.socket.SocketService
 import com.cy.obdproject.socket.WebSocketService
-import com.cy.obdproject.worker.StartWorker
+import com.cy.obdproject.worker.OBDStart1Worker
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.dip
 import org.jetbrains.anko.matchParent
@@ -27,7 +27,7 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
 
     private var mIntent1: Intent? = null
     private var mIntent2: Intent? = null
-    private var startWorker: StartWorker? = null
+    private var startWorker: OBDStart1Worker? = null
 
     var items = "221,222,223,224,225,226"
     var homes: List<String>? = null
@@ -41,7 +41,7 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
     private fun initView() {
         mIntent1 = Intent(this, WebSocketService::class.java)
         mIntent2 = Intent(this, SocketService::class.java)
-        startWorker = StartWorker()
+        startWorker = OBDStart1Worker()
         setClickMethod(tv_connnect_obd)
         setClickMethod(tv_ycxz)
         setClickMethod(ll_main1)
