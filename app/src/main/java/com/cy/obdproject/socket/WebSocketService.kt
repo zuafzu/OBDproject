@@ -4,11 +4,16 @@ import android.app.Service
 import android.content.Intent
 import android.os.IBinder
 import android.util.Log
-import com.cy.obdproject.activity.MainTestActivity
 import com.cy.obdproject.app.MyApp
+import com.cy.obdproject.base.BaseActivity
+import com.cy.obdproject.bean.WebSocketBean
+import com.cy.obdproject.constant.Constant
+import com.google.gson.Gson
 import org.java_websocket.WebSocket
 import org.java_websocket.drafts.Draft_17
+import org.json.JSONObject
 import java.net.URI
+
 
 class WebSocketService : Service() {
 
@@ -54,16 +59,37 @@ class WebSocketService : Service() {
      */
     private fun createWebSocket() {
         val map = HashMap<String, String>()
-        msgClient = object : MyWebSocketClient(URI("ws://10.133.73.119:8883/websocket"), Draft_17(), map, 12000) {
+        msgClient = object : MyWebSocketClient(URI("ws://10.133.73.112:8883/websocket"), Draft_17(), map, 12000) {
 
             override fun onMessage(message: String?) {
                 super.onMessage(message)
                 Log.e("cyf", message)
-                // 如果是专家端传过来的信息处理点击事件，如果是用户端传来的信息处理显示数据的事件
-                for (i in 0 until (application as MyApp).activityList.size ){
-                    if((application as MyApp).activityList[i].localClassName.contains(message!!.split(",")[0])){
-                        ((application as MyApp).activityList[i] as MainTestActivity).doMethod(message!!.split(",")[1])
-                        break
+                val webSocketBean = Gson().fromJson(message, WebSocketBean::class.java)
+                val jsonObject = JSONObject(webSocketBean.d.toString())
+                val activityName = jsonObject.opt("activity").toString()
+                if (WebSocketService.getIntance() != null && (application as MyApp).userType == Constant.userProfessional) {
+                    // 用户端传过来的信息处理显示数据的事件
+                    val data = jsonObject.opt("data").toString()
+//                    val method = jsonObject.opt("method").toString()
+//                    val clz = Class.forName("com.cy.obdproject.activity." + activityName.substring(9, activityName.length))
+//                    val obj = clz.newInstance()
+//                    val m = obj.javaClass.getDeclaredMethod(method, String::class.java)
+//                    m.invoke(obj, data) as String
+                    for (i in 0 until (application as MyApp).activityList.size) {
+                        if ((application as MyApp).activityList[i].localClassName.contains(activityName)) {
+                            ((application as MyApp).activityList[i] as BaseActivity).setData(data)
+                            break
+                        }
+                    }
+                }
+                if (WebSocketService.getIntance() != null && (application as MyApp).userType == Constant.userNormal) {
+                    // 专家端传来的信息处理点击事件
+                    val tag = jsonObject.opt("tag").toString()
+                    for (i in 0 until (application as MyApp).activityList.size) {
+                        if ((application as MyApp).activityList[i].localClassName.contains(activityName)) {
+                            ((application as MyApp).activityList[i] as BaseActivity.ClickMethoListener).doMethod(tag)
+                            break
+                        }
                     }
                 }
             }
@@ -80,7 +106,7 @@ class WebSocketService : Service() {
     }
 
     fun isConnected(): Boolean {
-        if (msgClient != null &&  msgClient!!.readyState == WebSocket.READYSTATE.OPEN) {
+        if (msgClient != null && msgClient!!.readyState == WebSocket.READYSTATE.OPEN) {
             return true
         }
         return false

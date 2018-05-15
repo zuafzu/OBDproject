@@ -9,7 +9,7 @@ import java.util.List;
 public class MyApp extends Application {
 
     private List<Activity> activityList;
-    private int userType = -1;// 默认没有用户
+    private int userType = 1;// 默认没有用户
 
     public List<Activity> getActivityList() {
         return activityList;

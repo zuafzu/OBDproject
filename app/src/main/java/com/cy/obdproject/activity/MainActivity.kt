@@ -8,6 +8,7 @@ import android.os.Handler
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,8 +17,10 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.cy.obdproject.R
 import com.cy.obdproject.base.BaseActivity
+import com.cy.obdproject.constant.Constant
 import com.cy.obdproject.socket.SocketService
 import com.cy.obdproject.socket.WebSocketService
+import com.cy.obdproject.tools.WifiTools
 import com.cy.obdproject.worker.OBDStart1Worker
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.dip
@@ -28,6 +31,7 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
     private var mIntent1: Intent? = null
     private var mIntent2: Intent? = null
     private var startWorker: OBDStart1Worker? = null
+    private var wifiTools: WifiTools? = null
 
     var items = "221,222,223,224,225,226"
     var homes: List<String>? = null
@@ -38,10 +42,20 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
         initView()
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (wifiTools!!.wifiAPState == -1) {
+            tv_connnect_obd.text = "开启热点"
+        } else {
+
+        }
+    }
+
     private fun initView() {
         mIntent1 = Intent(this, WebSocketService::class.java)
         mIntent2 = Intent(this, SocketService::class.java)
         startWorker = OBDStart1Worker()
+        wifiTools = WifiTools(this)
         setClickMethod(tv_connnect_obd)
         setClickMethod(tv_ycxz)
         setClickMethod(ll_main1)
@@ -68,25 +82,44 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                     stopService(mIntent2)
                     dismissProgressDialog()
                 } else {
-                    startService(mIntent2)
-                    startWorker!!.init(this@MainActivity, { data ->
+                    // 建立热点
+                    if (wifiTools!!.setWifiApEnabled(true)) {
+                        Handler().postDelayed({
+                            // 获取ip地址
+                            Constant.mDstName = wifiTools!!.hotIp
+                            Log.e("cyf", "1111 " + Constant.mDstName)
+                            Log.i("cyf", "2222 " + wifiTools!!.hotIp)
+                            // 建立长连接
+                            startService(mIntent2)
+                            startWorker!!.init(this@MainActivity, { data ->
+                                dismissProgressDialog()
+                                tv_connnect_obd.text = "断开OBD"
+                                tv_obd_state.text = data
+                            })
+                            Handler().postDelayed({
+                                // 发送开始信息
+                                if (SocketService.getIntance() != null && SocketService.getIntance()!!.isConnected()) {
+                                    startWorker!!.start()
+                                } else {
+                                    tv_connnect_obd.text = "连接OBD"
+                                    tv_obd_state.text = "未连接"
+                                    stopService(mIntent2)
+                                }
+                            }, 2000)
+                        }, 5000)
+                    } else {
                         dismissProgressDialog()
-                        tv_connnect_obd.text = "断开OBD"
-                        tv_obd_state.text = data
-                    })
-                    Handler().postDelayed({
-                        if (SocketService.getIntance() != null && SocketService.getIntance()!!.isConnected()) {
-                            startWorker!!.start()
-                        } else {
-                            tv_connnect_obd.text = "连接OBD"
-                            tv_obd_state.text = "未连接"
-                            stopService(mIntent2)
-                        }
-                    }, 2000)
+                    }
                 }
             }
             "tv_ycxz" -> {//远程协作
-
+                if ("远程协助" == tv_ycxz.text) {
+                    tv_ycxz.text = "断开协助"
+                    startService(mIntent1)
+                } else {
+                    tv_ycxz.text = "远程协助"
+                    stopService(mIntent1)
+                }
             }
             "ll_main1" -> {//读基本信息
                 startActivity(Intent(this@MainActivity, ReadBaseInfoActivity::class.java))
@@ -142,37 +175,55 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
             holder.ll_main!!.layoutParams = lp
             when (homes!![position]) {
                 "221" -> {
-                    holder.ll_main!!.setOnClickListener { doMethod("ll_main1") }
+                    holder.ll_main!!.setOnClickListener {
+                        sendClick(this@MainActivity.localClassName, "ll_main1")
+                        doMethod("ll_main1")
+                    }
                     holder.textView!!.text = getString(R.string.djbxx)
                     holder.imageView!!.setImageResource(R.mipmap.ic_launcher_round)
                     holder.imageView!!.setBackgroundColor(Color.parseColor("#77b3d4"))
                 }
                 "222" -> {
-                    holder.ll_main!!.setOnClickListener { doMethod("ll_main2") }
+                    holder.ll_main!!.setOnClickListener {
+                        sendClick(this@MainActivity.localClassName, "ll_main2")
+                        doMethod("ll_main2")
+                    }
                     holder.textView!!.text = getString(R.string.xjbxx)
                     holder.imageView!!.setImageResource(R.mipmap.ic_launcher_round)
                     holder.imageView!!.setBackgroundColor(Color.parseColor("#4f5d73"))
                 }
                 "223" -> {
-                    holder.ll_main!!.setOnClickListener { doMethod("ll_main3") }
+                    holder.ll_main!!.setOnClickListener {
+                        sendClick(this@MainActivity.localClassName, "ll_main3")
+                        doMethod("ll_main3")
+                    }
                     holder.textView!!.text = getString(R.string.gzdm)
                     holder.imageView!!.setImageResource(R.mipmap.ic_launcher_round)
                     holder.imageView!!.setBackgroundColor(Color.parseColor("#76c2af"))
                 }
                 "224" -> {
-                    holder.ll_main!!.setOnClickListener { doMethod("ll_main4") }
+                    holder.ll_main!!.setOnClickListener {
+                        sendClick(this@MainActivity.localClassName, "ll_main4")
+                        doMethod("ll_main4")
+                    }
                     holder.textView!!.text = getString(R.string.dtsj)
                     holder.imageView!!.setImageResource(R.mipmap.ic_launcher_round)
                     holder.imageView!!.setBackgroundColor(Color.parseColor("#77b3d4"))
                 }
                 "225" -> {
-                    holder.ll_main!!.setOnClickListener { doMethod("ll_main5") }
+                    holder.ll_main!!.setOnClickListener {
+                        sendClick(this@MainActivity.localClassName, "ll_main5")
+                        doMethod("ll_main5")
+                    }
                     holder.textView!!.text = getString(R.string.iotest)
                     holder.imageView!!.setImageResource(R.mipmap.ic_launcher_round)
                     holder.imageView!!.setBackgroundColor(Color.parseColor("#76c2af"))
                 }
                 "226" -> {
-                    holder.ll_main!!.setOnClickListener { doMethod("ll_main6") }
+                    holder.ll_main!!.setOnClickListener {
+                        sendClick(this@MainActivity.localClassName, "ll_main6")
+                        doMethod("ll_main6")
+                    }
                     holder.textView!!.text = getString(R.string.sxwj)
                     holder.imageView!!.setImageResource(R.mipmap.ic_launcher_round)
                     holder.imageView!!.setBackgroundColor(Color.parseColor("#76c2af"))

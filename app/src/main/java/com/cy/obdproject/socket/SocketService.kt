@@ -4,6 +4,8 @@ import android.app.Service
 import android.content.Intent
 import android.os.IBinder
 import android.util.Log
+import com.cy.obdproject.app.MyApp
+import com.cy.obdproject.base.BaseActivity
 import com.cy.obdproject.constant.Constant
 
 class SocketService : Service() {
@@ -50,7 +52,16 @@ class SocketService : Service() {
      */
     private fun createSocket() {
         msgClient = MySocketClient(Constant.mDstName, Constant.mDstPort)
-        Thread { msgClient!!.connect() }.start()
+        Thread {
+            try {
+                msgClient!!.connect()
+            } catch (e: Exception) {
+                (application as MyApp).activityList[(application as MyApp).activityList.size-1].runOnUiThread {
+                    ((application as MyApp).activityList[(application as MyApp).activityList.size-1] as BaseActivity).dismissProgressDialog()
+                }
+                Log.e("cyf", "SocketService 连接失败")
+            }
+        }.start()
         Log.e("cyf", "SocketService 开始连接")
     }
 

@@ -1,12 +1,15 @@
 package com.cy.obdproject.activity
 
 import android.os.Bundle
+import android.util.Log
 import com.cy.obdproject.R
 import com.cy.obdproject.adapter.BaseInfoAdapter
 import com.cy.obdproject.base.BaseActivity
 import com.cy.obdproject.bean.BaseInfoBean
+import com.cy.obdproject.bean.WebSocketBean
 import com.cy.obdproject.constant.ECUConstant
 import com.cy.obdproject.socket.SocketService
+import com.cy.obdproject.socket.WebSocketService
 import com.cy.obdproject.worker.BaseInfoWorker
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -30,41 +33,55 @@ class ReadBaseInfoActivity : BaseActivity(), BaseActivity.ClickMethoListener {
         list = ArrayList()
         readBaseInfoWorker = BaseInfoWorker()
         readBaseInfoWorker!!.init(this, ECUConstant.getReadBaseInfoData()) { data ->
-            try {
-                val mlist = Gson().fromJson<List<BaseInfoBean>>(data, object : TypeToken<ArrayList<BaseInfoBean>>() {}.type) as ArrayList<BaseInfoBean>?
-                list!!.clear()
-                list!!.addAll(mlist!!)
-                setData()
-            } catch (e: Exception) {
-                toast(data!!)
-            }
+            setData(data)
         }
         setClickMethod(iv_back)
         setClickMethod(tv_refresh)
     }
 
     private fun initData() {
-        if (SocketService.getIntance() != null && SocketService.getIntance()!!.isConnected()) {
-            showProgressDialog()
-            readBaseInfoWorker!!.start()
+        if (isProfessionalConnected) {// 专家连接
+            doMethod("tv_refresh")
         } else {
-            list!!.clear()
-            for (i in 0 until ECUConstant.getReadBaseInfoData().size) {
-                val bean = BaseInfoBean()
-                bean.name = ECUConstant.getReadBaseInfoData()[i].name
-                list!!.add(bean)
+            showProgressDialog()
+            if (SocketService.getIntance() != null && SocketService.getIntance()!!.isConnected()) {
+                readBaseInfoWorker!!.start()
+            } else {
+                list!!.clear()
+                for (i in 0 until ECUConstant.getReadBaseInfoData().size) {
+                    val bean = BaseInfoBean()
+                    bean.name = ECUConstant.getReadBaseInfoData()[i].name
+                    list!!.add(bean)
+                }
+                setData(Gson().toJson(list))
             }
-            setData()
         }
     }
 
-    private fun setData() {
+    override fun setData(data: String) {
+        Log.i("cyf", "data : $data")
         dismissProgressDialog()
-        if (baseInfoAdapter == null) {
-            baseInfoAdapter = BaseInfoAdapter(list!!, this@ReadBaseInfoActivity, 1)
-            listView!!.adapter = baseInfoAdapter
-        } else {
-            baseInfoAdapter!!.notifyDataSetChanged()
+        try {
+            val mlist = Gson().fromJson<List<BaseInfoBean>>(data, object : TypeToken<ArrayList<BaseInfoBean>>() {}.type) as ArrayList<BaseInfoBean>?
+            list!!.clear()
+            list!!.addAll(mlist!!)
+            if (baseInfoAdapter == null) {
+                baseInfoAdapter = BaseInfoAdapter(list!!, this@ReadBaseInfoActivity, 1)
+                listView!!.adapter = baseInfoAdapter
+            } else {
+                baseInfoAdapter!!.notifyDataSetChanged()
+            }
+            if (isUserConnected) {// 用户连接
+                val str = "{\"activity\":\"" + this@ReadBaseInfoActivity.localClassName + "\",\"method\":\"" + "setData" + "\",\"data\":\"" + Gson().toJson(list).replace("\"", "\\\"") + "\"}"
+                val webSocketBean = WebSocketBean()
+                webSocketBean.s = ""// 自己（专家）id
+                webSocketBean.r = ""// 连接用户id
+                webSocketBean.c = "D"
+                webSocketBean.d = str// 自定义的json串
+                WebSocketService.getIntance()!!.sendMsg(Gson().toJson(webSocketBean))
+            }
+        } catch (e: Exception) {
+            toast(data!!)
         }
     }
 
@@ -74,7 +91,9 @@ class ReadBaseInfoActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                 finish()
             }
             "tv_refresh" -> {
-                initData()
+                if (!isProfessionalConnected) {// 专家连接
+                    initData()
+                }
             }
         }
     }
