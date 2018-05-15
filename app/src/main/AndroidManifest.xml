@@ -32,7 +32,8 @@
         <activity android:name=".activity.DynamicDataActivity" />
         <activity android:name=".activity.IOTestActivity" />
         <activity android:name=".activity.MainActivity" />
-        <activity android:name=".activity.WriteDataActivity"></activity>
+        <activity android:name=".activity.WriteDataActivity" />
+        <activity android:name=".activity.DynamicData2Activity"></activity>
     </application>
 
 </manifest>

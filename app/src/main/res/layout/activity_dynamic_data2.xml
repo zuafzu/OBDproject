@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".activity.DynamicDataActivity">
+    tools:context=".activity.DynamicData2Activity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -57,18 +57,56 @@
         android:listSelector="@android:color/transparent"
         android:tag="listView" />
 
-    <Button
-        android:id="@+id/btn_next"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="38dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginTop="8dp"
-        android:background="@drawable/shape_btn_colorprimary"
-        android:tag="btn_next"
-        android:text="@string/next"
-        android:textAllCaps="false"
-        android:textColor="@android:color/white"
-        android:textSize="14sp" />
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btn_lastPage"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="38dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/shape_btn_colorhint"
+            android:tag="btn_lastPage"
+            android:text="@string/last_page"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:textSize="14sp" />
+        <Button
+            android:id="@+id/btn_start"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="38dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/shape_btn_colorprimary"
+            android:tag="btn_start"
+            android:text="@string/start"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:textSize="14sp" />
+        <Button
+            android:id="@+id/btn_nextPage"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="38dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/shape_btn_colorprimary"
+            android:tag="btn_nextPage"
+            android:text="@string/next_page"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:textSize="14sp" />
+    </LinearLayout>
+
 </LinearLayout>
