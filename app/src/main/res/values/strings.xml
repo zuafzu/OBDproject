@@ -11,6 +11,8 @@
     <string name="refresh">刷新</string>
     <string name="clean">清空数据</string>
 
+    <string name="write">开始刷写</string>
+
     <string name="next">下一步</string>
 
     <string name="last_page">上一页</string>
