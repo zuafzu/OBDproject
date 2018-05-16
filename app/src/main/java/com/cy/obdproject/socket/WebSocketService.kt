@@ -2,6 +2,7 @@ package com.cy.obdproject.socket
 
 import android.app.Service
 import android.content.Intent
+import android.os.Handler
 import android.os.IBinder
 import android.util.Log
 import com.cy.obdproject.app.MyApp
@@ -48,6 +49,13 @@ class WebSocketService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         Log.e("cyf", "WebSocketServie onDestroy")
+//        if ((application as MyApp).userType == Constant.userNormal) {
+//            // 用户退出
+//            sendMsg("{\"S\":\"user1\",\"R\":\"user\",\"C\":\"K\",\"D\":\"\"}")
+//        } else {
+//            // 专家退出
+//            sendMsg("{\"S\":\"zuser\",\"R\":\"user\",\"C\":\"K\",\"D\":\"\"}")
+//        }
         webSocketServie = null
         if (msgClient != null) {
             msgClient!!.close()
@@ -59,42 +67,76 @@ class WebSocketService : Service() {
      */
     private fun createWebSocket() {
         val map = HashMap<String, String>()
-        msgClient = object : MyWebSocketClient(URI("ws://10.133.73.112:8883/websocket"), Draft_17(), map, 12000) {
+        msgClient = object : MyWebSocketClient(URI(Constant.ws_url), Draft_17(), map, 12000) {
 
             override fun onMessage(message: String?) {
                 super.onMessage(message)
                 Log.e("cyf", message)
                 val webSocketBean = Gson().fromJson(message, WebSocketBean::class.java)
-                val jsonObject = JSONObject(webSocketBean.d.toString())
-                val activityName = jsonObject.opt("activity").toString()
-                if (WebSocketService.getIntance() != null && (application as MyApp).userType == Constant.userProfessional) {
-                    // 用户端传过来的信息处理显示数据的事件
-                    val data = jsonObject.opt("data").toString()
-//                    val method = jsonObject.opt("method").toString()
-//                    val clz = Class.forName("com.cy.obdproject.activity." + activityName.substring(9, activityName.length))
-//                    val obj = clz.newInstance()
-//                    val m = obj.javaClass.getDeclaredMethod(method, String::class.java)
-//                    m.invoke(obj, data) as String
-                    for (i in 0 until (application as MyApp).activityList.size) {
-                        if ((application as MyApp).activityList[i].localClassName.contains(activityName)) {
-                            ((application as MyApp).activityList[i] as BaseActivity).setData(data)
-                            break
+                if (webSocketBean.c == "D") {// 专家操作或普通用户反馈指令的透传
+                    if (webSocketBean.d.length == 1) {
+                        if (webSocketBean.d == "S") {
+                            // 透传发送成功
+                        } else {
+                            // 透传发送失败
+                        }
+                    } else {
+                        val jsonObject = JSONObject(webSocketBean.d.toString())
+                        val activityName = jsonObject.opt("activity").toString()
+                        if (WebSocketService.getIntance() != null && (application as MyApp).userType == Constant.userProfessional) {
+                            // 用户端传过来的信息处理显示数据的事件
+                            val data = jsonObject.opt("data").toString()
+                            for (i in 0 until (application as MyApp).activityList.size) {
+                                if ((application as MyApp).activityList[i].localClassName.contains(activityName)) {
+                                    ((application as MyApp).activityList[i] as BaseActivity).setData(data)
+                                    break
+                                }
+                            }
+                        }
+                        if (WebSocketService.getIntance() != null && (application as MyApp).userType == Constant.userNormal) {
+                            // 专家端传来的信息处理点击事件
+                            val tag = jsonObject.opt("tag").toString()
+                            for (i in 0 until (application as MyApp).activityList.size) {
+                                if ((application as MyApp).activityList[i].localClassName.contains(activityName)) {
+                                    ((application as MyApp).activityList[i] as BaseActivity).runOnUiThread {
+                                        ((application as MyApp).activityList[i] as BaseActivity.ClickMethoListener).doMethod(tag)
+                                    }
+                                    break
+                                }
+                            }
                         }
                     }
-                }
-                if (WebSocketService.getIntance() != null && (application as MyApp).userType == Constant.userNormal) {
-                    // 专家端传来的信息处理点击事件
-                    val tag = jsonObject.opt("tag").toString()
-                    for (i in 0 until (application as MyApp).activityList.size) {
-                        if ((application as MyApp).activityList[i].localClassName.contains(activityName)) {
-                            ((application as MyApp).activityList[i] as BaseActivity.ClickMethoListener).doMethod(tag)
-                            break
+                } else if (webSocketBean.c == "L") {//登录
+                    if (webSocketBean.d.length == 1) {
+                        if (webSocketBean.d == "S") {
+                            // 登录成功
+                        } else {
+                            // 登录失败
+                        }
+                    }
+                } else if (webSocketBean.c == "C") {//专家同意普通用户请求
+                    if (webSocketBean.d.length == 1) {
+                        if (webSocketBean.d == "S") {
+                            // 专家同意普通用户请求成功
+                        } else {
+                            // 专家同意普通用户请求失败
                         }
                     }
                 }
             }
         }
         msgClient!!.connect()
+        // 开始连接
+        // -----------------------------后期可优化---------------------------------
+        Handler().postDelayed({
+            if ((application as MyApp).userType == Constant.userNormal) {
+                // 用户登录
+                sendMsg("{\"S\":\"user1\",\"R\":\"\",\"C\":\"L\",\"D\":{\"T\":\"N\",\"P\":\"pwd\"}}")
+            } else {
+                // 专家同意普通用户请求
+                sendMsg("{\"S\":\"zuser\",\"R\":\"user1\",\"C\":\"C\",\"D\":\"user1\"}")
+            }
+        }, 3000)
         Log.e("cyf", "WebSocketServie 开始连接")
     }
 

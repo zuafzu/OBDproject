@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.WindowManager;
 
 import com.cy.obdproject.app.MyApp;
 import com.cy.obdproject.bean.WebSocketBean;
@@ -23,6 +24,7 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         myApp = (MyApp) getApplication();
         isUserConnected = WebSocketService.Companion.getIntance() != null &&
                 WebSocketService.Companion.getIntance().isConnected() &&
@@ -75,8 +77,13 @@ public class BaseActivity extends AppCompatActivity {
             // 点击事件的远程控制
             String str = "{\"activity\":\"" + className + "\",\"tag\":\"" + tag + "\"}";
             WebSocketBean webSocketBean = new WebSocketBean();
-            webSocketBean.setS("");// 自己（专家）id
-            webSocketBean.setR("");// 连接用户id
+
+            webSocketBean.setS("user1");// 自己（专家）id
+            webSocketBean.setR("zuser");// 连接用户id
+
+//            webSocketBean.setS("zuser");// 自己（专家）id
+//            webSocketBean.setR("user1");// 连接用户id
+
             webSocketBean.setC("D");
             webSocketBean.setD(str);// 自定义的json串
             WebSocketService.Companion.getIntance().sendMsg(new Gson().toJson(webSocketBean));

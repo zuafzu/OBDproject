@@ -56,10 +56,10 @@ class SocketService : Service() {
             try {
                 msgClient!!.connect()
             } catch (e: Exception) {
-                (application as MyApp).activityList[(application as MyApp).activityList.size-1].runOnUiThread {
-                    ((application as MyApp).activityList[(application as MyApp).activityList.size-1] as BaseActivity).dismissProgressDialog()
+                (application as MyApp).activityList[(application as MyApp).activityList.size - 1].runOnUiThread {
+                    ((application as MyApp).activityList[(application as MyApp).activityList.size - 1] as BaseActivity).dismissProgressDialog()
                 }
-                Log.e("cyf", "SocketService 连接失败")
+                Log.e("cyf", "SocketService 连接失败 " + e.message)
             }
         }.start()
         Log.e("cyf", "SocketService 开始连接")

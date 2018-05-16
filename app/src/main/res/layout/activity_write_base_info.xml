@@ -17,12 +17,12 @@
 
         <ImageView
             android:id="@+id/iv_back"
-            android:tag="iv_back"
             android:layout_width="44dp"
             android:layout_height="44dp"
             android:background="?android:attr/selectableItemBackground"
             android:padding="12dp"
             android:src="@mipmap/ic_back"
+            android:tag="iv_back"
             android:visibility="visible" />
 
         <TextView
@@ -31,29 +31,30 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="@string/djbxx"
+            android:text="@string/xjbxx"
             android:textColor="@android:color/white"
             android:textSize="18sp" />
 
         <TextView
-            android:tag="tv_refresh"
             android:id="@+id/tv_refresh"
             android:layout_width="wrap_content"
             android:layout_height="44dp"
             android:padding="12dp"
+            android:tag="tv_refresh"
             android:text="@string/refresh"
-            android:textColor="@android:color/white" />
+            android:textColor="@android:color/white"
+            android:visibility="invisible" />
 
     </LinearLayout>
 
     <ListView
         android:id="@+id/listView"
-        android:tag="listView"
-        android:listSelector="@android:color/transparent"
-        android:divider="@android:color/transparent"
-        android:dividerHeight="0dp"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"/>
+        android:layout_weight="1"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="0dp"
+        android:listSelector="@android:color/transparent"
+        android:tag="listView" />
 
 </LinearLayout>

@@ -3,6 +3,7 @@ package com.cy.obdproject.activity
 import android.os.Bundle
 import android.util.Log
 import com.cy.obdproject.R
+import com.cy.obdproject.R.id.*
 import com.cy.obdproject.adapter.BaseInfoAdapter
 import com.cy.obdproject.base.BaseActivity
 import com.cy.obdproject.bean.BaseInfoBean
@@ -59,29 +60,37 @@ class ReadBaseInfoActivity : BaseActivity(), BaseActivity.ClickMethoListener {
     }
 
     override fun setData(data: String) {
-        Log.i("cyf", "data : $data")
-        dismissProgressDialog()
-        try {
-            val mlist = Gson().fromJson<List<BaseInfoBean>>(data, object : TypeToken<ArrayList<BaseInfoBean>>() {}.type) as ArrayList<BaseInfoBean>?
-            list!!.clear()
-            list!!.addAll(mlist!!)
-            if (baseInfoAdapter == null) {
-                baseInfoAdapter = BaseInfoAdapter(list!!, this@ReadBaseInfoActivity, 1)
-                listView!!.adapter = baseInfoAdapter
-            } else {
-                baseInfoAdapter!!.notifyDataSetChanged()
+        runOnUiThread {
+            Log.i("cyf", "data : $data")
+            dismissProgressDialog()
+            try {
+                val mlist = Gson().fromJson<List<BaseInfoBean>>(data, object : TypeToken<ArrayList<BaseInfoBean>>() {}.type) as ArrayList<BaseInfoBean>?
+                list!!.clear()
+                list!!.addAll(mlist!!)
+                if (baseInfoAdapter == null) {
+                    baseInfoAdapter = BaseInfoAdapter(list!!, this@ReadBaseInfoActivity, 1)
+                    listView!!.adapter = baseInfoAdapter
+                } else {
+                    baseInfoAdapter!!.notifyDataSetChanged()
+                }
+                if (isUserConnected) {// 用户连接
+                    val str = "{\"activity\":\"" + this@ReadBaseInfoActivity.localClassName + "\",\"method\":\"" + "setData" + "\",\"data\":\"" + Gson().toJson(list).replace("\"", "\\\"") + "\"}"
+                    val webSocketBean = WebSocketBean()
+
+                    webSocketBean.s = "user1"// 自己（专家）id
+                    webSocketBean.r = "zuser"// 连接用户id
+
+//                    webSocketBean.s = "zuser"// 自己（专家）id
+//                    webSocketBean.r = "user1"// 连接用户id
+
+                    webSocketBean.c = "D"
+                    webSocketBean.d = str// 自定义的json串
+                    WebSocketService.getIntance()!!.sendMsg(Gson().toJson(webSocketBean))
+                }
+            } catch (e: Exception) {
+                Log.i("cyf", "e : ${e.message}")
+                toast(data!!)
             }
-            if (isUserConnected) {// 用户连接
-                val str = "{\"activity\":\"" + this@ReadBaseInfoActivity.localClassName + "\",\"method\":\"" + "setData" + "\",\"data\":\"" + Gson().toJson(list).replace("\"", "\\\"") + "\"}"
-                val webSocketBean = WebSocketBean()
-                webSocketBean.s = ""// 自己（专家）id
-                webSocketBean.r = ""// 连接用户id
-                webSocketBean.c = "D"
-                webSocketBean.d = str// 自定义的json串
-                WebSocketService.getIntance()!!.sendMsg(Gson().toJson(webSocketBean))
-            }
-        } catch (e: Exception) {
-            toast(data!!)
         }
     }
 

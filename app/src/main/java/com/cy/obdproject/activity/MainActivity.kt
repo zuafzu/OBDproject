@@ -8,7 +8,6 @@ import android.os.Handler
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,7 +16,6 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.cy.obdproject.R
 import com.cy.obdproject.base.BaseActivity
-import com.cy.obdproject.constant.Constant
 import com.cy.obdproject.socket.SocketService
 import com.cy.obdproject.socket.WebSocketService
 import com.cy.obdproject.tools.WifiTools
@@ -83,33 +81,52 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                     dismissProgressDialog()
                 } else {
                     // 建立热点
-                    if (wifiTools!!.setWifiApEnabled(true)) {
-                        Handler().postDelayed({
-                            // 获取ip地址
-                            Constant.mDstName = wifiTools!!.hotIp
-                            Log.e("cyf", "1111 " + Constant.mDstName)
-                            Log.i("cyf", "2222 " + wifiTools!!.hotIp)
-                            // 建立长连接
-                            startService(mIntent2)
-                            startWorker!!.init(this@MainActivity, { data ->
-                                dismissProgressDialog()
-                                tv_connnect_obd.text = "断开OBD"
-                                tv_obd_state.text = data
-                            })
-                            Handler().postDelayed({
-                                // 发送开始信息
-                                if (SocketService.getIntance() != null && SocketService.getIntance()!!.isConnected()) {
-                                    startWorker!!.start()
-                                } else {
-                                    tv_connnect_obd.text = "连接OBD"
-                                    tv_obd_state.text = "未连接"
-                                    stopService(mIntent2)
-                                }
-                            }, 2000)
-                        }, 5000)
-                    } else {
+
+                    // 建立长连接
+                    startService(mIntent2)
+                    startWorker!!.init(this@MainActivity, { data ->
                         dismissProgressDialog()
-                    }
+                        tv_connnect_obd.text = "断开OBD"
+                        tv_obd_state.text = data
+                    })
+                    Handler().postDelayed({
+                        // 发送开始信息
+                        if (SocketService.getIntance() != null && SocketService.getIntance()!!.isConnected()) {
+                            startWorker!!.start()
+                        } else {
+                            tv_connnect_obd.text = "连接OBD"
+                            tv_obd_state.text = "未连接"
+                            stopService(mIntent2)
+                        }
+                    }, 5000)
+
+//                    if (wifiTools!!.setWifiApEnabled(true)) {
+//                        Handler().postDelayed({
+//                            // 获取ip地址
+//                            Constant.mDstName = wifiTools!!.hotIp
+//                            Log.e("cyf", "1111 " + Constant.mDstName)
+//                            Log.i("cyf", "2222 " + wifiTools!!.hotIp)
+//                            // 建立长连接
+//                            startService(mIntent2)
+//                            startWorker!!.init(this@MainActivity, { data ->
+//                                dismissProgressDialog()
+//                                tv_connnect_obd.text = "断开OBD"
+//                                tv_obd_state.text = data
+//                            })
+//                            Handler().postDelayed({
+//                                // 发送开始信息
+//                                if (SocketService.getIntance() != null && SocketService.getIntance()!!.isConnected()) {
+//                                    startWorker!!.start()
+//                                } else {
+//                                    tv_connnect_obd.text = "连接OBD"
+//                                    tv_obd_state.text = "未连接"
+//                                    stopService(mIntent2)
+//                                }
+//                            }, 2000)
+//                        }, 10000)
+//                    } else {
+//                        dismissProgressDialog()
+//                    }
                 }
             }
             "tv_ycxz" -> {//远程协作

@@ -18,9 +18,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class BaseSocketWorker {
+public class WriteBaseInfoWorker {
 
-    private List<SocketBean> socketBeanList;
+    private SocketBean socketBean;
     private List<BaseInfoBean> baseInfoBeanList = new ArrayList<>();
 
     private final int timeOut = 3000;// 超时时间
@@ -34,11 +34,11 @@ public class BaseSocketWorker {
     private Handler handler;
     private Runnable runnable;
 
-    public void init(Activity activity, List<SocketBean> socketBeanList,SocketCallBack socketCallBack) {
+    public void init(Activity activity, SocketBean socketBean,SocketCallBack socketCallBack) {
         this.activity = activity;
-        this.socketBeanList = socketBeanList;
+        this.socketBean = socketBean;
         this.socketCallBack = socketCallBack;
-        handler = new android.os.Handler();
+        handler = new Handler();
         runnable = new Runnable() {
             @Override
             public void run() {
@@ -54,15 +54,15 @@ public class BaseSocketWorker {
                 sysTime2 = new Date().getTime();
                 if (sysTime2 - sysTime1 <= timeOut) {
                     String msg = ECUTools.getData(data,
-                            BaseSocketWorker.this.socketBeanList.get(index).getType(),
-                            BaseSocketWorker.this.socketBeanList.get(index).getKey());
+                            WriteBaseInfoWorker.this.socketBean.getType(),
+                            WriteBaseInfoWorker.this.socketBean.getKey());
                     if (msg.equals(ECUTools.ERR)) {
                         putData("返回数据异常");
                     } else if (msg.equals(ECUTools.WAIT)) {
                         startTime();
                     } else {
                         BaseInfoBean baseInfoBean = new BaseInfoBean();
-                        baseInfoBean.setName(BaseSocketWorker.this.socketBeanList.get(index).getName());
+                        baseInfoBean.setName(WriteBaseInfoWorker.this.socketBean.getName());
                         baseInfoBean.setValue(msg);
                         baseInfoBeanList.add(baseInfoBean);
                         index++;
@@ -94,22 +94,28 @@ public class BaseSocketWorker {
     }
 
     private void putData(final String msg) {
-        BaseSocketWorker.this.activity.runOnUiThread(new Runnable() {
+        WriteBaseInfoWorker.this.activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                BaseSocketWorker.this.socketCallBack.getData(msg);
+                WriteBaseInfoWorker.this.socketCallBack.getData(msg);
             }
         });
     }
 
     private void next() {
-        if (index < socketBeanList.size()) {
-            msg = ECUagreement.a(socketBeanList.get(index).getCanLinkNum(),
-                    socketBeanList.get(index).getCanId(),
-                    socketBeanList.get(index).getLength(),
-                    socketBeanList.get(index).getData());
+        if(index == 0){
+
+        }else if(index == 1){
+
+        }else if(index == 3){
+
+        }else if(index == 4){
+            msg = ECUagreement.a(socketBean.getCanLinkNum(),
+                    socketBean.getCanId(),
+                    socketBean.getLength(),
+                    socketBean.getData());
             replay();
-        }else{
+        }else {
             putData(new Gson().toJson(baseInfoBeanList));
         }
     }
