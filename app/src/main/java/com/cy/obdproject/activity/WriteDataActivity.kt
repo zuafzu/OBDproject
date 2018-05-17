@@ -1,18 +1,14 @@
 package com.cy.obdproject.activity
 
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import com.cy.obdproject.R
-import com.cy.obdproject.adapter.BaseInfoAdapter
 import com.cy.obdproject.adapter.WriteDataAdapter
 import com.cy.obdproject.base.BaseActivity
-import com.cy.obdproject.bean.BaseInfoBean
 import com.cy.obdproject.bean.WriteDataBean
 import kotlinx.android.synthetic.main.activity_write_data.*
 import org.jetbrains.anko.toast
 
 class WriteDataActivity : BaseActivity(), BaseActivity.ClickMethoListener {
-
 
     private var list: ArrayList<WriteDataBean>? = null
     private var adapter: WriteDataAdapter? = null

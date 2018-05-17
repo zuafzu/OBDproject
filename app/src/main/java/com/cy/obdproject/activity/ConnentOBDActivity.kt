@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.view.View
 import com.cy.obdproject.R
-import com.cy.obdproject.R.id.*
 import com.cy.obdproject.base.BaseActivity
 import com.cy.obdproject.constant.Constant
 import com.cy.obdproject.socket.SocketService
@@ -15,7 +14,6 @@ import com.cy.obdproject.tools.WifiTools
 import com.cy.obdproject.worker.OBDStart1Worker
 import kotlinx.android.synthetic.main.activity_connent_obd.*
 import org.jetbrains.anko.toast
-
 
 class ConnentOBDActivity : BaseActivity(), BaseActivity.ClickMethoListener {
     private var mIntent2: Intent? = null

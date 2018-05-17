@@ -1,22 +1,13 @@
 package com.cy.obdproject.activity
 
-import android.content.Context
 import android.os.Bundle
-import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.AdapterView
-import android.widget.BaseAdapter
-import android.widget.TextView
+import android.widget.ArrayAdapter
 import com.cy.obdproject.R
 import com.cy.obdproject.base.BaseActivity
 import com.cy.obdproject.bean.IOTestBean
 import kotlinx.android.synthetic.main.activity_iotest2.*
-import android.widget.ArrayAdapter
-
-
-
 
 class IOTest2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
 

@@ -41,8 +41,6 @@ class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
                     btn_nextPage.isEnabled = false
                     btn_lastPage.setBackgroundResource(R.drawable.shape_btn_colorhint)
                     btn_nextPage.setBackgroundResource(R.drawable.shape_btn_colorhint)
-                } else {
-
                 }
                 if (adapter == null) {
                     adapter = ControlDynamicDataAdapter(listData!!, this)

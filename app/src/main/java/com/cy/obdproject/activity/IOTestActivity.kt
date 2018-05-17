@@ -7,7 +7,6 @@ import com.cy.obdproject.adapter.IOTestAdapter
 import com.cy.obdproject.base.BaseActivity
 import com.cy.obdproject.bean.IOTestBean
 import kotlinx.android.synthetic.main.activity_iotest.*
-import org.jetbrains.anko.toast
 
 class IOTestActivity : BaseActivity(), BaseActivity.ClickMethoListener {
 
@@ -25,7 +24,6 @@ class IOTestActivity : BaseActivity(), BaseActivity.ClickMethoListener {
 
         list = ArrayList()
         for (i in 0 until 10){
-
             var bean = IOTestBean(""+i,"65摄氏度")
             list!!.add(bean)
         }

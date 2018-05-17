@@ -2,9 +2,7 @@ package com.cy.obdproject.activity
 
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.util.Log
-import android.view.View
 import com.cy.obdproject.R
 import com.cy.obdproject.app.MyApp
 import com.cy.obdproject.base.BaseActivity
@@ -67,6 +65,7 @@ class LoginActivity : BaseActivity(), BaseActivity.ClickMethoListener {
             SPTools.put(this@LoginActivity, Constant.USERNAME, "" + et_name.text.toString())
             SPTools.put(this@LoginActivity, Constant.TOKEN, "" + loginBean.token)
             SPTools.put(this@LoginActivity, Constant.USERID, "" + loginBean.userId)
+
             var intent = Intent(Intent(this@LoginActivity, SelectRoleActivity::class.java))
             intent.putExtra("userType", "" + loginBean.userType)
             startActivity(intent)

@@ -23,7 +23,6 @@ import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.activity_write_base_info.*
 import org.jetbrains.anko.toast
 
-
 class WriteBaseInfoActivity : BaseActivity(), BaseActivity.ClickMethoListener, AdapterView.OnItemClickListener {
 
     private var readBaseInfoWorker: BaseInfoWorker? = null

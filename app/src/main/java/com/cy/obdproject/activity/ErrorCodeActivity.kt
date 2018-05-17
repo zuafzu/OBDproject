@@ -24,7 +24,6 @@ class ErrorCodeActivity : BaseActivity(), BaseActivity.ClickMethoListener {
 
         list = ArrayList()
         for (i in 0 until 10) {
-
             var bean = ErrorCodeBean("水温", "65摄氏度")
             list!!.add(bean)
         }

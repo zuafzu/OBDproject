@@ -31,7 +31,12 @@ class SelectSystemActivity : BaseActivity(), BaseActivity.ClickMethoListener {
 
         setClickMethod(iv_back)
         list = ArrayList()
-        list!!.add("整车控制系统")
+        if ("1" == SPTools[this@SelectSystemActivity,Constant.CARTYPE,""]){
+            list!!.add("整车控制系统")
+
+        }else if ("2" == SPTools[this@SelectSystemActivity,Constant.CARTYPE,""]){
+            list!!.add("电动助力转向系统")
+        }
 
         if (adapter == null) {
             adapter = SelectAdapter(list!!, this)

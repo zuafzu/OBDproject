@@ -29,21 +29,66 @@
         <service android:name=".socket.WebSocketService" />
         <service android:name=".socket.SocketService" />
 
-        <activity android:name=".activity.MainTestActivity" />
-        <activity android:name=".activity.ReadBaseInfoActivity" />
-        <activity android:name=".activity.WriteBaseInfoActivity" />
-        <activity android:name=".activity.ErrorCodeActivity" />
-        <activity android:name=".activity.DynamicDataActivity" />
-        <activity android:name=".activity.IOTestActivity" />
-        <activity android:name=".activity.MainActivity" />
-        <activity android:name=".activity.WriteDataActivity" />
-        <activity android:name=".activity.DynamicData2Activity" />
-        <activity android:name=".activity.IOTest2Activity" />
-        <activity android:name=".activity.SelectRoleActivity" />
-        <activity android:name=".activity.SelectCarTypeActivity" />
-        <activity android:name=".activity.SelectSystemActivity" />
-        <activity android:name=".activity.ConnentOBDActivity" />
-        <activity android:name=".activity.RequestListActivity"></activity>
+        <activity
+            android:name=".activity.MainTestActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustPan" />
+        <activity
+            android:name=".activity.ReadBaseInfoActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustPan" />
+        <activity
+            android:name=".activity.WriteBaseInfoActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustPan" />
+        <activity
+            android:name=".activity.ErrorCodeActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustPan" />
+        <activity
+            android:name=".activity.DynamicDataActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustPan" />
+        <activity
+            android:name=".activity.IOTestActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustPan" />
+        <activity
+            android:name=".activity.MainActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustPan" />
+        <activity
+            android:name=".activity.WriteDataActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustPan" />
+        <activity
+            android:name=".activity.DynamicData2Activity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustPan" />
+        <activity
+            android:name=".activity.IOTest2Activity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustPan" />
+        <activity
+            android:name=".activity.SelectRoleActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustPan" />
+        <activity
+            android:name=".activity.SelectCarTypeActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustPan" />
+        <activity
+            android:name=".activity.SelectSystemActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustPan" />
+        <activity
+            android:name=".activity.ConnentOBDActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustPan" />
+        <activity
+            android:name=".activity.RequestListActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustPan" />
     </application>
 
 </manifest>

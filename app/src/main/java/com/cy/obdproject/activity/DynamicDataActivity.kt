@@ -2,7 +2,6 @@ package com.cy.obdproject.activity
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import com.cy.obdproject.R
 import com.cy.obdproject.adapter.DynamicDataAdapter
 import com.cy.obdproject.base.BaseActivity
@@ -27,7 +26,7 @@ class DynamicDataActivity : BaseActivity(), BaseActivity.ClickMethoListener {
         list = ArrayList()
         for (i in 0 until 50) {
 
-            var bean = DynamicDataBean("" + i, "65摄氏度", "" + i,"0")
+            var bean = DynamicDataBean("" + i, "65摄氏度", "" + i, "0")
             list!!.add(bean)
         }
 
@@ -63,7 +62,7 @@ class DynamicDataActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                         }
                     }
                     var intent = Intent(this@DynamicDataActivity, DynamicData2Activity::class.java)
-                    intent.putExtra("listData",listData)
+                    intent.putExtra("listData", listData)
                     startActivity(intent)
 
                 } else {

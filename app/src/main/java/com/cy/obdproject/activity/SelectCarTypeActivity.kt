@@ -1,11 +1,8 @@
 package com.cy.obdproject.activity
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import com.cy.obdproject.R
 import com.cy.obdproject.adapter.SelectAdapter
 import com.cy.obdproject.base.BaseActivity
@@ -50,6 +47,7 @@ class SelectCarTypeActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                 SPTools.put(this@SelectCarTypeActivity, Constant.CARTYPE, "2")
             }
             SPTools.put(this@SelectCarTypeActivity, Constant.CARNAME, list!![position])
+
 
             startActivity(Intent(this@SelectCarTypeActivity, SelectSystemActivity::class.java))
         }
