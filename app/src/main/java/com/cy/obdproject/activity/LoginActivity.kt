@@ -62,12 +62,13 @@ class LoginActivity : BaseActivity(), BaseActivity.ClickMethoListener {
         map["pwd"] = pwd
         NetTools.net(map, Urls().auth_login, this) { response ->
             Log.e("zj", "auth_login = " + response.data)
-           var loginBean = Gson().fromJson(response.data, LoginBean::class.java)
+            var loginBean = Gson().fromJson(response.data, LoginBean::class.java)
 
-            SPTools.put(this@LoginActivity, Constant.TOKEN, ""+loginBean.token)
-            SPTools.put(this@LoginActivity, Constant.USERID, ""+loginBean.userId)
+            SPTools.put(this@LoginActivity, Constant.USERNAME, "" + et_name.text.toString())
+            SPTools.put(this@LoginActivity, Constant.TOKEN, "" + loginBean.token)
+            SPTools.put(this@LoginActivity, Constant.USERID, "" + loginBean.userId)
             var intent = Intent(Intent(this@LoginActivity, SelectRoleActivity::class.java))
-            intent.putExtra("userType",""+loginBean.userType)
+            intent.putExtra("userType", "" + loginBean.userType)
             startActivity(intent)
             finish()
         }

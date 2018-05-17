@@ -127,5 +127,4 @@ public class MainTestActivity extends BaseActivity implements BaseActivity.Click
         stopService(mIntent1);
         stopService(mIntent2);
     }
-
 }

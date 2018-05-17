@@ -36,7 +36,7 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
     private var startWorker: OBDStart1Worker? = null
     private var wifiTools: WifiTools? = null
 
-    var items = ""
+    var items = "221,222,223,224,225,226"
     var homes: List<String>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -83,6 +83,8 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
         setClickMethod(ibtn_setting)
 
         tv_title.text = getString(R.string.app_name)
+        tv_username.text = SPTools[this@MainActivity, Constant.USERNAME, ""].toString()
+        tv_carName.text = SPTools[this@MainActivity, Constant.CARNAME, ""].toString()
         homes = ArrayList()
         if ("1" == SPTools[this@MainActivity, Constant.CARTYPE, ""]) {
             items = "221,222,223,224,225"
@@ -157,10 +159,6 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
             return true
         }
         return super.onKeyDown(keyCode, event)
-    }
-
-    override fun onBackPressed() {
-
     }
 
     internal inner class HomeAdapter : RecyclerView.Adapter<HomeAdapter.MyViewHolder>() {

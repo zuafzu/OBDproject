@@ -57,7 +57,7 @@
     <LinearLayout
         android:id="@+id/iv_head"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="130dp"
         android:layout_below="@+id/ll_toolsbar"
         android:layout_marginBottom="8dp"
         android:layout_marginLeft="16dp"
@@ -92,14 +92,48 @@
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:gravity="center_vertical"
-                        android:text="用户名："
+                        android:text="车型："
                         android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tv_carName"
+                        android:tag="tv_carName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical"
+                        android:text="" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_marginBottom="2dp"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:gravity="center_vertical"
-                        android:text="张三" />
+                        android:text="用户名："
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tv_username"
+                        android:tag="tv_username"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical"
+                        android:text="" />
                 </LinearLayout>
 
                 <TextView
@@ -441,7 +475,6 @@
                 </LinearLayout>
 
             </LinearLayout>
-
         </LinearLayout>
 
     </ScrollView>

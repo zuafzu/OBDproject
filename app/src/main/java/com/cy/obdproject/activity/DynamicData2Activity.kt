@@ -11,6 +11,7 @@ import android.widget.TextView
 import com.cy.obdproject.R
 import com.cy.obdproject.base.BaseActivity
 import com.cy.obdproject.bean.DynamicDataBean
+import com.cy.obdproject.constant.Constant
 import kotlinx.android.synthetic.main.activity_dynamic_data2.*
 
 class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
@@ -60,7 +61,7 @@ class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
                 finish()
             }
             "btn_lastPage" -> {
-                if (pageCount > 1 && index > 0) {
+                if (pageCount > 1 && Constant.pageSize > 0) {
                     preView()
                 }
             }
@@ -68,31 +69,30 @@ class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
                 if (pageCount > 1) {
                     nextView()
                 }
-
             }
             "btn_start" -> {
-
+                Log.e("zj", "当前页 List = " + getPageList(listData!!, Constant.pageSize)[Constant.pageIndex])
             }
         }
     }
 
-    fun preView() {
-        index--
+    private fun preView() {
+        Constant.pageIndex--
         // 检查Button是否可用。
         checkButton()
     }
 
     // 点击右边的Button，表示向后翻页，索引值要加1.
-    fun nextView() {
-        index++
+    private fun nextView() {
+        Constant.pageIndex++
         // 检查Button是否可用。
         checkButton()
     }
 
-    fun checkButton() {
+    private fun checkButton() {
         // 索引值小于等于0，表示不能向前翻页了，以经到了第一页了。
         // 将向前翻页的按钮设为不可用。
-        if (index <= 0) {
+        if (Constant.pageIndex <= 0) {
             btn_lastPage.isEnabled = false
             btn_lastPage.setBackgroundResource(R.drawable.shape_btn_colorhint)
         } else {
@@ -102,7 +102,7 @@ class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
         }
         // 值的长度减去前几页的长度，剩下的就是这一页的长度，如果这一页的长度比View_Count小，表示这是最后的一页了，后面在没有了。
         // 将向后翻页的按钮设为不可用。
-        if (listData!!.size - index * VIEW_COUNT <= VIEW_COUNT) {
+        if (listData!!.size - Constant.pageIndex * Constant.pageSize <= Constant.pageSize) {
             btn_nextPage.isEnabled = false
             btn_nextPage.setBackgroundResource(R.drawable.shape_btn_colorhint)
         } else {
@@ -110,26 +110,26 @@ class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
             btn_nextPage.setBackgroundResource(R.drawable.shape_btn_colorprimary)
         }// 否则将2个按钮都设为可用的。
         // 刷新ListView里面的数值。
-        if (listData!!.size - index * VIEW_COUNT > 0) {
+        if (listData!!.size - Constant.pageIndex * Constant.pageSize > 0) {
             adapter!!.notifyDataSetChanged()
         }
     }
 
-    var VIEW_COUNT = 10
-    // 用于显示页号的索引
-    var index = 0
+//    var VIEW_COUNT = 10
+//    // 用于显示页号的索引
+//    var index = 0
 
     inner class ControlDynamicDataAdapter(private val items: ArrayList<DynamicDataBean>, private val context: Context) : BaseAdapter() {
 
         override fun getCount(): Int {
             // ori表示到目前为止的前几页的总共的个数。
-            val ori = VIEW_COUNT * index
+            val ori = Constant.pageSize * Constant.pageIndex
 
             // 值的总个数-前几页的个数就是这一页要显示的个数，如果比默认的值小，说明这是最后一页，只需显示这么多就可以了
-            return if (items!!.size - ori < VIEW_COUNT) {
+            return if (items!!.size - ori < Constant.pageSize) {
                 items!!.size - ori
             } else {
-                VIEW_COUNT
+                Constant.pageSize
             }// 如果比默认的值还要大，说明一页显示不完，还要用换一页显示，这一页用默认的值显示满就可以了。
         }
 
@@ -156,8 +156,8 @@ class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
                 holder = convertView.tag as Holder
             }
 
-            holder.tv_name!!.text = items.get(position + index * VIEW_COUNT).name
-            holder.tv_value!!.text = items.get(position + index * VIEW_COUNT).value
+            holder.tv_name!!.text = items.get(position + Constant.pageIndex * Constant.pageSize).name
+            holder.tv_value!!.text = items.get(position + Constant.pageIndex * Constant.pageSize).value
 
             //        if (position != (getCount() - 1)) {
             //            holder.view_line.setVisibility(View.VISIBLE);
@@ -172,5 +172,22 @@ class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
             var tv_value: TextView? = null
             var view_line: View? = null
         }
+    }
+
+    private fun getPageList(targe: ArrayList<DynamicDataBean>, size: Int): ArrayList<ArrayList<DynamicDataBean>> {
+        val listArr = ArrayList<ArrayList<DynamicDataBean>>()
+        //获取被拆分的数组个数
+        val arrSize = if (targe.size % size === 0) targe.size / size else targe.size / size + 1
+        for (i in 0 until arrSize) {
+            val sub = ArrayList<DynamicDataBean>()
+            //把指定索引数据放入到list中
+            for (j in i * size until size * (i + 1)) {
+                if (j <= targe.size - 1) {
+                    sub.add(targe[j])
+                }
+            }
+            listArr.add(sub)
+        }
+        return listArr
     }
 }

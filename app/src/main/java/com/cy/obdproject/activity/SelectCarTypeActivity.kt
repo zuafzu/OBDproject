@@ -33,7 +33,6 @@ class SelectCarTypeActivity : BaseActivity(), BaseActivity.ClickMethoListener {
         INSTANCE = this
 
         list = ArrayList()
-
         list!!.add("红旗EV")
         list!!.add("红旗HS5")
 
@@ -50,6 +49,8 @@ class SelectCarTypeActivity : BaseActivity(), BaseActivity.ClickMethoListener {
             } else if (position == 1) {
                 SPTools.put(this@SelectCarTypeActivity, Constant.CARTYPE, "2")
             }
+            SPTools.put(this@SelectCarTypeActivity, Constant.CARNAME, list!![position])
+
             startActivity(Intent(this@SelectCarTypeActivity, SelectSystemActivity::class.java))
         }
     }

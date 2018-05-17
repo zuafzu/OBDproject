@@ -7,11 +7,16 @@ public class Constant {
 
     public static final String TOKEN = "token";
 
-    public static String ISLOGIN = "isLogin";
-    public static String USERTYPE = "userType";
-    public static String USERID = "userId";
-    public static String CARTYPE = "carType";//1 红旗EV 2 红旗HS5
+    public static final String ISLOGIN = "isLogin";
+    public static final String USERTYPE = "userType";
+    public static final String USERID = "userId";
+    public static final String CARTYPE = "carType";//1 红旗EV 2 红旗HS5
+    public static final String CARNAME = "carName";
 
+    public static final String USERNAME = "userName";
+
+    public static int pageSize = 10;
+    public static int pageIndex = 0;
 
     public static final String ws_url = "ws://47.104.212.193:2012";//ws://10.133.73.204:2012
 
