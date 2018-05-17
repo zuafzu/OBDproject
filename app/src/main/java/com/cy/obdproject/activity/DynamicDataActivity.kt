@@ -56,7 +56,6 @@ class DynamicDataActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                 var listData = ArrayList<DynamicDataBean>()
                 if (list!!.size > 0) {
                     for (i in 0 until list!!.size) {
-
                         if (list!![i].isSelect == "1") {
                             listData.add(list!![i])
                         }

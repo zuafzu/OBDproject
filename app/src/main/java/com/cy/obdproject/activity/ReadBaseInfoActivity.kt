@@ -3,7 +3,6 @@ package com.cy.obdproject.activity
 import android.os.Bundle
 import android.util.Log
 import com.cy.obdproject.R
-import com.cy.obdproject.R.id.*
 import com.cy.obdproject.adapter.BaseInfoAdapter
 import com.cy.obdproject.base.BaseActivity
 import com.cy.obdproject.bean.BaseInfoBean

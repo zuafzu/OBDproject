@@ -61,7 +61,6 @@ public class NetTools {
         Log.e("zj", "net url = " + url);
         Log.e("zj", "net token = " + SPTools.INSTANCE.get(context, Constant.TOKEN, ""));
 
-
         RequestCall call = OkHttpUtils.postString().url(url)
                 .addHeader(Constant.TOKEN, (String) SPTools.INSTANCE.get(context, Constant.TOKEN, ""))
                 .mediaType(MediaType.parse("application/json"))
@@ -83,7 +82,7 @@ public class NetTools {
                 JSONObject jsonObject = new JSONObject(json);
                 BaseBean bean = new BaseBean();
                 bean.setCode(jsonObject.optString("code"));
-                bean.setMsg(jsonObject.optString("message"));
+                bean.setMsg(jsonObject.optString("msg"));
                 String json2 = jsonObject.optString("data");
                 if (!"".equals(json2) && !"{}".equals(json2) && !"{ }".equals(json2)) {
                     bean.setData(json2);

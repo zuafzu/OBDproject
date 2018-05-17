@@ -48,7 +48,6 @@ class SelectCarTypeActivity : BaseActivity(), BaseActivity.ClickMethoListener {
             }
             SPTools.put(this@SelectCarTypeActivity, Constant.CARNAME, list!![position])
 
-
             startActivity(Intent(this@SelectCarTypeActivity, SelectSystemActivity::class.java))
         }
     }

@@ -50,7 +50,6 @@ class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
                 }
             }
         }
-
     }
 
     override fun doMethod(string: String?) {

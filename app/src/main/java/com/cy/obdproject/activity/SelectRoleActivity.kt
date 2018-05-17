@@ -12,7 +12,7 @@ import kotlinx.android.synthetic.main.activity_select_role.*
 
 class SelectRoleActivity : BaseActivity(), BaseActivity.ClickMethoListener {
 
-    private var list = ArrayList<String>()
+    private var list: ArrayList<String>? = null
     private var adapter: SelectAdapter? = null
 
     companion object {
@@ -30,28 +30,28 @@ class SelectRoleActivity : BaseActivity(), BaseActivity.ClickMethoListener {
 
         setClickMethod(iv_back)
 
-        if (intent.hasExtra("userType")) {
-            var userType = intent.getStringExtra("userType")
-            list.addAll(userType.toLowerCase().replace("s", "受控端").replace("z", "专家端").split(","))
-        }
+        if (intent.hasExtra("list")) {
+            list = intent.getStringArrayListExtra("list")
 
-        if (adapter == null) {
-            adapter = SelectAdapter(list, this)
-            listView!!.adapter = adapter
-        } else {
-            adapter!!.notifyDataSetChanged()
-        }
-
-        listView.setOnItemClickListener { _, _, position, id ->
-            if ("受控端" == list!![position].toString()) {
-                SPTools.put(this@SelectRoleActivity, Constant.USERTYPE, Constant.userNormal)
-                startActivity(Intent(this@SelectRoleActivity, SelectCarTypeActivity::class.java))
-            } else if ("专家端" == list[position].toString()) {
-                SPTools.put(this@SelectRoleActivity, Constant.USERTYPE, Constant.userProfessional)
-                startActivity(Intent(this@SelectRoleActivity, RequestListActivity::class.java))
+            if (adapter == null) {
+                adapter = SelectAdapter(list, this)
+                listView!!.adapter = adapter
+            } else {
+                adapter!!.notifyDataSetChanged()
             }
 
+            listView.setOnItemClickListener { _, _, position, id ->
+                if ("受控端" == list!![position].toString()) {
+                    SPTools.put(this@SelectRoleActivity, Constant.USERTYPE, Constant.userNormal)
+                    startActivity(Intent(this@SelectRoleActivity, SelectCarTypeActivity::class.java))
+                } else if ("专家端" == list!![position].toString()) {
+                    SPTools.put(this@SelectRoleActivity, Constant.USERTYPE, Constant.userProfessional)
+                    startActivity(Intent(this@SelectRoleActivity, RequestListActivity::class.java))
+                }
+
+            }
         }
+
     }
 
     override fun doMethod(string: String?) {

@@ -66,10 +66,29 @@ class LoginActivity : BaseActivity(), BaseActivity.ClickMethoListener {
             SPTools.put(this@LoginActivity, Constant.TOKEN, "" + loginBean.token)
             SPTools.put(this@LoginActivity, Constant.USERID, "" + loginBean.userId)
 
-            var intent = Intent(Intent(this@LoginActivity, SelectRoleActivity::class.java))
-            intent.putExtra("userType", "" + loginBean.userType)
-            startActivity(intent)
-            finish()
+            var list = ArrayList<String>()
+            list.addAll(loginBean.userType.toLowerCase().replace("s", "受控端").replace("z", "专家端").split(","))
+
+            if (list.size == 1) {
+                if ("受控端" == list!![0]) {
+                    SPTools.put(this@LoginActivity, Constant.USERTYPE, Constant.userNormal)
+                    startActivity(Intent(this@LoginActivity, SelectCarTypeActivity::class.java))
+                } else if ("专家端" == list[0]) {
+                    SPTools.put(this@LoginActivity, Constant.USERTYPE, Constant.userProfessional)
+                    startActivity(Intent(this@LoginActivity, RequestListActivity::class.java))
+                }
+                finish()
+
+            } else if (list.size > 1) {
+                var intent = Intent(Intent(this@LoginActivity, SelectRoleActivity::class.java))
+                intent.putExtra("list", list)
+                startActivity(intent)
+                finish()
+            } else {
+                toast("返回角色信息错误")
+            }
+
+
         }
     }
 
