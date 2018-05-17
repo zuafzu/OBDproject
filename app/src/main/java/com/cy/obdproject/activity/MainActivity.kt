@@ -137,6 +137,7 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                     for (i in 0 until (application as MyApp).activityList.size) {
                         (application as MyApp).activityList[i].finish()
                     }
+                    startActivity(Intent(this@MainActivity, LoginActivity::class.java))
                 }.setNegativeButton("取消") { _, _ -> }.show()
             }
         }
