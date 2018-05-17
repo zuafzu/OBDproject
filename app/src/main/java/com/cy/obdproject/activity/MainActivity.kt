@@ -130,7 +130,6 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
             "ll_main6" -> {
                 startActivity(Intent(this@MainActivity, WriteDataActivity::class.java))
             }
-
             "ibtn_setting" -> {
                 AlertDialog.Builder(this).setTitle("提示").setMessage("确认退出当前账号？").setPositiveButton("确认") { _, _ ->
                     SPTools.clear(this@MainActivity)

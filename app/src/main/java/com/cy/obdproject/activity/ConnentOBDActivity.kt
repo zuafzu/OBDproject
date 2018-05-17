@@ -85,6 +85,11 @@ class ConnentOBDActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                 if (SocketService.getIntance() != null && SocketService.getIntance()!!.isConnected()) {
                     stopService(mIntent2)
                 } else {
+                    //
+                    if (!wifiTools!!.isWifiApEnabled) {
+                        toast("请先开启热点")
+                        return
+                    }
                     // 建立长连接
                     if (!StringTools.isIP(et_input_ip.text.toString())) {
                         toast("IP地址格式不正确")
