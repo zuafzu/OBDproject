@@ -65,10 +65,14 @@ public class OBDStart1Worker {
 
     private void replay() {
         Log.e("cyf", "发送信息 : " + msg);
-        SocketService.Companion.getIntance().sendMsg(StringTools.hex2byte(msg), connectLinstener);
-        sysTime1 = new Date().getTime();
-        sysTime2 = 0L;
-        handler.postDelayed(runnable, timeOut);
+        if(SocketService.Companion.getIntance()!=null && SocketService.Companion.getIntance().isConnected()){
+            SocketService.Companion.getIntance().sendMsg(StringTools.hex2byte(msg), connectLinstener);
+            sysTime1 = new Date().getTime();
+            sysTime2 = 0L;
+            handler.postDelayed(runnable, timeOut);
+        }else{
+            putData("OBD未连接");
+        }
     }
 
     private void putData(final String msg) {
@@ -93,11 +97,11 @@ public class OBDStart1Worker {
                 replay();
                 break;
             case 2:
-                msg = OBDagreement.c("10", "c6dc0000", "0019f5f4");
+                msg = OBDagreement.c("10", "FC600000", "01000000");
                 replay();
                 break;
             case 3:
-                msg = OBDagreement.d("10", "18da00fa", "18dafa00");
+                msg = OBDagreement.d("10", "000007E3", "000007EB");
                 replay();
                 break;
             case 4:

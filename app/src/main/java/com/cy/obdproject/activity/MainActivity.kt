@@ -46,10 +46,12 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
 
     override fun onResume() {
         super.onResume()
-        if (wifiTools!!.wifiAPState == -1) {
-            tv_connnect_obd.text = "开启热点"
+        if (SocketService.getIntance() != null && SocketService.getIntance()!!.isConnected()) {
+            tv_obd_state.text = "已连接"
+            tv_connnect_obd.text = "断开OBD"
         } else {
-
+            tv_obd_state.text = "未连接"
+            tv_connnect_obd.text = "连接OBD"
         }
     }
 
@@ -80,64 +82,6 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
         when (string) {
             "tv_connnect_obd" -> {//连接obd
                 startActivity(Intent(this@MainActivity, ConnentOBDActivity::class.java))
-
-
-//                showProgressDialog()
-//                if ("断开OBD" == tv_connnect_obd.text) {
-//                    tv_connnect_obd.text = "连接OBD"
-//                    tv_obd_state.text = "未连接"
-//                    stopService(mIntent2)
-//                    dismissProgressDialog()
-//                } else {
-//                    // 建立热点
-//
-//                    // 建立长连接
-
-//                    startService(mIntent2)
-//                    startWorker!!.init(this@MainActivity, { data ->
-//                        dismissProgressDialog()
-//                        tv_connnect_obd.text = "断开OBD"
-//                        tv_obd_state.text = data
-//                    })
-//                    Handler().postDelayed({
-//                        // 发送开始信息
-//                        if (SocketService.getIntance() != null && SocketService.getIntance()!!.isConnected()) {
-//                            startWorker!!.start()
-//                        } else {
-//                            tv_connnect_obd.text = "连接OBD"
-//                            tv_obd_state.text = "未连接"
-//                            stopService(mIntent2)
-//                        }
-//                    }, 5000)
-
-//                    if (wifiTools!!.setWifiApEnabled(true)) {
-//                        Handler().postDelayed({
-//                            // 获取ip地址
-//                            Constant.mDstName = wifiTools!!.hotIp
-//                            Log.e("cyf", "1111 " + Constant.mDstName)
-//                            Log.i("cyf", "2222 " + wifiTools!!.hotIp)
-//                            // 建立长连接
-//                            startService(mIntent2)
-//                            startWorker!!.init(this@MainActivity, { data ->
-//                                dismissProgressDialog()
-//                                tv_connnect_obd.text = "断开OBD"
-//                                tv_obd_state.text = data
-//                            })
-//                            Handler().postDelayed({
-//                                // 发送开始信息
-//                                if (SocketService.getIntance() != null && SocketService.getIntance()!!.isConnected()) {
-//                                    startWorker!!.start()
-//                                } else {
-//                                    tv_connnect_obd.text = "连接OBD"
-//                                    tv_obd_state.text = "未连接"
-//                                    stopService(mIntent2)
-//                                }
-//                            }, 2000)
-//                        }, 10000)
-//                    } else {
-//                        dismissProgressDialog()
-//                    }
-//                }
             }
             "tv_ycxz" -> {//远程协作
                 if ("远程协助" == tv_ycxz.text) {

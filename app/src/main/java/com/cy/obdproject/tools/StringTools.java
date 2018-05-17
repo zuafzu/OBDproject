@@ -49,35 +49,6 @@ public class StringTools {
         return hs.toUpperCase();
     }
 
-    public byte[] _GetKey(int mask, byte[] seed, int seedLen) {
-        int retLen = 0;
-        byte[] bytes = new byte[4];
-        byte[] key = new byte[4];
-
-        int wort;
-
-        if (seed[1] == 0 && seed[2] == 0)
-            return null;
-        else {
-            retLen = seedLen - 1;
-            wort = seed[1] << 24 + seed[2] << 16 + seed[3] << 8 + seed[4];
-
-            for (int i = 0; i < 35; i++) {
-                if ((wort & 0x80000000) > 0) {
-                    wort = wort << 1;
-                    wort = (wort ^ mask);
-                } else {
-                    wort = wort << 1;
-                }
-            }
-            for (int i = 0; i < 4; i++) {
-                key[3 - i] = bytes[i];
-            }
-        }
-        return key;
-    }
-
-
     public static boolean isIP(String addr) {
         if (addr.length() < 7 || addr.length() > 15 || "".equals(addr)) {
             return false;

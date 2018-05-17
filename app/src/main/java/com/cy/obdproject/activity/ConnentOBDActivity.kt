@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.view.View
 import com.cy.obdproject.R
+import com.cy.obdproject.R.id.*
 import com.cy.obdproject.base.BaseActivity
 import com.cy.obdproject.constant.Constant
 import com.cy.obdproject.socket.SocketService
@@ -38,6 +39,15 @@ class ConnentOBDActivity : BaseActivity(), BaseActivity.ClickMethoListener {
 
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (SocketService.getIntance() != null && SocketService.getIntance()!!.isConnected()) {
+            btn_ok.text = "断开OBD"
+        } else {
+            btn_ok.text = "启动OBD"
+        }
+    }
+
     override fun doMethod(string: String?) {
         when (string) {
             "iv_back" -> {
@@ -68,28 +78,30 @@ class ConnentOBDActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                 startActivity(intent)
             }
             "btn_ok" -> {
-                // 建立长连接
-                if (!StringTools.isIP(et_input_ip.text.toString())) {
-                    toast("IP地址格式不正确")
-                    return
-                }
-                Constant.mDstName = et_input_ip.text.toString()
-                startService(mIntent2)
-                startWorker!!.init(this@ConnentOBDActivity, { data ->
-                    dismissProgressDialog()
-//                        tv_connnect_obd.text = "断开OBD"
-//                        tv_obd_state.text = data
-                })
-                Handler().postDelayed({
-                    // 发送开始信息
-                    if (SocketService.getIntance() != null && SocketService.getIntance()!!.isConnected()) {
-                        startWorker!!.start()
-                    } else {
-//                            tv_connnect_obd.text = "连接OBD"
-//                            tv_obd_state.text = "未连接"
-                        stopService(mIntent2)
+                if (SocketService.getIntance() != null && SocketService.getIntance()!!.isConnected()) {
+                    stopService(mIntent2)
+                } else {
+                    // 建立长连接
+                    if (!StringTools.isIP(et_input_ip.text.toString())) {
+                        toast("IP地址格式不正确")
+                        return
                     }
-                }, 5000)
+                    Constant.mDstName = et_input_ip.text.toString()
+                    startService(mIntent2)
+                    startWorker!!.init(this@ConnentOBDActivity, { data ->
+                        this.finish()
+                        toast(data)
+                        dismissProgressDialog()
+                    })
+                    Handler().postDelayed({
+                        // 发送开始信息
+                        if (SocketService.getIntance() != null && SocketService.getIntance()!!.isConnected()) {
+                            startWorker!!.start()
+                        } else {
+                            stopService(mIntent2)
+                        }
+                    }, 5000)
+                }
             }
         }
     }

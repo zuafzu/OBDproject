@@ -42,8 +42,7 @@
             android:padding="12dp"
             android:tag="tv_refresh"
             android:text="@string/refresh"
-            android:textColor="@android:color/white"
-            android:visibility="invisible" />
+            android:textColor="@android:color/white" />
 
     </LinearLayout>
 

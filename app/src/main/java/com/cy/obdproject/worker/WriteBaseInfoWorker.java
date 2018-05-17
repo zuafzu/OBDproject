@@ -5,23 +5,18 @@ import android.os.Handler;
 import android.util.Log;
 
 import com.cy.obdproject.agreement.ECUagreement;
-import com.cy.obdproject.bean.BaseInfoBean;
 import com.cy.obdproject.bean.SocketBean;
 import com.cy.obdproject.callback.SocketCallBack;
 import com.cy.obdproject.socket.MySocketClient;
 import com.cy.obdproject.socket.SocketService;
 import com.cy.obdproject.tools.ECUTools;
 import com.cy.obdproject.tools.StringTools;
-import com.google.gson.Gson;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 public class WriteBaseInfoWorker {
 
     private SocketBean socketBean;
-    private List<BaseInfoBean> baseInfoBeanList = new ArrayList<>();
 
     private final int timeOut = 3000;// 超时时间
     private Activity activity;
@@ -34,9 +29,10 @@ public class WriteBaseInfoWorker {
     private Handler handler;
     private Runnable runnable;
 
-    public void init(Activity activity, SocketBean socketBean,SocketCallBack socketCallBack) {
+    private String key = "";
+
+    public void init(Activity activity, SocketCallBack socketCallBack) {
         this.activity = activity;
-        this.socketBean = socketBean;
         this.socketCallBack = socketCallBack;
         handler = new Handler();
         runnable = new Runnable() {
@@ -61,10 +57,10 @@ public class WriteBaseInfoWorker {
                     } else if (msg.equals(ECUTools.WAIT)) {
                         startTime();
                     } else {
-                        BaseInfoBean baseInfoBean = new BaseInfoBean();
-                        baseInfoBean.setName(WriteBaseInfoWorker.this.socketBean.getName());
-                        baseInfoBean.setValue(msg);
-                        baseInfoBeanList.add(baseInfoBean);
+                        if (index == 1) {
+
+                            // key = ECUTools._GetKey()
+                        }
                         index++;
                         next();
                     }
@@ -75,16 +71,20 @@ public class WriteBaseInfoWorker {
         };
     }
 
-    public void start() {
-        baseInfoBeanList.clear();
+    public void start(SocketBean socketBean) {
+        this.socketBean = socketBean;
         index = 0;
         next();
     }
 
     private void replay() {
         Log.e("cyf", "发送信息 : " + msg + "  " + index);
-        SocketService.Companion.getIntance().sendMsg(StringTools.hex2byte(msg), connectLinstener);
-        startTime();
+        if (SocketService.Companion.getIntance() != null && SocketService.Companion.getIntance().isConnected()) {
+            SocketService.Companion.getIntance().sendMsg(StringTools.hex2byte(msg), connectLinstener);
+            startTime();
+        } else {
+            putData("OBD未连接");
+        }
     }
 
     private void startTime() {
@@ -103,20 +103,20 @@ public class WriteBaseInfoWorker {
     }
 
     private void next() {
-        if(index == 0){
-
-        }else if(index == 1){
-
-        }else if(index == 3){
-
-        }else if(index == 4){
+        if (index == 0) {
+            msg = ECUagreement.a("10", "000007E3", "0002", "1003");
+        } else if (index == 1) {
+            msg = ECUagreement.a("10", "000007E3", "0002", "2701");
+        } else if (index == 2) {
+            msg = ECUagreement.a("10", "000007E3", "0006", "2702" + key);
+        } else if (index == 3) {
             msg = ECUagreement.a(socketBean.getCanLinkNum(),
                     socketBean.getCanId(),
                     socketBean.getLength(),
                     socketBean.getData());
             replay();
-        }else {
-            putData(new Gson().toJson(baseInfoBeanList));
+        } else {
+            putData("0");
         }
     }
 

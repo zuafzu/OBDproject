@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.cy.obdproject.R;
 import com.cy.obdproject.bean.BaseInfoBean;
+import com.cy.obdproject.socket.SocketService;
 
 import java.util.ArrayList;
 
@@ -19,7 +20,7 @@ public class BaseInfoAdapter extends BaseAdapter {
     private Context context;
     private int flag;
 
-    public BaseInfoAdapter(ArrayList<BaseInfoBean> items, Context context,int flag) {
+    public BaseInfoAdapter(ArrayList<BaseInfoBean> items, Context context, int flag) {
         this.items = items;
         this.context = context;
         this.flag = flag;
@@ -56,9 +57,9 @@ public class BaseInfoAdapter extends BaseAdapter {
         }
         holder.tv_name.setText(items.get(position).getName());
         holder.tv_value.setText(items.get(position).getValue());
-        if (flag ==1){
+        if (flag == 1) {
             holder.iv_left.setVisibility(View.GONE);
-        }else {
+        } else {
             holder.iv_left.setVisibility(View.VISIBLE);
         }
 //        if (position != (getCount() - 1)) {
@@ -66,6 +67,71 @@ public class BaseInfoAdapter extends BaseAdapter {
 //        } else {
 //            holder.view_line.setVisibility(View.GONE);
 //        }
+        if (SocketService.Companion.getIntance() != null && SocketService.Companion.getIntance().isConnected()) {
+            if (items.get(position).getName().contains("车辆运输模式")) {
+                int value = -1;
+                try {
+                    value = Integer.valueOf(items.get(position).getValue());
+                } catch (Exception e) {
+
+                }
+                if (value == 0) {
+                    holder.tv_value.setText("退出运输模式");
+                } else if (value == 1) {
+                    holder.tv_value.setText("激活运输模式");
+                } else {
+                    holder.tv_value.setText("解析异常");
+                }
+            }
+            if (items.get(position).getName().contains("车辆售后服务模式")) {
+                int value = -1;
+                try {
+                    value = Integer.valueOf(items.get(position).getValue());
+                } catch (Exception e) {
+
+                }
+                if (value == 0) {
+                    holder.tv_value.setText("退出售后服务模式");
+                } else if (value == 1) {
+                    holder.tv_value.setText("激活售后服务模式");
+                } else {
+                    holder.tv_value.setText("解析异常");
+                }
+            }
+            if (items.get(position).getName().contains("a2l文件ID")) {
+                int value = -1;
+                try {
+                    value = Integer.valueOf(items.get(position).getValue());
+                } catch (Exception e) {
+
+                }
+                if (value == 0) {
+                    holder.tv_value.setText("退出售后服务模式");
+                } else if (value == 1) {
+                    holder.tv_value.setText("激活售后服务模式");
+                } else {
+                    holder.tv_value.setText("解析异常");
+                }
+            }
+            if (items.get(position).getName().contains("噪声Simu语音配置")) {
+                int value = -1;
+                try {
+                    value = Integer.valueOf(items.get(position).getValue());
+                } catch (Exception e) {
+
+                }
+                if (value == 0) {
+                    holder.tv_value.setText("未配置");
+                } else if (value == 1) {
+                    holder.tv_value.setText("声音1");
+                } else if (value == 2) {
+                    holder.tv_value.setText("声音2");
+                } else {
+                    holder.tv_value.setText("解析异常");
+                }
+            }
+        }
+
         return convertView;
     }
 

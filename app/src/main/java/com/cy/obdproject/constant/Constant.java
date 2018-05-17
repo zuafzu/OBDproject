@@ -13,7 +13,7 @@ public class Constant {
 
     public static final String ws_url = "ws://121.42.146.140:2012";//ws://10.133.73.204:2012
 
-    public static String mDstName = "192.168.43.56";
+    public static String mDstName = "192.168.43.68";
     public static int mDstPort = 6954;
 
 }

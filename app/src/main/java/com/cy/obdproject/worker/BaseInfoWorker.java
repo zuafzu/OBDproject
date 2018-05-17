@@ -83,8 +83,12 @@ public class BaseInfoWorker {
 
     private void replay() {
         Log.e("cyf", "发送信息 : " + msg + "  " + index);
-        SocketService.Companion.getIntance().sendMsg(StringTools.hex2byte(msg), connectLinstener);
-        startTime();
+        if(SocketService.Companion.getIntance()!=null && SocketService.Companion.getIntance().isConnected()){
+            SocketService.Companion.getIntance().sendMsg(StringTools.hex2byte(msg), connectLinstener);
+            startTime();
+        }else{
+            putData("OBD未连接");
+        }
     }
 
     private void startTime() {
