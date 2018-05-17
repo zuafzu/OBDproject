@@ -9,6 +9,7 @@ import com.cy.obdproject.app.MyApp
 import com.cy.obdproject.base.BaseActivity
 import com.cy.obdproject.bean.WebSocketBean
 import com.cy.obdproject.constant.Constant
+import com.cy.obdproject.url.Urls
 import com.google.gson.Gson
 import org.java_websocket.WebSocket
 import org.java_websocket.drafts.Draft_17
@@ -67,7 +68,7 @@ class WebSocketService : Service() {
      */
     private fun createWebSocket() {
         val map = HashMap<String, String>()
-        msgClient = object : MyWebSocketClient(URI(Constant.ws_url), Draft_17(), map, 12000) {
+        msgClient = object : MyWebSocketClient(URI(Urls.ws_url), Draft_17(), map, 12000) {
 
             override fun onMessage(message: String?) {
                 super.onMessage(message)
