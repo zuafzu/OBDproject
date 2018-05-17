@@ -7,11 +7,13 @@ public class Constant {
 
     public static final String TOKEN = "token";
 
+    public static String ISLOGIN = "isLogin";
+    public static String USERTYPE = "userType";
+    public static String USERID = "userId";
+    public static String CARTYPE = "carType";//1 红旗EV 2 红旗HS5
 
-    public static String UserType = "userType";
-    public static String UserId = "userId";
 
-    public static final String ws_url = "ws://121.42.146.140:2012";//ws://10.133.73.204:2012
+    public static final String ws_url = "ws://47.104.212.193:2012";//ws://10.133.73.204:2012
 
     public static String mDstName = "192.168.43.68";
     public static int mDstPort = 6954;

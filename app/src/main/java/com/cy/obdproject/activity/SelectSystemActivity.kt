@@ -1,5 +1,6 @@
 package com.cy.obdproject.activity
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -14,6 +15,11 @@ class SelectSystemActivity : BaseActivity(), BaseActivity.ClickMethoListener {
 
     private var list: ArrayList<String>? = null
     private var adapter: SelectAdapter? = null
+
+    companion object {
+        var INSTANCE: Activity? = null
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_select_system)
@@ -21,6 +27,8 @@ class SelectSystemActivity : BaseActivity(), BaseActivity.ClickMethoListener {
     }
 
     private fun initView() {
+        INSTANCE = this
+
         setClickMethod(iv_back)
         list = ArrayList()
         list!!.add("整车控制系统")
@@ -34,7 +42,6 @@ class SelectSystemActivity : BaseActivity(), BaseActivity.ClickMethoListener {
 
         listView.setOnItemClickListener { _, _, position, id ->
             startActivity(Intent(this@SelectSystemActivity,MainActivity::class.java))
-            finish()
         }
     }
 

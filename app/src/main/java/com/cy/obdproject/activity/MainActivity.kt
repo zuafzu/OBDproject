@@ -17,6 +17,7 @@ import android.widget.TextView
 import com.cy.obdproject.R
 import com.cy.obdproject.app.MyApp
 import com.cy.obdproject.base.BaseActivity
+import com.cy.obdproject.constant.Constant
 import com.cy.obdproject.socket.SocketService
 import com.cy.obdproject.socket.WebSocketService
 import com.cy.obdproject.tools.SPTools
@@ -56,6 +57,17 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
     }
 
     private fun initView() {
+        SPTools.put(this@MainActivity, Constant.ISLOGIN, "1")
+        if (null != SelectRoleActivity.INSTANCE){
+            SelectRoleActivity.INSTANCE!!.finish()
+        }
+        if (null != SelectCarTypeActivity.INSTANCE){
+            SelectCarTypeActivity.INSTANCE!!.finish()
+        }
+        if (null != SelectSystemActivity.INSTANCE){
+            SelectSystemActivity.INSTANCE!!.finish()
+        }
+
         mIntent1 = Intent(this, WebSocketService::class.java)
         mIntent2 = Intent(this, SocketService::class.java)
         startWorker = OBDStart1Worker()
@@ -112,7 +124,7 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
             }
 
             "ibtn_setting" -> {
-                AlertDialog.Builder(this).setTitle("提示").setMessage("确认退出吗？").setPositiveButton("确认") { _, _ ->
+                AlertDialog.Builder(this).setTitle("提示").setMessage("确认退出当前账号？").setPositiveButton("确认") { _, _ ->
                     SPTools.clear(this@MainActivity)
                     for (i in 0 until (application as MyApp).activityList.size) {
                         (application as MyApp).activityList[i].finish()

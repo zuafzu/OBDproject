@@ -78,16 +78,29 @@ public class WifiTools {
         return connectedIP;
     }
 
-    //获取热点状态
-    public int getWifiAPState() {
-        int state = -1;
-        try {
-            Method method2 = wifiManager.getClass().getMethod("getWifiApState");
-            state = (Integer) method2.invoke(wifiManager);
-        } catch (Exception ignored) {
+    public boolean isWifiApEnabled() {
+        return getWifiApState() == WIFI_AP_STATE.WIFI_AP_STATE_ENABLED;
+    }
 
+    private WIFI_AP_STATE getWifiApState(){
+        int tmp;
+        try {
+            Method method = wifiManager.getClass().getMethod("getWifiApState");
+            tmp = ((Integer) method.invoke(wifiManager));
+            // Fix for Android 4
+            if (tmp > 10) {
+                tmp = tmp - 10;
+            }
+            return WIFI_AP_STATE.class.getEnumConstants()[tmp];
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return WIFI_AP_STATE.WIFI_AP_STATE_FAILED;
         }
-        return state;
+    }
+
+    public enum WIFI_AP_STATE {
+        WIFI_AP_STATE_DISABLING, WIFI_AP_STATE_DISABLED, WIFI_AP_STATE_ENABLING,  WIFI_AP_STATE_ENABLED, WIFI_AP_STATE_FAILED
     }
 
 }

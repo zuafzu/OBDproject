@@ -41,6 +41,12 @@ class ConnentOBDActivity : BaseActivity(), BaseActivity.ClickMethoListener {
 
     override fun onResume() {
         super.onResume()
+        if (wifiTools!!.isWifiApEnabled) {
+            tv_wifiState.text = "热点是否开启：已开启"
+        } else {
+            tv_wifiState.text = "热点是否开启：未开启"
+        }
+
         if (SocketService.getIntance() != null && SocketService.getIntance()!!.isConnected()) {
             btn_ok.text = "断开OBD"
         } else {

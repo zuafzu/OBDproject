@@ -29,7 +29,7 @@ class LoginActivity : BaseActivity(), BaseActivity.ClickMethoListener {
         setClickMethod(btn_login)
 
         // 判断是否自动登录
-        if (SPTools.get(this@LoginActivity, Constant.TOKEN, "") != "") {
+        if (SPTools.get(this@LoginActivity, Constant.ISLOGIN, "") != "") {
             for (i in 0 until (application as MyApp).activityList.size) {
                 (application as MyApp).activityList[i].finish()
             }
@@ -65,7 +65,7 @@ class LoginActivity : BaseActivity(), BaseActivity.ClickMethoListener {
            var loginBean = Gson().fromJson(response.data, LoginBean::class.java)
 
             SPTools.put(this@LoginActivity, Constant.TOKEN, ""+loginBean.token)
-            SPTools.put(this@LoginActivity, Constant.UserId, ""+loginBean.userId)
+            SPTools.put(this@LoginActivity, Constant.USERID, ""+loginBean.userId)
             var intent = Intent(Intent(this@LoginActivity, SelectRoleActivity::class.java))
             intent.putExtra("userType",""+loginBean.userType)
             startActivity(intent)

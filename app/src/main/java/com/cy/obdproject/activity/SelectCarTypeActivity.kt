@@ -1,5 +1,7 @@
 package com.cy.obdproject.activity
 
+import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -15,6 +17,11 @@ class SelectCarTypeActivity : BaseActivity(), BaseActivity.ClickMethoListener {
 
     private var list: ArrayList<String>? = null
     private var adapter: SelectAdapter? = null
+
+    companion object {
+        var INSTANCE: Activity? = null
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_select_car_type)
@@ -23,8 +30,7 @@ class SelectCarTypeActivity : BaseActivity(), BaseActivity.ClickMethoListener {
 
     private fun initView() {
         setClickMethod(iv_back)
-
-        Log.e("zj", "usertype = " + SPTools[this@SelectCarTypeActivity, Constant.UserType, 0])
+        INSTANCE = this
 
         list = ArrayList()
 
@@ -39,8 +45,12 @@ class SelectCarTypeActivity : BaseActivity(), BaseActivity.ClickMethoListener {
         }
 
         listView.setOnItemClickListener { _, _, position, id ->
+            if (position == 0) {
+                SPTools.put(this@SelectCarTypeActivity, Constant.CARTYPE, "1")
+            } else if (position == 1) {
+                SPTools.put(this@SelectCarTypeActivity, Constant.CARTYPE, "2")
+            }
             startActivity(Intent(this@SelectCarTypeActivity, SelectSystemActivity::class.java))
-            finish()
         }
     }
 
