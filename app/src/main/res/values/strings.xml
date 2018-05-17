@@ -7,6 +7,17 @@
     <string name="dtsj">动态数据</string>
     <string name="iotest">输入输出控制</string>
     <string name="sxwj">刷写</string>
+    <string name="connent_obd">连接OBD</string>
+
+    <string name="select_role">选择角色</string>
+    <string name="select_carType">选择车辆</string>
+    <string name="select_system">选择系统</string>
+
+    <string name="request_list">请求协助列表</string>
+
+
+    <string name="yhmbnwk">登录名不能为空</string>
+    <string name="mmbnwk">密码不能为空</string>
 
     <string name="refresh">刷新</string>
     <string name="clean">清空数据</string>
@@ -15,9 +26,18 @@
 
     <string name="next">下一步</string>
 
+    <string name="start_test">开始测试</string>
+    <string name="stop_test">结束测试</string>
+
     <string name="last_page">上一页</string>
     <string name="next_page">下一页</string>
     <string name="start">开始</string>
+
+    <string name="open_wifi">开启热点</string>
+    <string name="see_ip">查看IP</string>
+    <string name="input_ip">请输入IP地址</string>
+    <string name="ok">确定</string>
+    <string name="start_obd">启动OBD</string>
 
     <string name="yhm">登录名</string>
     <string name="yhm2">用户名</string>

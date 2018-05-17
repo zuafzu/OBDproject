@@ -37,7 +37,13 @@
         <activity android:name=".activity.IOTestActivity" />
         <activity android:name=".activity.MainActivity" />
         <activity android:name=".activity.WriteDataActivity" />
-        <activity android:name=".activity.DynamicData2Activity"></activity>
+        <activity android:name=".activity.DynamicData2Activity" />
+        <activity android:name=".activity.IOTest2Activity" />
+        <activity android:name=".activity.SelectRoleActivity" />
+        <activity android:name=".activity.SelectCarTypeActivity" />
+        <activity android:name=".activity.SelectSystemActivity" />
+        <activity android:name=".activity.ConnentOBDActivity" />
+        <activity android:name=".activity.RequestListActivity"></activity>
     </application>
 
 </manifest>

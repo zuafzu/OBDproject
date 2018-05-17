@@ -20,6 +20,7 @@ class ErrorCodeActivity : BaseActivity(), BaseActivity.ClickMethoListener {
     private fun initView() {
         setClickMethod(iv_back)
         setClickMethod(tv_refresh)
+        setClickMethod(btn_clean)
 
         list = ArrayList()
         for (i in 0 until 10) {
@@ -50,6 +51,11 @@ class ErrorCodeActivity : BaseActivity(), BaseActivity.ClickMethoListener {
             "tv_refresh" -> {
 
             }
+            "btn_clean" -> {
+                list!!.clear()
+                adapter!!.notifyDataSetChanged()
+            }
+
         }
     }
 

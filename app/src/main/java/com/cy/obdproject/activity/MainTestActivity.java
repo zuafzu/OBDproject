@@ -21,6 +21,8 @@ import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.FileCallBack;
 
 import java.io.File;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import okhttp3.Call;
 
@@ -125,4 +127,5 @@ public class MainTestActivity extends BaseActivity implements BaseActivity.Click
         stopService(mIntent1);
         stopService(mIntent2);
     }
+
 }

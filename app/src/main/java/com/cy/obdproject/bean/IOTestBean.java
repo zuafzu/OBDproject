@@ -1,6 +1,8 @@
 package com.cy.obdproject.bean;
 
-public class IOTestBean {
+import java.io.Serializable;
+
+public class IOTestBean implements Serializable{
 
     private String name;
     private String id;

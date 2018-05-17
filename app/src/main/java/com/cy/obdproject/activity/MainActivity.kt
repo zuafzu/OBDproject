@@ -4,10 +4,10 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
-import android.os.Handler
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,16 +15,20 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.cy.obdproject.R
+import com.cy.obdproject.app.MyApp
 import com.cy.obdproject.base.BaseActivity
 import com.cy.obdproject.socket.SocketService
 import com.cy.obdproject.socket.WebSocketService
+import com.cy.obdproject.tools.SPTools
 import com.cy.obdproject.tools.WifiTools
 import com.cy.obdproject.worker.OBDStart1Worker
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.dip
 import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.toast
 
 class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
+    private var mExitTime: Long = 0
 
     private var mIntent1: Intent? = null
     private var mIntent2: Intent? = null
@@ -62,6 +66,8 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
         setClickMethod(ll_main4)
         setClickMethod(ll_main5)
         setClickMethod(ll_main6)
+        setClickMethod(ibtn_setting)
+
         tv_title.text = getString(R.string.app_name)
         homes = ArrayList()
         homes = items.split(",")
@@ -73,32 +79,36 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
     override fun doMethod(string: String?) {
         when (string) {
             "tv_connnect_obd" -> {//连接obd
-                showProgressDialog()
-                if ("断开OBD" == tv_connnect_obd.text) {
-                    tv_connnect_obd.text = "连接OBD"
-                    tv_obd_state.text = "未连接"
-                    stopService(mIntent2)
-                    dismissProgressDialog()
-                } else {
-                    // 建立热点
+                startActivity(Intent(this@MainActivity, ConnentOBDActivity::class.java))
 
-                    // 建立长连接
-                    startService(mIntent2)
-                    startWorker!!.init(this@MainActivity, { data ->
-                        dismissProgressDialog()
-                        tv_connnect_obd.text = "断开OBD"
-                        tv_obd_state.text = data
-                    })
-                    Handler().postDelayed({
-                        // 发送开始信息
-                        if (SocketService.getIntance() != null && SocketService.getIntance()!!.isConnected()) {
-                            startWorker!!.start()
-                        } else {
-                            tv_connnect_obd.text = "连接OBD"
-                            tv_obd_state.text = "未连接"
-                            stopService(mIntent2)
-                        }
-                    }, 5000)
+
+//                showProgressDialog()
+//                if ("断开OBD" == tv_connnect_obd.text) {
+//                    tv_connnect_obd.text = "连接OBD"
+//                    tv_obd_state.text = "未连接"
+//                    stopService(mIntent2)
+//                    dismissProgressDialog()
+//                } else {
+//                    // 建立热点
+//
+//                    // 建立长连接
+
+//                    startService(mIntent2)
+//                    startWorker!!.init(this@MainActivity, { data ->
+//                        dismissProgressDialog()
+//                        tv_connnect_obd.text = "断开OBD"
+//                        tv_obd_state.text = data
+//                    })
+//                    Handler().postDelayed({
+//                        // 发送开始信息
+//                        if (SocketService.getIntance() != null && SocketService.getIntance()!!.isConnected()) {
+//                            startWorker!!.start()
+//                        } else {
+//                            tv_connnect_obd.text = "连接OBD"
+//                            tv_obd_state.text = "未连接"
+//                            stopService(mIntent2)
+//                        }
+//                    }, 5000)
 
 //                    if (wifiTools!!.setWifiApEnabled(true)) {
 //                        Handler().postDelayed({
@@ -127,7 +137,7 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
 //                    } else {
 //                        dismissProgressDialog()
 //                    }
-                }
+//                }
             }
             "tv_ycxz" -> {//远程协作
                 if ("远程协助" == tv_ycxz.text) {
@@ -156,6 +166,15 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
             "ll_main6" -> {
                 startActivity(Intent(this@MainActivity, WriteDataActivity::class.java))
             }
+
+            "ibtn_setting" -> {
+                AlertDialog.Builder(this).setTitle("提示").setMessage("确认退出吗？").setPositiveButton("确认") { _, _ ->
+                    SPTools.clear(this@MainActivity)
+                    for (i in 0 until (application as MyApp).activityList.size) {
+                        (application as MyApp).activityList[i].finish()
+                    }
+                }.setNegativeButton("取消") { _, _ -> }.show()
+            }
         }
     }
 
@@ -165,8 +184,21 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
         stopService(mIntent2)
     }
 
+    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if (System.currentTimeMillis() - mExitTime > 2000) {
+                toast("再按一次退出程序")
+                mExitTime = System.currentTimeMillis()
+            } else {
+                finish()
+            }
+            return true
+        }
+        return super.onKeyDown(keyCode, event)
+    }
+
     override fun onBackPressed() {
-        AlertDialog.Builder(this).setTitle("提示").setMessage("确认退出吗？").setPositiveButton("确认") { _, _ -> finish() }.setNegativeButton("取消") { _, _ -> }.show()
+
     }
 
     internal inner class HomeAdapter : RecyclerView.Adapter<HomeAdapter.MyViewHolder>() {

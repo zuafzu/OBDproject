@@ -1,9 +1,7 @@
 package com.cy.obdproject.activity
 
-import android.support.v7.app.AppCompatActivity
+import android.content.Intent
 import android.os.Bundle
-import android.view.View
-
 import com.cy.obdproject.R
 import com.cy.obdproject.adapter.IOTestAdapter
 import com.cy.obdproject.base.BaseActivity
@@ -40,7 +38,9 @@ class IOTestActivity : BaseActivity(), BaseActivity.ClickMethoListener {
         }
 
         adapter!!.setOnTestClick { id, position ->
-            toast(""+position)
+            var intent = Intent(this@IOTestActivity,IOTest2Activity::class.java)
+            intent.putExtra("bean",list!![position])
+            startActivity(intent)
         }
     }
 
