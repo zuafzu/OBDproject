@@ -36,7 +36,7 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
     private var startWorker: OBDStart1Worker? = null
     private var wifiTools: WifiTools? = null
 
-    var items = "221,222,223,224,225,226"
+    var items = ""
     var homes: List<String>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,13 +58,13 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
 
     private fun initView() {
         SPTools.put(this@MainActivity, Constant.ISLOGIN, "1")
-        if (null != SelectRoleActivity.INSTANCE){
+        if (null != SelectRoleActivity.INSTANCE) {
             SelectRoleActivity.INSTANCE!!.finish()
         }
-        if (null != SelectCarTypeActivity.INSTANCE){
+        if (null != SelectCarTypeActivity.INSTANCE) {
             SelectCarTypeActivity.INSTANCE!!.finish()
         }
-        if (null != SelectSystemActivity.INSTANCE){
+        if (null != SelectSystemActivity.INSTANCE) {
             SelectSystemActivity.INSTANCE!!.finish()
         }
 
@@ -84,6 +84,12 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
 
         tv_title.text = getString(R.string.app_name)
         homes = ArrayList()
+        if ("1" == SPTools[this@MainActivity, Constant.CARTYPE, ""]) {
+            items = "221,222,223,224,225"
+        } else if ("2" == SPTools[this@MainActivity, Constant.CARTYPE, ""]) {
+            items = "226"
+        }
+
         homes = items.split(",")
         recyclerview.layoutManager = GridLayoutManager(this, 2)
         recyclerview.adapter = HomeAdapter()
