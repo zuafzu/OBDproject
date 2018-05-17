@@ -53,17 +53,17 @@ public class BaseInfoWorker {
                 handler.removeCallbacks(runnable);
                 sysTime2 = new Date().getTime();
                 if (sysTime2 - sysTime1 <= timeOut) {
-                    String msg = ECUTools.getData(data,
+                    String value = ECUTools.getData(data,
                             BaseInfoWorker.this.socketBeanList.get(index).getType(),
                             BaseInfoWorker.this.socketBeanList.get(index).getKey());
-                    if (msg.equals(ECUTools.ERR)) {
+                    if (value.equals(ECUTools.ERR)) {
                         putData("返回数据异常");
-                    } else if (msg.equals(ECUTools.WAIT)) {
+                    } else if (value.equals(ECUTools.WAIT)) {
                         startTime();
                     } else {
                         BaseInfoBean baseInfoBean = new BaseInfoBean();
                         baseInfoBean.setName(BaseInfoWorker.this.socketBeanList.get(index).getName());
-                        baseInfoBean.setValue(msg);
+                        baseInfoBean.setValue(value);
                         baseInfoBeanList.add(baseInfoBean);
                         index++;
                         next();

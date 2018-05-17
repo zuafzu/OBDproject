@@ -53,6 +53,14 @@ public class BaseActivity extends AppCompatActivity {
 
     }
 
+    public void setData1(String data){
+
+    }
+
+    public void setData2(String data){
+
+    }
+
     public void dismissProgressDialog() {
         if (progressDialog != null && progressDialog.isShowing()) {
             progressDialog.dismiss();

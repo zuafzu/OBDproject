@@ -30,6 +30,7 @@ public class WriteBaseInfoWorker {
     private Runnable runnable;
 
     private String key = "";
+    private String mKEY = "";
 
     public void init(Activity activity, SocketCallBack socketCallBack) {
         this.activity = activity;
@@ -49,17 +50,14 @@ public class WriteBaseInfoWorker {
                 handler.removeCallbacks(runnable);
                 sysTime2 = new Date().getTime();
                 if (sysTime2 - sysTime1 <= timeOut) {
-                    String msg = ECUTools.getData(data,
-                            WriteBaseInfoWorker.this.socketBean.getType(),
-                            WriteBaseInfoWorker.this.socketBean.getKey());
+                    String msg = ECUTools.getData(data, 1, key);
                     if (msg.equals(ECUTools.ERR)) {
                         putData("返回数据异常");
                     } else if (msg.equals(ECUTools.WAIT)) {
                         startTime();
                     } else {
                         if (index == 1) {
-
-                            // key = ECUTools._GetKey()
+                            mKEY = StringTools.byte2hex(ECUTools._GetKey(StringTools.hex2byte(msg)));
                         }
                         index++;
                         next();
@@ -104,19 +102,26 @@ public class WriteBaseInfoWorker {
 
     private void next() {
         if (index == 0) {
+            key = "5003";
             msg = ECUagreement.a("10", "000007E3", "0002", "1003");
+            replay();
         } else if (index == 1) {
+            key = "6701";
             msg = ECUagreement.a("10", "000007E3", "0002", "2701");
+            replay();
         } else if (index == 2) {
-            msg = ECUagreement.a("10", "000007E3", "0006", "2702" + key);
+            key = "6702";
+            msg = ECUagreement.a("10", "000007E3", "0006", "2702" + mKEY);
+            replay();
         } else if (index == 3) {
+            key = socketBean.getKey();
             msg = ECUagreement.a(socketBean.getCanLinkNum(),
                     socketBean.getCanId(),
                     socketBean.getLength(),
                     socketBean.getData());
             replay();
         } else {
-            putData("0");
+            putData("修改成功");
         }
     }
 

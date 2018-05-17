@@ -20,7 +20,7 @@ public class ECUTools {
         StringBuilder mData = new StringBuilder();
         int index = data.indexOf(key);
         if (index != -1) {
-            String msg = data.substring(index + 6, data.length() - 2);
+            String msg = data.substring(index + key.length(), data.length() - 2);
             if (msg.length() % 2 == 0) {
                 Integer[] strings = new Integer[msg.length() / 2];
                 if (type == 1) {
@@ -46,6 +46,7 @@ public class ECUTools {
 
     /**
      * 录入
+     *
      * @param data
      * @return
      */
@@ -58,31 +59,33 @@ public class ECUTools {
         return parseAscii(data);
     }
 
-    public static byte[] _GetKey( byte[] seed) {
-        return _GetKey(0x4a68795b,seed,4);
+    public static byte[] _GetKey(byte[] seed) {
+        return _GetKey(0x4a68795b, seed, 4);
     }
 
     public static byte[] _GetKey(int mask, byte[] seed, int seedLen) {
+
         int retLen = 0;
         byte[] bytes = new byte[4];
         byte[] key = new byte[4];
-
         int wort;
-
         if (seed[1] == 0 && seed[2] == 0)
             return null;
         else {
             retLen = seedLen - 1;
-            wort = seed[1] << 24 + seed[2] << 16 + seed[3] << 8 + seed[4];
-
+            wort = seed[0] << 24 | seed[1] << 16 | seed[2] << 8 | seed[3];
             for (int i = 0; i < 35; i++) {
-                if ((wort & 0x80000000) > 0) {
-                    wort = wort << 1;
+                if ((wort & 0x80000000) != 0) {
+                    wort = (wort << 1);
                     wort = (wort ^ mask);
                 } else {
-                    wort = wort << 1;
+                    wort = (wort << 1);
                 }
             }
+            bytes[0] = (byte) wort;
+            bytes[1] = (byte) (wort >> 8);
+            bytes[2] = (byte) (wort >> 16);
+            bytes[3] = (byte) (wort >> 24);
             for (int i = 0; i < 4; i++) {
                 key[3 - i] = bytes[i];
             }
@@ -90,37 +93,49 @@ public class ECUTools {
         return key;
     }
 
-    public static String parseAscii(String str){
-        StringBuilder sb=new StringBuilder();
-        byte[] bs=str.getBytes();
-        for(int i=0;i<bs.length;i++)
+    public static String parseAscii(String str) {
+        StringBuilder sb = new StringBuilder();
+        byte[] bs = str.getBytes();
+        for (int i = 0; i < bs.length; i++)
             sb.append(toHex(bs[i]));
         return sb.toString();
     }
 
-    public static String toHex(int n){
-        StringBuilder sb=new StringBuilder();
-        if(n/16==0){
+    public static String toHex(int n) {
+        StringBuilder sb = new StringBuilder();
+        if (n / 16 == 0) {
             return toHexUtil(n);
-        }else{
-            String t=toHex(n/16);
-            int nn=n%16;
+        } else {
+            String t = toHex(n / 16);
+            int nn = n % 16;
             sb.append(t).append(toHexUtil(nn));
         }
         return sb.toString();
     }
 
-    private static String toHexUtil(int n){
-        String rt="";
-        switch(n){
-            case 10:rt+="A";break;
-            case 11:rt+="B";break;
-            case 12:rt+="C";break;
-            case 13:rt+="D";break;
-            case 14:rt+="E";break;
-            case 15:rt+="F";break;
+    private static String toHexUtil(int n) {
+        String rt = "";
+        switch (n) {
+            case 10:
+                rt += "A";
+                break;
+            case 11:
+                rt += "B";
+                break;
+            case 12:
+                rt += "C";
+                break;
+            case 13:
+                rt += "D";
+                break;
+            case 14:
+                rt += "E";
+                break;
+            case 15:
+                rt += "F";
+                break;
             default:
-                rt+=n;
+                rt += n;
         }
         return rt;
     }

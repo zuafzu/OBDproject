@@ -49,11 +49,11 @@ class WriteBaseInfoActivity : BaseActivity(), BaseActivity.ClickMethoListener, A
         }
         writeBaseInfoWorker = WriteBaseInfoWorker()
         writeBaseInfoWorker!!.init(this) { data ->
-            if (data == "0") {
+            if (data == "修改成功") {
                 initData()
-            } else {
-                toast(data)
             }
+            toast(data)
+            dismissProgressDialog()
         }
         setClickMethod(iv_back)
         setClickMethod(tv_refresh)
@@ -114,6 +114,71 @@ class WriteBaseInfoActivity : BaseActivity(), BaseActivity.ClickMethoListener, A
         }
     }
 
+    private fun putData(data: String) {
+        showProgressDialog()
+        var input = data.split("-")[0]
+        // 远程赋值
+        edit!!.setText(input)
+        val position = data.split("-")[1].toInt()
+        val length = input.length
+        if (list!![position].name.contains("模式配置")) {
+            if (length != 1) {
+                input = ""
+            }
+        } else if (list!![position].name.contains("FAW车辆识别号码")) {
+            if (length != 17) {
+                input = ""
+            }
+        } else if (list!![position].name.contains("维修店代码和/或诊断仪序列号")) {
+            if (length != 10) {
+                input = ""
+            }
+        } else if (list!![position].name.contains("ECU安装日期")) {
+            if (length != 4) {
+                input = ""
+            }
+        } else if (list!![position].name.contains("车辆规格编号")) {
+            if (length != 18) {
+                input = ""
+            }
+        } else if (list!![position].name.contains("FAW生产线中的汽车制造日期")) {
+            if (length != 4) {
+                input = ""
+            }
+        } else if (list!![position].name.contains("车辆运输模式")) {
+            if (length != 1) {
+                input = ""
+            }
+        } else if (list!![position].name.contains("车辆售后服务模式")) {
+            if (length != 1) {
+                input = ""
+            }
+        } else if (list!![position].name.contains("噪声Simu语音配置")) {
+            if (length != 1) {
+                input = ""
+            }
+        } else if (list!![position].name.contains("车辆配置信息")) {
+            if (length != 4) {
+                input = ""
+            }
+        }
+        if (input == "") {
+            toast("录入数据长度错误！")
+            dismissProgressDialog()
+        } else {
+            val socketBean = ECUConstant.getWriteBaseInfoData2()[position]
+            socketBean.data = socketBean.data + ECUTools.putData(input)
+            writeBaseInfoWorker!!.start(socketBean)
+        }
+        dismiss()
+    }
+
+    private fun dismiss() {
+        if (dialog != null && dialog!!.isShowing) {
+            dialog!!.dismiss()
+        }
+    }
+
     override fun onItemClick(parent: AdapterView<*>?, mView: View?, position: Int, id: Long) {
         sendClick(this@WriteBaseInfoActivity.localClassName, "" + position)
         view = LayoutInflater.from(this@WriteBaseInfoActivity).inflate(R.layout.alert_view, null)
@@ -128,78 +193,33 @@ class WriteBaseInfoActivity : BaseActivity(), BaseActivity.ClickMethoListener, A
                 .setView(view)
                 .setCancelable(false)
                 .setPositiveButton("确定", { _, _ ->
-                    var input = edit!!.text.toString()
-                    val length = input.length
-                    if (list!![position].name.contains("模式配置")) {
-                        if (length != 1) {
-                            input = ""
-                        }
-                    } else if (list!![position].name.contains("FAW车辆识别号码")) {
-                        if (length != 17) {
-                            input = ""
-                        }
-                    } else if (list!![position].name.contains("维修店代码和/或诊断仪序列号")) {
-                        if (length != 10) {
-                            input = ""
-                        }
-                    } else if (list!![position].name.contains("ECU安装日期")) {
-                        if (length != 4) {
-                            input = ""
-                        }
-                    } else if (list!![position].name.contains("车辆规格编号")) {
-                        if (length != 18) {
-                            input = ""
-                        }
-                    } else if (list!![position].name.contains("FAW生产线中的汽车制造日期")) {
-                        if (length != 4) {
-                            input = ""
-                        }
-                    } else if (list!![position].name.contains("车辆运输模式")) {
-                        if (length != 1) {
-                            input = ""
-                        }
-                    } else if (list!![position].name.contains("车辆售后服务模式")) {
-                        if (length != 1) {
-                            input = ""
-                        }
-                    } else if (list!![position].name.contains("噪声Simu语音配置")) {
-                        if (length != 1) {
-                            input = ""
-                        }
-                    } else if (list!![position].name.contains("车辆配置信息")) {
-                        if (length != 4) {
-                            input = ""
-                        }
-                    }
-                    if (input == "") {
-                        toast("录入数据长度错误！")
-                    } else {
-                        Log.e("cyf88","ECUTools.putData(input) : "+ECUTools.putData(input))
-                        val socketBean = ECUConstant.getWriteBaseInfoData2()[position]
-                        // input需要处理
-                        socketBean.data = socketBean.data + ECUTools.putData(input)
-                        writeBaseInfoWorker!!.start(socketBean)
-                    }
-                    dialog!!.dismiss()
+                    val input = edit!!.text.toString()
+                    sendClick(this@WriteBaseInfoActivity.localClassName, "$input-$position")
+                    putData("$input-$position")
                 })
                 .setNegativeButton("取消") { _, _ ->
-                    dialog!!.dismiss()
+                    sendClick(this@WriteBaseInfoActivity.localClassName, "")
+                    dismiss()
                 }.create()
         dialog!!.show()
     }
 
     override fun doMethod(string: String?) {
-        when (string) {
-            "iv_back" -> {
-                finish()
-            }
-            "tv_refresh" -> {
-                if (!isProfessionalConnected) {// 专家连接
-                    initData()
+        when {
+            string!!.contains("-") -> putData(string)
+            string == "" -> dismiss()
+            else -> when (string) {
+                "iv_back" -> {
+                    finish()
                 }
-            }
-            else -> {
-                onItemClick(null, null, string!!.toInt(), string.toLong())
+                "tv_refresh" -> {
+                    if (!isProfessionalConnected) {// 专家连接
+                        initData()
+                    }
+                }
+                else -> {
+                    onItemClick(null, null, string!!.toInt(), string.toLong())
+                }
             }
         }
     }
