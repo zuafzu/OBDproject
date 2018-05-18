@@ -9,6 +9,7 @@ import com.cy.obdproject.app.MyApp
 import com.cy.obdproject.base.BaseActivity
 import com.cy.obdproject.bean.WebSocketBean
 import com.cy.obdproject.constant.Constant
+import com.cy.obdproject.tools.SPTools
 import com.cy.obdproject.url.Urls
 import com.google.gson.Gson
 import org.java_websocket.WebSocket
@@ -132,10 +133,12 @@ class WebSocketService : Service() {
         Handler().postDelayed({
             if ((application as MyApp).userType == Constant.userNormal) {
                 // 用户登录
-                sendMsg("{\"S\":\"user1\",\"R\":\"\",\"C\":\"L\",\"D\":{\"T\":\"N\",\"P\":\"pwd\"}}")
+                sendMsg("{\"S\":\"" + SPTools[this, Constant.USERID, ""].toString()
+                        + "\",\"R\":\"\",\"C\":\"L\",\"D\":{\"T\":\"N\",\"P\":\"pwd\"}}")
             } else {
                 // 专家同意普通用户请求
-                sendMsg("{\"S\":\"zuser\",\"R\":\"user1\",\"C\":\"C\",\"D\":\"user1\"}")
+                sendMsg("{\"S\":\"" + SPTools[this, Constant.USERID, ""].toString()
+                        + "\",\"R\":\"user1\",\"C\":\"C\",\"D\":\"user1\"}")
             }
         }, 3000)
         Log.e("cyf", "WebSocketServie 开始连接")

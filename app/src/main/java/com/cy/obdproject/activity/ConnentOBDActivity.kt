@@ -1,5 +1,6 @@
 package com.cy.obdproject.activity
 
+import android.annotation.SuppressLint
 import android.content.ComponentName
 import android.content.Intent
 import android.os.Bundle
@@ -37,6 +38,7 @@ class ConnentOBDActivity : BaseActivity(), BaseActivity.ClickMethoListener {
 
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onResume() {
         super.onResume()
         if (wifiTools!!.isWifiApEnabled) {
@@ -47,11 +49,13 @@ class ConnentOBDActivity : BaseActivity(), BaseActivity.ClickMethoListener {
 
         if (SocketService.getIntance() != null && SocketService.getIntance()!!.isConnected()) {
             btn_ok.text = "断开OBD"
+            et_input_ip.setText(Constant.mDstName)
         } else {
             btn_ok.text = "启动OBD"
         }
     }
 
+    @SuppressLint("SetTextI18n")
     override fun doMethod(string: String?) {
         when (string) {
             "iv_back" -> {
@@ -82,17 +86,24 @@ class ConnentOBDActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                 startActivity(intent)
             }
             "btn_ok" -> {
+                showProgressDialog()
                 if (SocketService.getIntance() != null && SocketService.getIntance()!!.isConnected()) {
                     stopService(mIntent2)
+                    Handler().postDelayed({
+                        btn_ok.text = "连接OBD"
+                        dismissProgressDialog()
+                    }, 2000)
                 } else {
                     //
                     if (!wifiTools!!.isWifiApEnabled) {
                         toast("请先开启热点")
+                        dismissProgressDialog()
                         return
                     }
                     // 建立长连接
                     if (!StringTools.isIP(et_input_ip.text.toString())) {
                         toast("IP地址格式不正确")
+                        dismissProgressDialog()
                         return
                     }
                     Constant.mDstName = et_input_ip.text.toString()

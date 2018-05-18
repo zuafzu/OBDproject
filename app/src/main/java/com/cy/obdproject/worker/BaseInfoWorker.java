@@ -23,6 +23,7 @@ public class BaseInfoWorker {
     private List<SocketBean> socketBeanList;
     private List<BaseInfoBean> baseInfoBeanList = new ArrayList<>();
 
+    private List<String> myData = new ArrayList<>();
     private final int timeOut = 3000;// 超时时间
     private Activity activity;
     private SocketCallBack socketCallBack;
@@ -34,7 +35,7 @@ public class BaseInfoWorker {
     private Handler handler;
     private Runnable runnable;
 
-    public void init(Activity activity, List<SocketBean> socketBeanList,SocketCallBack socketCallBack) {
+    public void init(Activity activity, List<SocketBean> socketBeanList, SocketCallBack socketCallBack) {
         this.activity = activity;
         this.socketBeanList = socketBeanList;
         this.socketCallBack = socketCallBack;
@@ -50,27 +51,7 @@ public class BaseInfoWorker {
         connectLinstener = new MySocketClient.ConnectLinstener() {
             @Override
             public void onReceiveData(String data) {
-                handler.removeCallbacks(runnable);
-                sysTime2 = new Date().getTime();
-                if (sysTime2 - sysTime1 <= timeOut) {
-                    String value = ECUTools.getData(data,
-                            BaseInfoWorker.this.socketBeanList.get(index).getType(),
-                            BaseInfoWorker.this.socketBeanList.get(index).getKey());
-                    if (value.equals(ECUTools.ERR)) {
-                        putData("返回数据异常");
-                    } else if (value.equals(ECUTools.WAIT)) {
-                        startTime();
-                    } else {
-                        BaseInfoBean baseInfoBean = new BaseInfoBean();
-                        baseInfoBean.setName(BaseInfoWorker.this.socketBeanList.get(index).getName());
-                        baseInfoBean.setValue(value);
-                        baseInfoBeanList.add(baseInfoBean);
-                        index++;
-                        next();
-                    }
-                } else {
-                    putData("返回数据超时");
-                }
+                myData.add(data);
             }
         };
     }
@@ -81,20 +62,74 @@ public class BaseInfoWorker {
         next();
     }
 
-    private void replay() {
-        Log.e("cyf", "发送信息 : " + msg + "  " + index);
-        if(SocketService.Companion.getIntance()!=null && SocketService.Companion.getIntance().isConnected()){
+    private boolean replay() {
+        if (myData.size() > 0) {
+            myData.remove(0);
+        }
+        Log.e("cyf", "发送信息 : " + msg + "  ");
+        if (SocketService.Companion.getIntance() != null && SocketService.Companion.getIntance().isConnected()) {
             SocketService.Companion.getIntance().sendMsg(StringTools.hex2byte(msg), connectLinstener);
             startTime();
-        }else{
+        } else {
             putData("OBD未连接");
         }
+        return sleep() || checkData();
+    }
+
+    private boolean sleep() {
+        while (myData.size() == 0) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            sysTime2 = new Date().getTime();
+            if (sysTime2 - sysTime1 > timeOut) {
+                putData("返回数据超时");
+                return true;
+            }
+        }
+        return false;
     }
 
     private void startTime() {
         sysTime1 = new Date().getTime();
         sysTime2 = 0L;
         handler.postDelayed(runnable, timeOut);
+    }
+
+    private boolean checkData() {
+        handler.removeCallbacks(runnable);
+        sysTime2 = new Date().getTime();
+        if (sysTime2 - sysTime1 <= timeOut) {
+            String mmsg = "";
+            for (int i = 0; i < myData.size(); i++) {
+                mmsg = ECUTools.getData2(myData.get(i), socketBeanList.get(index).getType(), msg);
+                if (mmsg.equals(ECUTools.ERR)) {
+                    myData.remove(i);
+                    i--;
+                } else if (mmsg.equals(ECUTools.WAIT)) {
+                    myData.remove(i);
+                    startTime();
+                    return sleep() || checkData();
+                } else {
+                    BaseInfoBean baseInfoBean = new BaseInfoBean();
+                    baseInfoBean.setName(BaseInfoWorker.this.socketBeanList.get(index).getName());
+                    baseInfoBean.setValue(mmsg);
+                    baseInfoBeanList.add(baseInfoBean);
+                    index++;
+                    break;
+                }
+            }
+            if (myData.size() == 0) {
+                putData("返回数据异常");
+                return true;
+            }
+        } else {
+            putData("返回数据超时");
+            return true;
+        }
+        return false;
     }
 
     private void putData(final String msg) {
@@ -107,15 +142,20 @@ public class BaseInfoWorker {
     }
 
     private void next() {
-        if (index < socketBeanList.size()) {
-            msg = ECUagreement.a(socketBeanList.get(index).getCanLinkNum(),
-                    socketBeanList.get(index).getCanId(),
-                    socketBeanList.get(index).getLength(),
-                    socketBeanList.get(index).getData());
-            replay();
-        }else{
-            putData(new Gson().toJson(baseInfoBeanList));
-        }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if (index < socketBeanList.size()) {
+                    msg = ECUagreement.a(socketBeanList.get(index).getData());
+                    if (replay()) {
+                        return;
+                    }
+                    next();
+                } else {
+                    putData(new Gson().toJson(baseInfoBeanList));
+                }
+            }
+        }).start();
     }
 
 }

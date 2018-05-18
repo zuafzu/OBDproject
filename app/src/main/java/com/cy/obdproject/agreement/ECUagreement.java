@@ -2,14 +2,24 @@ package com.cy.obdproject.agreement;
 
 public class ECUagreement {
 
+    public static String canLinkNum = "10"; // 1个字节
+    public static String canId = "000007E3"; // 4个字节（发送的CanId）
+
+    public static String reCanId = "000007EB"; // 4个字节（返回的CanId）
+
     /**
-     * @param canLinkNum 1个字节
-     * @param canId      4个字节
-     * @param length     2个字节(长度)
      * @param data
      * @return
      */
-    public static String a(String canLinkNum, String canId, String length, String data) {
+    public static String a(String data) {
+        String length = Integer.toHexString(data.length() / 2);
+        if (length.length() == 1) {
+            length = "000" + length;
+        } else if (length.length() == 2) {
+            length = "00" + length;
+        } else if (length.length() == 3) {
+            length = "0" + length;
+        }
         String string = 75 + "" + OBDagreement.numPlus() + "" + canLinkNum + "" + canId + "" + length + "" + data;
         String sLength = Integer.toHexString(string.length() / 2);
         if (sLength.length() == 1) {
