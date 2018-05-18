@@ -24,10 +24,6 @@ class RequestListActivity : BaseActivity(), BaseActivity.ClickMethoListener {
         setClickMethod(iv_back)
 
         list = ArrayList()
-        for (i in 1 until 4) {
-            var bean = RequestBean(""+i, "请求协助$i")
-            list!!.add(bean)
-        }
 
         var bean = RequestBean("1", "请求协助1")
         list!!.add(bean)
