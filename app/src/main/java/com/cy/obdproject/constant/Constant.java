@@ -9,6 +9,7 @@ public class Constant {
     public static final String ISLOGIN = "isLogin";
     public static final String USERTYPE = "userType";
     public static final String USERID = "userId";
+    public static final String ZFORUID = "zforUid";//专家选择的用户ID
     public static final String CARTYPE = "carType";//1 红旗EV 2 红旗HS5
     public static final String CARNAME = "carName";
     public static final String USERNAME = "userName";
