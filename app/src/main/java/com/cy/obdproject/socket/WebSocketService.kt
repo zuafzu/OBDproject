@@ -2,9 +2,14 @@ package com.cy.obdproject.socket
 
 import android.app.Service
 import android.content.Intent
+import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.os.Handler
 import android.os.IBinder
 import android.util.Log
+import android.widget.Toast
+import com.cy.obdproject.activity.LoginActivity
+import com.cy.obdproject.activity.MainActivity
+import com.cy.obdproject.activity.RequestListActivity
 import com.cy.obdproject.app.MyApp
 import com.cy.obdproject.base.BaseActivity
 import com.cy.obdproject.bean.WebSocketBean
@@ -51,13 +56,19 @@ class WebSocketService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         Log.e("cyf", "WebSocketServie onDestroy")
-//        if ((application as MyApp).userType == Constant.userNormal) {
-//            // 用户退出
-//            sendMsg("{\"S\":\"user1\",\"R\":\"user\",\"C\":\"K\",\"D\":\"\"}")
-//        } else {
-//            // 专家退出
-//            sendMsg("{\"S\":\"zuser\",\"R\":\"user\",\"C\":\"K\",\"D\":\"\"}")
-//        }
+        val webSocketBean = WebSocketBean()
+        webSocketBean.s = SPTools[this@WebSocketService, Constant.USERID, ""]!!.toString()
+        webSocketBean.r = SPTools[this@WebSocketService, Constant.ZFORUID, ""]!!.toString()
+        webSocketBean.c = "K"
+        this@WebSocketService.sendMsg(Gson().toJson(webSocketBean))
+        for (i in 0 until (application as MyApp).activityList.size) {
+            if ((application as MyApp).activityList[i].localClassName.contains("MainActivity")) {
+                ((application as MyApp).activityList[i] as BaseActivity).runOnUiThread {
+                    ((application as MyApp).activityList[i] as BaseActivity).dismissProgressDialog()
+                }
+                break
+            }
+        }
         webSocketServie = null
         if (msgClient != null) {
             msgClient!!.close()
@@ -76,54 +87,131 @@ class WebSocketService : Service() {
                 Log.e("cyf", message)
                 val webSocketBean = Gson().fromJson(message, WebSocketBean::class.java)
                 if (webSocketBean.c == "D") {// 专家操作或普通用户反馈指令的透传
-                    if (webSocketBean.d.length == 1) {
-                        if (webSocketBean.d == "S") {
-                            // 透传发送成功
-                        } else {
-                            // 透传发送失败
-                        }
+                    if (webSocketBean.e != "0" && webSocketBean.e != "") {
+                        // 透传发送失败
+
                     } else {
-                        val jsonObject = JSONObject(webSocketBean.d.toString())
-                        val activityName = jsonObject.opt("activity").toString()
-                        if (WebSocketService.getIntance() != null && (application as MyApp).userType == Constant.userProfessional) {
-                            // 用户端传过来的信息处理显示数据的事件
-                            val data = jsonObject.opt("data").toString()
-                            for (i in 0 until (application as MyApp).activityList.size) {
-                                if ((application as MyApp).activityList[i].localClassName.contains(activityName)) {
-                                    ((application as MyApp).activityList[i] as BaseActivity).setData(data)
-                                    break
+                        // 透传发送成功
+                        if (webSocketBean.d.toString() == "") {
+
+                        } else {
+                            val jsonObject = JSONObject(webSocketBean.d.toString())
+                            val activityName = jsonObject.opt("activity").toString()
+                            if (WebSocketService.getIntance() != null && SPTools[this@WebSocketService, Constant.USERTYPE, 0] == Constant.userProfessional) {
+                                // 用户端传过来的信息处理显示数据的事件
+                                val data = jsonObject.opt("data").toString()
+                                val method = jsonObject.opt("method").toString()
+                                for (i in 0 until (application as MyApp).activityList.size) {
+                                    if ((application as MyApp).activityList[i].localClassName.contains(activityName)) {
+                                        when (method) {
+                                            "setData" -> ((application as MyApp).activityList[i] as BaseActivity).setData(data)
+                                            "setData1" -> ((application as MyApp).activityList[i] as BaseActivity).setData1(data)
+                                            "setData2" -> ((application as MyApp).activityList[i] as BaseActivity).setData2(data)
+                                        }
+                                        break
+                                    }
+                                }
+                            }
+                            if (WebSocketService.getIntance() != null && SPTools[this@WebSocketService, Constant.USERTYPE, 0] == Constant.userNormal) {
+                                // 专家端传来的信息处理点击事件
+                                val tag = jsonObject.opt("tag").toString()
+                                for (i in 0 until (application as MyApp).activityList.size) {
+                                    if ((application as MyApp).activityList[i].localClassName.contains(activityName)) {
+                                        ((application as MyApp).activityList[i] as BaseActivity).runOnUiThread {
+                                            ((application as MyApp).activityList[i] as BaseActivity.ClickMethoListener).doMethod(tag)
+                                        }
+                                        break
+                                    }
                                 }
                             }
                         }
-                        if (WebSocketService.getIntance() != null && (application as MyApp).userType == Constant.userNormal) {
-                            // 专家端传来的信息处理点击事件
-                            val tag = jsonObject.opt("tag").toString()
+                    }
+                } else if (webSocketBean.c == "L") {//登录
+                    if (webSocketBean.e != "0" && webSocketBean.e != "3") {
+                        // 登录失败
+                        for (i in 0 until (application as MyApp).activityList.size) {
+                            if ((application as MyApp).activityList[i].localClassName.contains("MainActivity")) {
+                                ((application as MyApp).activityList[i] as BaseActivity).runOnUiThread {
+                                    ((application as MyApp).activityList[i] as BaseActivity).dismissProgressDialog()
+                                }
+                                break
+                            }
+                        }
+                    } else {
+                        // 登录成功
+                        if (SPTools[this@WebSocketService, Constant.USERTYPE, 0] == Constant.userNormal) {
+                            // 用户
+                            val webSocketBean = WebSocketBean()
+                            webSocketBean.s = SPTools[this@WebSocketService, Constant.USERID, ""]!!.toString()
+                            webSocketBean.r = "2"
+                            webSocketBean.c = "C"
+                            this@WebSocketService.sendMsg(Gson().toJson(webSocketBean))
+                        } else {
+                            // 专家
                             for (i in 0 until (application as MyApp).activityList.size) {
-                                if ((application as MyApp).activityList[i].localClassName.contains(activityName)) {
+                                if ((application as MyApp).activityList[i].localClassName.contains("LoginActivity")) {
                                     ((application as MyApp).activityList[i] as BaseActivity).runOnUiThread {
-                                        ((application as MyApp).activityList[i] as BaseActivity.ClickMethoListener).doMethod(tag)
+                                        var mIntent = Intent(((application as MyApp).activityList[i] as LoginActivity),
+                                                RequestListActivity::class.java)
+                                        mIntent.addFlags(FLAG_ACTIVITY_NEW_TASK)
+                                        startActivity(mIntent)
+                                        (application as MyApp).activityList[i].finish()
                                     }
                                     break
                                 }
                             }
                         }
                     }
-                } else if (webSocketBean.c == "L") {//登录
-                    if (webSocketBean.d.length == 1) {
-                        if (webSocketBean.d == "S") {
-                            // 登录成功
+                } else if (webSocketBean.c == "C") {//呼叫
+                    if (webSocketBean.e != "0" && webSocketBean.e != "3") {
+                        // 呼叫失败
+                        if (SPTools[this@WebSocketService, Constant.USERTYPE, 0] == Constant.userNormal) {
+                            // 用户
+
                         } else {
-                            // 登录失败
+                            // 专家
+                            for (i in 0 until (application as MyApp).activityList.size) {
+                                if ((application as MyApp).activityList[i].localClassName.contains("RequestListActivity")) {
+                                    ((application as MyApp).activityList[i] as BaseActivity).runOnUiThread {
+                                        Toast.makeText(((application as MyApp).activityList[i] as BaseActivity),
+                                                "连接失败", Toast.LENGTH_SHORT).show()
+                                        ((application as MyApp).activityList[i] as BaseActivity).dismissProgressDialog()
+                                    }
+                                    break
+                                }
+                            }
+                        }
+                    } else {
+                        // 呼叫成功
+                        if (SPTools[this@WebSocketService, Constant.USERTYPE, 0] == Constant.userNormal) {
+                            // 用户
+
+                        } else {
+                            // 专家
+                            for (i in 0 until (application as MyApp).activityList.size) {
+                                if ((application as MyApp).activityList[i].localClassName.contains("RequestListActivity")) {
+                                    ((application as MyApp).activityList[i] as BaseActivity).runOnUiThread {
+                                        val mIntent = Intent(((application as MyApp).activityList[i] as RequestListActivity),
+                                                MainActivity::class.java)
+                                        mIntent.addFlags(FLAG_ACTIVITY_NEW_TASK)
+                                        startActivity(mIntent)
+                                        ((application as MyApp).activityList[i] as RequestListActivity).finish()
+                                    }
+                                    break
+                                }
+                            }
                         }
                     }
-                } else if (webSocketBean.c == "C") {//专家同意普通用户请求
-                    if (webSocketBean.d.length == 1) {
-                        if (webSocketBean.d == "S") {
-                            // 专家同意普通用户请求成功
-                        } else {
-                            // 专家同意普通用户请求失败
+                    for (i in 0 until (application as MyApp).activityList.size) {
+                        if ((application as MyApp).activityList[i].localClassName.contains("MainActivity")) {
+                            ((application as MyApp).activityList[i] as BaseActivity).runOnUiThread {
+                                ((application as MyApp).activityList[i] as BaseActivity).dismissProgressDialog()
+                            }
+                            break
                         }
                     }
+                } else if (webSocketBean.c == "K") {
+                    stopSelf()
                 }
             }
         }
@@ -131,21 +219,31 @@ class WebSocketService : Service() {
         // 开始连接
         // -----------------------------后期可优化---------------------------------
         Handler().postDelayed({
-            if ((application as MyApp).userType == Constant.userNormal) {
-                // 用户登录
-                sendMsg("{\"S\":\"" + SPTools[this, Constant.USERID, ""].toString()
-                        + "\",\"R\":\"\",\"C\":\"L\",\"D\":{\"T\":\"N\",\"P\":\"pwd\"}}")
+            if (msgClient!!.isOpen) {
+                val webSocketBean = WebSocketBean()
+                webSocketBean.s = SPTools[this, Constant.USERID, ""]!!.toString()// 自己（专家）id
+                webSocketBean.r = ""
+                webSocketBean.c = "L"
+                sendMsg(Gson().toJson(webSocketBean))
             } else {
-                // 专家同意普通用户请求
-                sendMsg("{\"S\":\"" + SPTools[this, Constant.USERID, ""].toString()
-                        + "\",\"R\":\"user1\",\"C\":\"C\",\"D\":\"user1\"}")
+                // 没连接上
+                for (i in 0 until (application as MyApp).activityList.size) {
+                    if ((application as MyApp).activityList[i].localClassName.contains("MainActivity")) {
+                        ((application as MyApp).activityList[i] as BaseActivity).runOnUiThread {
+                            Toast.makeText(((application as MyApp).activityList[i] as BaseActivity),
+                                    "与OBD连接失败", Toast.LENGTH_SHORT).show()
+                            ((application as MyApp).activityList[i] as BaseActivity).dismissProgressDialog()
+                        }
+                        break
+                    }
+                }
             }
         }, 3000)
         Log.e("cyf", "WebSocketServie 开始连接")
     }
 
     fun sendMsg(msg: String) {
-        Log.e("cyf", "WebSocketServie msg : $msg")
+        Log.i("cyf", "WebSocketServie 发送 : $msg")
         if (msgClient != null && msgClient!!.readyState == WebSocket.READYSTATE.OPEN) {
             msgClient!!.sendMsg(msg)
         }

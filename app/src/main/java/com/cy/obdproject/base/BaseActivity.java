@@ -29,10 +29,10 @@ public class BaseActivity extends AppCompatActivity {
         myApp = (MyApp) getApplication();
         isUserConnected = WebSocketService.Companion.getIntance() != null &&
                 WebSocketService.Companion.getIntance().isConnected() &&
-                myApp.getUserType() == Constant.userNormal;
+                (int) SPTools.INSTANCE.get(this, Constant.USERTYPE, 0) == Constant.userNormal;
         isProfessionalConnected = WebSocketService.Companion.getIntance() != null &&
                 WebSocketService.Companion.getIntance().isConnected() &&
-                myApp.getUserType() == Constant.userProfessional;
+                (int) SPTools.INSTANCE.get(this, Constant.USERTYPE, 0) == Constant.userProfessional;
         myApp.getActivityList().add(this);
         if (this instanceof ClickMethoListener) {
             clickMethoListener = (ClickMethoListener) this;
@@ -50,16 +50,28 @@ public class BaseActivity extends AppCompatActivity {
         progressDialog.show();
     }
 
-    public void setData(String data){
-
+    public void setData(String data) {
+        setAllData(data);
     }
 
-    public void setData1(String data){
-
+    public void setData1(String data) {
+        setAllData(data);
     }
 
-    public void setData2(String data){
+    public void setData2(String data) {
+        setAllData(data);
+    }
 
+    private void setAllData(String data){
+        if (isUserConnected) {// 用户连接
+            String str = "{\"activity\":\"" + this.getLocalClassName() + "\",\"method\":\"" + "setData" + "\",\"data\":\"" + data.replace("\"", "\\\"") + "\"}";
+            WebSocketBean webSocketBean = new WebSocketBean();
+            webSocketBean.setS("" + SPTools.INSTANCE.get(this, Constant.USERID, ""));
+            webSocketBean.setR("" + SPTools.INSTANCE.get(this, Constant.ZFORUID, ""));
+            webSocketBean.setC("D");
+            webSocketBean.setD(str);
+            WebSocketService.Companion.getIntance().sendMsg(new Gson().toJson(webSocketBean));
+        }
     }
 
     public void dismissProgressDialog() {
@@ -74,30 +86,34 @@ public class BaseActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if (clickMethoListener != null) {
                     // 如果长连接开启，并且我是专家端
-                    sendClick(BaseActivity.this.getLocalClassName(),view.getTag().toString());
+                    sendClick(BaseActivity.this.getLocalClassName(), view.getTag().toString());
                     clickMethoListener.doMethod(view.getTag().toString());
                 }
             }
         });
     }
 
-    public void sendClick(String className,String tag){
-        if (WebSocketService.Companion.getIntance() != null && myApp.getUserType() == Constant.userProfessional) {
+    public void sendClick(String className, String tag) {
+        if (WebSocketService.Companion.getIntance() != null && (int) SPTools.INSTANCE.get(this, Constant.USERTYPE, 0) == Constant.userProfessional) {
             // 点击事件的远程控制
             String str = "{\"activity\":\"" + className + "\",\"tag\":\"" + tag + "\"}";
             WebSocketBean webSocketBean = new WebSocketBean();
-            webSocketBean.setS(SPTools.INSTANCE.get(this,Constant.USERID,"").toString());// 自己（专家）id
-            webSocketBean.setR("1");// 连接用户id
+            webSocketBean.setS(SPTools.INSTANCE.get(this, Constant.USERID, "").toString());// 自己（专家）id
+            webSocketBean.setR(SPTools.INSTANCE.get(this, Constant.ZFORUID, "").toString());
             webSocketBean.setC("D");
             webSocketBean.setD(str);// 自定义的json串
+            webSocketBean.setE("");
             WebSocketService.Companion.getIntance().sendMsg(new Gson().toJson(webSocketBean));
         }
     }
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
+        if (progressDialog != null && progressDialog.isShowing()) {
+            progressDialog.dismiss();
+        }
         myApp.getActivityList().remove(this);
+        super.onDestroy();
     }
 
     @Override

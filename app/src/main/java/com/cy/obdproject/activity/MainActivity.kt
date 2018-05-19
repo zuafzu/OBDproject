@@ -104,6 +104,7 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                 startActivity(Intent(this@MainActivity, ConnentOBDActivity::class.java))
             }
             "tv_ycxz" -> {//远程协作
+                showProgressDialog()
                 if ("远程协助" == tv_ycxz.text) {
                     tv_ycxz.text = "断开协助"
                     startService(mIntent1)

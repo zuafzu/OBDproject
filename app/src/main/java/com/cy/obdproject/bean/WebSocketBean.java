@@ -8,21 +8,15 @@ import java.io.Serializable;
 public class WebSocketBean implements Serializable {
 
     // {"S":"zuser","R":"user","C":"D","D":"operation command"}
-    private String S;
-    private String R;
-    private String C;
-    private String D;
+    private String S = "";
+    private String R = "";
+    private String C = "";
+    private String D = "";
+    private String E = "";
 
 
     public WebSocketBean() {
         super();
-    }
-
-    public WebSocketBean(String s, String r, String c, String d) {
-        S = s;
-        R = r;
-        C = c;
-        D = d;
     }
 
     public String getS() {
@@ -57,6 +51,14 @@ public class WebSocketBean implements Serializable {
         D = d;
     }
 
+    public String getE() {
+        return E;
+    }
+
+    public void setE(String e) {
+        E = e;
+    }
+
     @Override
     public String toString() {
         return "WebSocketBean{" +
@@ -64,6 +66,7 @@ public class WebSocketBean implements Serializable {
                 ", R='" + R + '\'' +
                 ", C='" + C + '\'' +
                 ", D='" + D + '\'' +
+                ", E='" + E + '\'' +
                 '}';
     }
 }

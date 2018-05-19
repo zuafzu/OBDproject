@@ -49,7 +49,11 @@ public class OBDStart1Worker {
     }
 
     public void start() {
-        next();
+        if (SocketService.Companion.getIntance() != null && SocketService.Companion.getIntance().isConnected()) {
+            next();
+        } else {
+            putData("OBD未连接");
+        }
     }
 
     private boolean replay() {
@@ -63,8 +67,6 @@ public class OBDStart1Worker {
         if (SocketService.Companion.getIntance() != null && SocketService.Companion.getIntance().isConnected()) {
             SocketService.Companion.getIntance().sendMsg(StringTools.hex2byte(msg), connectLinstener);
             startTime();
-        } else {
-            putData("OBD未连接");
         }
         return sleep() || checkData();
     }

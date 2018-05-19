@@ -8,6 +8,7 @@ import com.cy.obdproject.app.MyApp
 import com.cy.obdproject.base.BaseActivity
 import com.cy.obdproject.bean.LoginBean
 import com.cy.obdproject.constant.Constant
+import com.cy.obdproject.socket.WebSocketService
 import com.cy.obdproject.tools.NetTools
 import com.cy.obdproject.tools.SPTools
 import com.cy.obdproject.url.Urls
@@ -27,11 +28,17 @@ class LoginActivity : BaseActivity(), BaseActivity.ClickMethoListener {
         setClickMethod(btn_login)
 
         // 判断是否自动登录
-        if (SPTools.get(this@LoginActivity, Constant.ISLOGIN, "") != "") {
+        if (SPTools[this@LoginActivity, Constant.ISLOGIN, ""] != "") {
             for (i in 0 until (application as MyApp).activityList.size) {
                 (application as MyApp).activityList[i].finish()
             }
-            startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+            if (SPTools[this@LoginActivity, Constant.USERTYPE, 0] == Constant.userNormal) {
+                startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+            } else {
+                showProgressDialog()
+                val mIntent1 = Intent(this@LoginActivity, WebSocketService::class.java)
+                startService(mIntent1)
+            }
         }
     }
 
@@ -58,8 +65,8 @@ class LoginActivity : BaseActivity(), BaseActivity.ClickMethoListener {
         val map = hashMapOf<String, String>()
         map["username"] = username
         map["pwd"] = pwd
-        NetTools.net(map, Urls().auth_login, this) { response ->
-            Log.e("zj", "auth_login = " + response.data)
+        NetTools.net(map, Urls().auth_login, this, { response ->
+            Log.e("zj", "auth_login = " + response!!.data)
             var loginBean = Gson().fromJson(response.data, LoginBean::class.java)
 
             SPTools.put(this@LoginActivity, Constant.USERNAME, "" + et_name.text.toString())
@@ -73,11 +80,13 @@ class LoginActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                 if ("受控端" == list!![0]) {
                     SPTools.put(this@LoginActivity, Constant.USERTYPE, Constant.userNormal)
                     startActivity(Intent(this@LoginActivity, SelectCarTypeActivity::class.java))
+                    finish()
                 } else if ("专家端" == list[0]) {
                     SPTools.put(this@LoginActivity, Constant.USERTYPE, Constant.userProfessional)
-                    startActivity(Intent(this@LoginActivity, RequestListActivity::class.java))
+                    val mIntent1 = Intent(this@LoginActivity, WebSocketService::class.java)
+                    startService(mIntent1)
+                    // startActivity(Intent(this@LoginActivity, RequestListActivity::class.java))
                 }
-                finish()
 
             } else if (list.size > 1) {
                 var intent = Intent(Intent(this@LoginActivity, SelectRoleActivity::class.java))
@@ -86,10 +95,9 @@ class LoginActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                 finish()
             } else {
                 toast("返回角色信息错误")
+                dismissProgressDialog()
             }
-
-
-        }
+        }, "正在加载...", true, false)
     }
 
 

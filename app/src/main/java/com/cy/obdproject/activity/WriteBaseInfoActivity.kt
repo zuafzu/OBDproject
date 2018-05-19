@@ -1,6 +1,7 @@
 package com.cy.obdproject.activity
 
 import android.os.Bundle
+import android.os.Handler
 import android.support.v7.app.AlertDialog
 import android.util.Log
 import android.view.LayoutInflater
@@ -11,10 +12,8 @@ import com.cy.obdproject.R
 import com.cy.obdproject.adapter.BaseInfoAdapter
 import com.cy.obdproject.base.BaseActivity
 import com.cy.obdproject.bean.BaseInfoBean
-import com.cy.obdproject.bean.WebSocketBean
 import com.cy.obdproject.constant.ECUConstant
 import com.cy.obdproject.socket.SocketService
-import com.cy.obdproject.socket.WebSocketService
 import com.cy.obdproject.tools.ECUTools
 import com.cy.obdproject.worker.BaseInfoWorker
 import com.cy.obdproject.worker.WriteBaseInfoWorker
@@ -49,11 +48,7 @@ class WriteBaseInfoActivity : BaseActivity(), BaseActivity.ClickMethoListener, A
         }
         writeBaseInfoWorker = WriteBaseInfoWorker()
         writeBaseInfoWorker!!.init(this) { data ->
-            if (data == "修改成功") {
-                initData()
-            }
-            toast(data)
-            dismissProgressDialog()
+            setData1(data)
         }
         setClickMethod(iv_back)
         setClickMethod(tv_refresh)
@@ -93,24 +88,22 @@ class WriteBaseInfoActivity : BaseActivity(), BaseActivity.ClickMethoListener, A
                 } else {
                     baseInfoAdapter!!.notifyDataSetChanged()
                 }
-                if (isUserConnected) {// 用户连接
-                    val str = "{\"activity\":\"" + this@WriteBaseInfoActivity.localClassName + "\",\"method\":\"" + "setData" + "\",\"data\":\"" + Gson().toJson(list).replace("\"", "\\\"") + "\"}"
-                    val webSocketBean = WebSocketBean()
-
-                    webSocketBean.s = "user1"// 自己（专家）id
-                    webSocketBean.r = "zuser"// 连接用户id
-
-//                    webSocketBean.s = "zuser"// 自己（专家）id
-//                    webSocketBean.r = "user1"// 连接用户id
-
-                    webSocketBean.c = "D"
-                    webSocketBean.d = str// 自定义的json串
-                    WebSocketService.getIntance()!!.sendMsg(Gson().toJson(webSocketBean))
-                }
             } catch (e: Exception) {
                 Log.i("cyf", "e : ${e.message}")
                 toast(data!!)
             }
+            super.setData(data)
+        }
+    }
+
+    override fun setData1(data: String?) {
+        runOnUiThread {
+            if (data == "修改成功") {
+                initData()
+            }
+            toast(data!!)
+            dismissProgressDialog()
+            super.setData1(data)
         }
     }
 
@@ -119,58 +112,65 @@ class WriteBaseInfoActivity : BaseActivity(), BaseActivity.ClickMethoListener, A
         var input = data.split("-")[0]
         // 远程赋值
         edit!!.setText(input)
-        val position = data.split("-")[1].toInt()
-        val length = input.length
-        if (list!![position].name.contains("模式配置")) {
-            if (length != 1) {
-                input = ""
+        Handler().postDelayed({
+            val position = data.split("-")[1].toInt()
+            val length = input.length
+            if (list!![position].name.contains("模式配置")) {
+                if (length != 1) {
+                    input = ""
+                }
+            } else if (list!![position].name.contains("FAW车辆识别号码")) {
+                if (length != 17) {
+                    input = ""
+                }
+            } else if (list!![position].name.contains("维修店代码和/或诊断仪序列号")) {
+                if (length != 10) {
+                    input = ""
+                }
+            } else if (list!![position].name.contains("ECU安装日期")) {
+                if (length != 4) {
+                    input = ""
+                }
+            } else if (list!![position].name.contains("车辆规格编号")) {
+                if (length != 18) {
+                    input = ""
+                }
+            } else if (list!![position].name.contains("FAW生产线中的汽车制造日期")) {
+                if (length != 4) {
+                    input = ""
+                }
+            } else if (list!![position].name.contains("车辆运输模式")) {
+                if (length != 1) {
+                    input = ""
+                }
+            } else if (list!![position].name.contains("车辆售后服务模式")) {
+                if (length != 1) {
+                    input = ""
+                }
+            } else if (list!![position].name.contains("噪声Simu语音配置")) {
+                if (length != 1) {
+                    input = ""
+                }
+            } else if (list!![position].name.contains("车辆配置信息")) {
+                if (length != 4) {
+                    input = ""
+                }
             }
-        } else if (list!![position].name.contains("FAW车辆识别号码")) {
-            if (length != 17) {
-                input = ""
+            if (input == "") {
+                toast("录入数据长度错误！")
+                dismissProgressDialog()
+            } else {
+                if (isProfessionalConnected) {
+                    // 专家端参数修改，什么都不操作，等待用户反馈，反馈方法需要实现
+
+                } else {
+                    val socketBean = ECUConstant.getWriteBaseInfoData2()[position]
+                    socketBean.data = socketBean.data + ECUTools.putData(input)
+                    writeBaseInfoWorker!!.start(socketBean)
+                }
             }
-        } else if (list!![position].name.contains("维修店代码和/或诊断仪序列号")) {
-            if (length != 10) {
-                input = ""
-            }
-        } else if (list!![position].name.contains("ECU安装日期")) {
-            if (length != 4) {
-                input = ""
-            }
-        } else if (list!![position].name.contains("车辆规格编号")) {
-            if (length != 18) {
-                input = ""
-            }
-        } else if (list!![position].name.contains("FAW生产线中的汽车制造日期")) {
-            if (length != 4) {
-                input = ""
-            }
-        } else if (list!![position].name.contains("车辆运输模式")) {
-            if (length != 1) {
-                input = ""
-            }
-        } else if (list!![position].name.contains("车辆售后服务模式")) {
-            if (length != 1) {
-                input = ""
-            }
-        } else if (list!![position].name.contains("噪声Simu语音配置")) {
-            if (length != 1) {
-                input = ""
-            }
-        } else if (list!![position].name.contains("车辆配置信息")) {
-            if (length != 4) {
-                input = ""
-            }
-        }
-        if (input == "") {
-            toast("录入数据长度错误！")
-            dismissProgressDialog()
-        } else {
-            val socketBean = ECUConstant.getWriteBaseInfoData2()[position]
-            socketBean.data = socketBean.data + ECUTools.putData(input)
-            writeBaseInfoWorker!!.start(socketBean)
-        }
-        dismiss()
+            dismiss()
+        }, 1000)
     }
 
     private fun dismiss() {

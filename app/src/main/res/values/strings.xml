@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">OBDproject</string>
+    <string name="app_name">红旗故障诊断系统</string>
 
     <string name="djbxx">基本信息</string>
     <string name="xjbxx">参数修改</string>

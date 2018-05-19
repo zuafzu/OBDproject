@@ -53,7 +53,11 @@ public class WriteBaseInfoWorker {
 
     public void start(SocketBean socketBean) {
         this.socketBean = socketBean;
-        next();
+        if (SocketService.Companion.getIntance() != null && SocketService.Companion.getIntance().isConnected()) {
+            next();
+        } else {
+            putData("OBD未连接");
+        }
     }
 
     private boolean replay() {
@@ -64,8 +68,6 @@ public class WriteBaseInfoWorker {
         if (SocketService.Companion.getIntance() != null && SocketService.Companion.getIntance().isConnected()) {
             SocketService.Companion.getIntance().sendMsg(StringTools.hex2byte(msg), connectLinstener);
             startTime();
-        } else {
-            putData("OBD未连接");
         }
         return sleep() || checkData();
     }
@@ -98,7 +100,7 @@ public class WriteBaseInfoWorker {
         if (sysTime2 - sysTime1 <= timeOut) {
             String mmsg = "";
             for (int i = 0; i < myData.size(); i++) {
-                mmsg = ECUTools.getData2(myData.get(i), 1, msg);
+                mmsg = ECUTools.getData(myData.get(i), 1, msg);
                 if (mmsg.equals(ECUTools.ERR)) {
                     myData.remove(i);
                     i--;

@@ -6,10 +6,8 @@ import com.cy.obdproject.R
 import com.cy.obdproject.adapter.BaseInfoAdapter
 import com.cy.obdproject.base.BaseActivity
 import com.cy.obdproject.bean.BaseInfoBean
-import com.cy.obdproject.bean.WebSocketBean
 import com.cy.obdproject.constant.ECUConstant
 import com.cy.obdproject.socket.SocketService
-import com.cy.obdproject.socket.WebSocketService
 import com.cy.obdproject.worker.BaseInfoWorker
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -72,24 +70,11 @@ class ReadBaseInfoActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                 } else {
                     baseInfoAdapter!!.notifyDataSetChanged()
                 }
-                if (isUserConnected) {// 用户连接
-                    val str = "{\"activity\":\"" + this@ReadBaseInfoActivity.localClassName + "\",\"method\":\"" + "setData" + "\",\"data\":\"" + Gson().toJson(list).replace("\"", "\\\"") + "\"}"
-                    val webSocketBean = WebSocketBean()
-
-                    webSocketBean.s = "user1"// 自己（专家）id
-                    webSocketBean.r = "zuser"// 连接用户id
-
-//                    webSocketBean.s = "zuser"// 自己（专家）id
-//                    webSocketBean.r = "user1"// 连接用户id
-
-                    webSocketBean.c = "D"
-                    webSocketBean.d = str// 自定义的json串
-                    WebSocketService.getIntance()!!.sendMsg(Gson().toJson(webSocketBean))
-                }
             } catch (e: Exception) {
                 Log.i("cyf", "e : ${e.message}")
                 toast(data!!)
             }
+            super.setData(data)
         }
     }
 
