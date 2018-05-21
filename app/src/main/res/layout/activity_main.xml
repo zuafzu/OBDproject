@@ -22,8 +22,8 @@
             android:layout_height="match_parent"
             android:background="@android:color/transparent"
             android:padding="4dp"
-            android:visibility="invisible"
-            android:src="@mipmap/logout" />
+            android:src="@mipmap/logout"
+            android:visibility="invisible" />
 
         <TextView
             android:id="@+id/tv_title"
@@ -37,12 +37,12 @@
 
         <ImageView
             android:id="@+id/ibtn_setting"
-            android:tag="ibtn_setting"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:background="@android:color/transparent"
             android:padding="4dp"
-            android:src="@mipmap/logout" />
+            android:src="@mipmap/logout"
+            android:tag="ibtn_setting" />
     </LinearLayout>
 
     <ImageView
@@ -54,7 +54,8 @@
         android:tint="@color/colorPrimary"
         android:translationZ="2dp" />
 
-    <LinearLayout
+
+    <RelativeLayout
         android:id="@+id/iv_head"
         android:layout_width="match_parent"
         android:layout_height="130dp"
@@ -68,6 +69,15 @@
         android:translationZ="4dp">
 
 
+        <com.cy.obdproject.view.RoundImageView
+            android:id="@+id/iv_background"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="2dp"
+            android:scaleType="fitXY"
+            android:src="@mipmap/ic_background"
+            android:tag="iv_background" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -75,10 +85,10 @@
             android:orientation="vertical">
 
             <LinearLayout
-                android:layout_marginBottom="2dp"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_gravity="center"
+                android:layout_marginBottom="2dp"
                 android:layout_weight="1"
                 android:orientation="horizontal">
 
@@ -93,24 +103,27 @@
                         android:layout_height="match_parent"
                         android:gravity="center_vertical"
                         android:text="车型："
+                        android:textColor="@android:color/white"
                         android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/tv_carName"
-                        android:tag="tv_carName"
                         android:layout_width="wrap_content"
+
                         android:layout_height="match_parent"
                         android:gravity="center_vertical"
-                        android:text="" />
+                        android:tag="tv_carName"
+                        android:text=""
+                        android:textColor="@android:color/white" />
                 </LinearLayout>
 
             </LinearLayout>
 
             <LinearLayout
-                android:layout_marginBottom="2dp"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_gravity="center"
+                android:layout_marginBottom="2dp"
                 android:layout_weight="1"
                 android:orientation="horizontal">
 
@@ -125,29 +138,31 @@
                         android:layout_height="match_parent"
                         android:gravity="center_vertical"
                         android:text="用户名："
+                        android:textColor="@android:color/white"
                         android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/tv_username"
-                        android:tag="tv_username"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:gravity="center_vertical"
-                        android:text="" />
+                        android:tag="tv_username"
+                        android:text=""
+                        android:textColor="@android:color/white" />
                 </LinearLayout>
 
                 <TextView
                     android:id="@+id/tv_ycxz"
-                    android:tag="tv_ycxz"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:gravity="center_vertical"
                     android:layout_margin="4dp"
-                    android:padding="4dp"
-                    android:textSize="12sp"
-                    android:textColor="@android:color/white"
                     android:background="@drawable/shape_corner_accent"
-                    android:text="远程协助" />
+                    android:gravity="center_vertical"
+                    android:padding="4dp"
+                    android:tag="tv_ycxz"
+                    android:text="远程协助"
+                    android:textColor="@android:color/white"
+                    android:textSize="12sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -167,39 +182,41 @@
                         android:layout_height="match_parent"
                         android:gravity="center_vertical"
                         android:text="OBD连接状态："
+                        android:textColor="@android:color/white"
                         android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/tv_obd_state"
-                        android:tag="tv_obd_state"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:gravity="center_vertical"
-                        android:text="未连接" />
+                        android:tag="tv_obd_state"
+                        android:text="未连接"
+                        android:textColor="@android:color/white" />
                 </LinearLayout>
 
 
                 <TextView
                     android:id="@+id/tv_connnect_obd"
-                    android:tag="tv_connnect_obd"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:gravity="center_vertical"
-                    android:padding="4dp"
-                    android:textColor="@android:color/white"
-                    android:textSize="12sp"
                     android:layout_margin="4dp"
                     android:background="@drawable/shape_corner_accent"
-                    android:text="连接OBD" />
+                    android:gravity="center_vertical"
+                    android:padding="4dp"
+                    android:tag="tv_connnect_obd"
+                    android:text="连接OBD"
+                    android:textColor="@android:color/white"
+                    android:textSize="12sp" />
 
             </LinearLayout>
         </LinearLayout>
 
-    </LinearLayout>
+
+    </RelativeLayout>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerview"
-        android:tag="recyclerview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/iv_head"
@@ -207,276 +224,7 @@
         android:overScrollFooter="@android:color/transparent"
         android:overScrollHeader="@android:color/transparent"
         android:overScrollMode="never"
+        android:tag="recyclerview"
         android:translationZ="2dp" />
-
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/ll_toolsbar"
-        android:translationZ="2dp"
-        android:visibility="gone">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"
-                android:background="@drawable/shape_corner_white2"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:translationZ="4dp">
-
-                <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_margin="4dp"
-                    android:adjustViewBounds="true"
-                    android:src="@mipmap/ic_launcher_round" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="116dp"
-                android:orientation="horizontal">
-
-                <LinearLayout
-                    android:id="@+id/ll_main1"
-                    android:tag="ll_main1"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginBottom="8dp"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginRight="8dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/shape_corner_white"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:translationZ="2dp">
-
-                    <ImageView
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1"
-                        android:background="#77b3d4"
-                        android:padding="8dp"
-                        android:src="@mipmap/ic_launcher_round"
-                        android:translationZ="4dp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="8dp"
-                        android:text="@string/djbxx"
-                        android:textColor="@android:color/black"
-                        android:textSize="12sp" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/ll_main2"
-                    android:tag="ll_main2"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginBottom="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginRight="16dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/shape_corner_white"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:translationZ="2dp">
-
-                    <ImageView
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="2"
-                        android:background="#4f5d73"
-                        android:padding="8dp"
-                        android:src="@mipmap/ic_launcher_round"
-                        android:translationZ="4dp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="8dp"
-                        android:text="@string/xjbxx"
-                        android:textColor="@android:color/black"
-                        android:textSize="12sp" />
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="116dp"
-                android:orientation="horizontal">
-
-                <LinearLayout
-                    android:id="@+id/ll_main3"
-                    android:tag="ll_main3"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginBottom="8dp"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginRight="8dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/shape_corner_white"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:translationZ="2dp">
-
-                    <ImageView
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1"
-                        android:background="#76c2af"
-                        android:padding="8dp"
-                        android:src="@mipmap/ic_launcher_round"
-                        android:translationZ="4dp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="8dp"
-                        android:gravity="center"
-                        android:text="@string/gzdm"
-                        android:textColor="@android:color/black"
-                        android:textSize="12sp" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/ll_main4"
-                    android:tag="ll_main4"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginBottom="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginRight="16dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/shape_corner_white"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:translationZ="2dp">
-
-                    <ImageView
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1"
-                        android:background="#77b3d4"
-                        android:padding="8dp"
-                        android:src="@mipmap/ic_launcher_round"
-                        android:translationZ="4dp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="8dp"
-                        android:text="@string/dtsj"
-                        android:textColor="@android:color/black"
-                        android:textSize="12sp" />
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="116dp"
-                android:orientation="horizontal"
-                android:weightSum="2">
-
-                <LinearLayout
-                    android:id="@+id/ll_main5"
-                    android:tag="ll_main5"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginBottom="8dp"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginRight="32dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/shape_corner_white"
-                    android:gravity="center_horizontal"
-                    android:orientation="vertical"
-                    android:translationZ="2dp">
-
-                    <ImageView
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1"
-                        android:background="#76c2af"
-                        android:padding="8dp"
-                        android:src="@mipmap/ic_launcher_round"
-                        android:translationZ="4dp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="8dp"
-                        android:text="@string/iotest"
-                        android:textColor="@android:color/black"
-                        android:textSize="12sp" />
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="116dp"
-                android:orientation="horizontal"
-                android:weightSum="2">
-
-                <LinearLayout
-                    android:id="@+id/ll_main6"
-                    android:tag="ll_main6"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginBottom="8dp"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginRight="32dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/shape_corner_white"
-                    android:gravity="center_horizontal"
-                    android:orientation="vertical"
-                    android:translationZ="2dp">
-
-                    <ImageView
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1"
-                        android:background="#76c2af"
-                        android:padding="8dp"
-                        android:src="@mipmap/ic_launcher_round"
-                        android:translationZ="4dp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="8dp"
-                        android:text="@string/sxwj"
-                        android:textColor="@android:color/black"
-                        android:textSize="12sp" />
-
-                </LinearLayout>
-
-            </LinearLayout>
-        </LinearLayout>
-
-    </ScrollView>
 
 </RelativeLayout>

@@ -38,6 +38,7 @@ class ReadBaseInfoActivity : BaseActivity(), BaseActivity.ClickMethoListener {
     }
 
     private fun initData() {
+
         if (isProfessionalConnected) {// 专家连接
             doMethod("tv_refresh")
         } else {

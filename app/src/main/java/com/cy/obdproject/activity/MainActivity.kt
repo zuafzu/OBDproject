@@ -27,6 +27,11 @@ import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.dip
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.toast
+import com.cy.obdproject.tools.FastBlurUtil
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+
+
 
 class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
     private var mExitTime: Long = 0
@@ -57,6 +62,16 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
     }
 
     private fun initView() {
+
+        //        获取需要被模糊的原图bitmap
+        val res = resources
+        val scaledBitmap = BitmapFactory.decodeResource(res, R.mipmap.ic_background)
+
+        //        scaledBitmap为目标图像，10是缩放的倍数（越大模糊效果越高）
+        val blurBitmap = FastBlurUtil.toBlur(scaledBitmap, 2)
+        iv_background.scaleType = ImageView.ScaleType.CENTER_CROP
+        iv_background.setImageBitmap(blurBitmap)
+
         SPTools.put(this@MainActivity, Constant.ISLOGIN, "1")
         if (null != SelectRoleActivity.INSTANCE) {
             SelectRoleActivity.INSTANCE!!.finish()
@@ -74,12 +89,7 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
         wifiTools = WifiTools(this)
         setClickMethod(tv_connnect_obd)
         setClickMethod(tv_ycxz)
-        setClickMethod(ll_main1)
-        setClickMethod(ll_main2)
-        setClickMethod(ll_main3)
-        setClickMethod(ll_main4)
-        setClickMethod(ll_main5)
-        setClickMethod(ll_main6)
+
         setClickMethod(ibtn_setting)
 
         tv_title.text = getString(R.string.app_name)
@@ -106,8 +116,10 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
             "tv_ycxz" -> {//远程协作
                 showProgressDialog()
                 if ("远程协助" == tv_ycxz.text) {
-                    tv_ycxz.text = "断开协助"
-                    startService(mIntent1)
+                    startActivity(Intent(this@MainActivity, ResponseListActivity::class.java))
+
+//                    tv_ycxz.text = "断开协助"
+//                    startService(mIntent1)
                 } else {
                     tv_ycxz.text = "远程协助"
                     stopService(mIntent1)
@@ -190,8 +202,8 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                         doMethod("ll_main1")
                     }
                     holder.textView!!.text = getString(R.string.djbxx)
-                    holder.imageView!!.setImageResource(R.mipmap.ic_launcher_round)
-                    holder.imageView!!.setBackgroundColor(Color.parseColor("#77b3d4"))
+                    holder.imageView!!.setImageResource(R.mipmap.ic_card1)
+                    holder.imageView!!.setBackgroundColor(Color.parseColor("#4f5d73"))
                 }
                 "222" -> {
                     holder.ll_main!!.setOnClickListener {
@@ -199,8 +211,8 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                         doMethod("ll_main2")
                     }
                     holder.textView!!.text = getString(R.string.xjbxx)
-                    holder.imageView!!.setImageResource(R.mipmap.ic_launcher_round)
-                    holder.imageView!!.setBackgroundColor(Color.parseColor("#4f5d73"))
+                    holder.imageView!!.setImageResource(R.mipmap.ic_card2)//4f5d73
+                    holder.imageView!!.setBackgroundColor(Color.parseColor("#77b3d4"))
                 }
                 "223" -> {
                     holder.ll_main!!.setOnClickListener {
@@ -208,8 +220,8 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                         doMethod("ll_main3")
                     }
                     holder.textView!!.text = getString(R.string.gzdm)
-                    holder.imageView!!.setImageResource(R.mipmap.ic_launcher_round)
-                    holder.imageView!!.setBackgroundColor(Color.parseColor("#76c2af"))
+                    holder.imageView!!.setImageResource(R.mipmap.ic_card3)
+                    holder.imageView!!.setBackgroundColor(Color.parseColor("#77b3d4"))
                 }
                 "224" -> {
                     holder.ll_main!!.setOnClickListener {
@@ -217,8 +229,8 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                         doMethod("ll_main4")
                     }
                     holder.textView!!.text = getString(R.string.dtsj)
-                    holder.imageView!!.setImageResource(R.mipmap.ic_launcher_round)
-                    holder.imageView!!.setBackgroundColor(Color.parseColor("#77b3d4"))
+                    holder.imageView!!.setImageResource(R.mipmap.ic_card4)
+                    holder.imageView!!.setBackgroundColor(Color.parseColor("#4f5d73"))
                 }
                 "225" -> {
                     holder.ll_main!!.setOnClickListener {
@@ -226,8 +238,8 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                         doMethod("ll_main5")
                     }
                     holder.textView!!.text = getString(R.string.iotest)
-                    holder.imageView!!.setImageResource(R.mipmap.ic_launcher_round)
-                    holder.imageView!!.setBackgroundColor(Color.parseColor("#76c2af"))
+                    holder.imageView!!.setImageResource(R.mipmap.ic_card5)
+                    holder.imageView!!.setBackgroundColor(Color.parseColor("#4f5d73"))
                 }
                 "226" -> {
                     holder.ll_main!!.setOnClickListener {
@@ -235,8 +247,8 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                         doMethod("ll_main6")
                     }
                     holder.textView!!.text = getString(R.string.sxwj)
-                    holder.imageView!!.setImageResource(R.mipmap.ic_launcher_round)
-                    holder.imageView!!.setBackgroundColor(Color.parseColor("#76c2af"))
+                    holder.imageView!!.setImageResource(R.mipmap.ic_card6)
+                    holder.imageView!!.setBackgroundColor(Color.parseColor("#77b3d4"))
                 }
             }
         }

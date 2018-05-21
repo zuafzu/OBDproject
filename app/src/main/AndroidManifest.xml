@@ -89,6 +89,10 @@
             android:name=".activity.RequestListActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustPan" />
+        <activity
+            android:name=".activity.ResponseListActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustPan"></activity>
     </application>
 
 </manifest>
