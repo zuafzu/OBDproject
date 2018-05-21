@@ -2,6 +2,7 @@ package com.cy.obdproject.activity
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
@@ -20,6 +21,7 @@ import com.cy.obdproject.base.BaseActivity
 import com.cy.obdproject.constant.Constant
 import com.cy.obdproject.socket.SocketService
 import com.cy.obdproject.socket.WebSocketService
+import com.cy.obdproject.tools.FastBlurUtil
 import com.cy.obdproject.tools.SPTools
 import com.cy.obdproject.tools.WifiTools
 import com.cy.obdproject.worker.OBDStart1Worker
@@ -27,9 +29,6 @@ import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.dip
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.toast
-import com.cy.obdproject.tools.FastBlurUtil
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 
 
 
@@ -116,10 +115,10 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
             "tv_ycxz" -> {//远程协作
                 showProgressDialog()
                 if ("远程协助" == tv_ycxz.text) {
-                    startActivity(Intent(this@MainActivity, ResponseListActivity::class.java))
+//                    startActivity(Intent(this@MainActivity, ResponseListActivity::class.java))
 
-//                    tv_ycxz.text = "断开协助"
-//                    startService(mIntent1)
+                    tv_ycxz.text = "断开协助"
+                    startService(mIntent1)
                 } else {
                     tv_ycxz.text = "远程协助"
                     stopService(mIntent1)

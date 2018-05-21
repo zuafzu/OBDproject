@@ -7,7 +7,6 @@ import java.io.Serializable;
  */
 public class WebSocketBean implements Serializable {
 
-    // {"S":"zuser","R":"user","C":"D","D":"operation command"}
     private String S = "";
     private String R = "";
     private String C = "";

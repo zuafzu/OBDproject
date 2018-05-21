@@ -1,15 +1,12 @@
 package com.cy.obdproject.activity
 
-import android.os.AsyncTask
+import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import com.cy.obdproject.R
 import com.cy.obdproject.adapter.WriteDataAdapter
 import com.cy.obdproject.base.BaseActivity
 import com.cy.obdproject.bean.WriteDataBean
-import com.cy.obdproject.tools.StringTools
 import kotlinx.android.synthetic.main.activity_write_data.*
-import org.jetbrains.anko.toast
 
 class WriteDataActivity : BaseActivity(), BaseActivity.ClickMethoListener {
 
@@ -20,7 +17,6 @@ class WriteDataActivity : BaseActivity(), BaseActivity.ClickMethoListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_write_data)
         initView()
-        test()
     }
 
 
@@ -40,7 +36,9 @@ class WriteDataActivity : BaseActivity(), BaseActivity.ClickMethoListener {
             adapter!!.notifyDataSetChanged()
         }
         listView.setOnItemClickListener { parent, view, position, id ->
-            toast("filePath = " + list!![position].filePath)
+            val mIntent = Intent(this, WriteData2Activity::class.java)
+            mIntent.putExtra("url", "http://p.gdown.baidu.com/60332a6f13574428559b663d5adad887219fa2e6070da7e66162d8d25561f8ffe6e9c60e6c68be502a45303ce87f36228a02825f92b8d9e5426f684e60de79128148cede56f7b1bc1a1bf927b5342d1c387caa1a980a0b4a1ed8501d01d454b35a151cde03b4abe3261361f02d9a87b531e25ce730a2c48b3a1253258e892f01bdc4ca836f83f382052d694050d08dbb1f80f193d1f58286ebb23d0a9e9b5e9199106b7d77cb43008bc4c220733a85e56e1d1101ac59f1a1541243c5a95e16e171b5bc1df2529ab2501183ae227166a9dc61601287ed5f695c9c5ae3eceebaf8ba791b3302edaef3c58f29b5df2eeb110c4fc32710c7b78263f4c6253581d960e8a1edb3d0229517ec1f579b1aa73b31eef65ecadba96d67c13cbbd216039347342b1370a7273a125009e4f902c86523aa14265001ac9f263b33cd0e8ba7daf69bc3fdf7e85ac556")
+            startActivity(mIntent)
         }
 
     }
@@ -51,58 +49,6 @@ class WriteDataActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                 finish()
             }
         }
-    }
-
-    fun test() {
-        object : AsyncTask<String, Void, String>() {
-            override fun doInBackground(vararg p0: String?): String {
-                val mIs = assets.open("HS3EV_EPS_20180327.eol")
-                val length = mIs.available()
-                Log.e("cyf88", "length " + length)
-                val buffer = ByteArray(length)
-                mIs.read(buffer)
-                val ba1 = ByteArray(4)
-                ba1[0] = buffer[10]
-                ba1[1] = buffer[9]
-                ba1[2] = buffer[8]
-                ba1[3] = buffer[7]
-                val ba2 = ByteArray(4)
-                ba2[0] = buffer[14]
-                ba2[1] = buffer[13]
-                ba2[2] = buffer[12]
-                ba2[3] = buffer[11]
-                var str = StringTools.byte2hex(ba1)
-                var str2 = StringTools.byte2hex(ba2)
-                val a = (str2.toInt(16) - str.toInt(16) + 1)
-                Log.e("cyf88", "" + str2.toInt(16) + " - " + str.toInt(16) + " = " + a)
-                ba1[0] = buffer[14 + a + 4]
-                ba1[1] = buffer[14 + a + 3]
-                ba1[2] = buffer[14 + a + 2]
-                ba1[3] = buffer[14 + a + 1]
-                ba2[0] = buffer[14 + a + 8]
-                ba2[1] = buffer[14 + a + 7]
-                ba2[2] = buffer[14 + a + 6]
-                ba2[3] = buffer[14 + a + 5]
-                str = StringTools.byte2hex(ba1)
-                str2 = StringTools.byte2hex(ba2)
-                val b = (str2.toInt(16) - str.toInt(16) + 1)
-                Log.e("cyf88", "" + str2.toInt(16) + " - " + str.toInt(16) + " = " + b)
-                ba1[0] = buffer[14 + a + 8 + b + 4]
-                ba1[1] = buffer[14 + a + 8 + b + 3]
-                ba1[2] = buffer[14 + a + 8 + b + 2]
-                ba1[3] = buffer[14 + a + 8 + b + 1]
-                ba2[0] = buffer[14 + a + 8 + b + 8]
-                ba2[1] = buffer[14 + a + 8 + b + 7]
-                ba2[2] = buffer[14 + a + 8 + b + 6]
-                ba2[3] = buffer[14 + a + 8 + b + 5]
-                str = StringTools.byte2hex(ba1)
-                str2 = StringTools.byte2hex(ba2)
-                val c = (str2.toInt(16) - str.toInt(16) + 1)
-                Log.e("cyf88", "" + str2.toInt(16) + " - " + str.toInt(16) + " = " + c)
-                return ""
-            }
-
-        }.execute()
     }
 
 }

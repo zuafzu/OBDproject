@@ -5,41 +5,36 @@ import android.os.Handler;
 import android.util.Log;
 
 import com.cy.obdproject.agreement.ECUagreement;
-import com.cy.obdproject.bean.BaseInfoBean;
-import com.cy.obdproject.bean.SocketBean;
+import com.cy.obdproject.bean.WriteFileBean;
 import com.cy.obdproject.callback.SocketCallBack;
 import com.cy.obdproject.socket.MySocketClient;
 import com.cy.obdproject.socket.SocketService;
 import com.cy.obdproject.tools.ECUTools;
 import com.cy.obdproject.tools.StringTools;
-import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class BaseInfoWorker {
+public class WriteDataWorker {
 
-    private List<SocketBean> socketBeanList;
-    private List<BaseInfoBean> baseInfoBeanList = new ArrayList<>();
+    private ArrayList<WriteFileBean> writeFileBeans;
 
     private List<String> myData = new ArrayList<>();
     private final int timeOut = 3000;// 超时时间
     private Activity activity;
     private SocketCallBack socketCallBack;
     private String msg = "";
-    private int index = 0;
     private MySocketClient.ConnectLinstener connectLinstener;
     private Long sysTime1 = 0L;
     private Long sysTime2 = 0L;
     private Handler handler;
     private Runnable runnable;
 
-    public void init(Activity activity, List<SocketBean> socketBeanList, SocketCallBack socketCallBack) {
+    public void init(Activity activity, SocketCallBack socketCallBack) {
         this.activity = activity;
-        this.socketBeanList = socketBeanList;
         this.socketCallBack = socketCallBack;
-        handler = new android.os.Handler();
+        handler = new Handler();
         runnable = new Runnable() {
             @Override
             public void run() {
@@ -56,11 +51,10 @@ public class BaseInfoWorker {
         };
     }
 
-    public void start() {
-        baseInfoBeanList.clear();
-        index = 0;
+    public void start(ArrayList<WriteFileBean> writeFileBeans) {
+        this.writeFileBeans = writeFileBeans;
         if (SocketService.Companion.getIntance() != null && SocketService.Companion.getIntance().isConnected()) {
-            next();
+            // next();
         } else {
             putData("OBD未连接");
         }
@@ -78,8 +72,8 @@ public class BaseInfoWorker {
         return sleep() || checkData();
     }
 
-    private boolean sleep() {
-        while (myData.size() == 0) {
+    private boolean sleep(){
+        while (myData.size()==0) {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
@@ -106,7 +100,7 @@ public class BaseInfoWorker {
         if (sysTime2 - sysTime1 <= timeOut) {
             String mmsg = "";
             for (int i = 0; i < myData.size(); i++) {
-                mmsg = ECUTools.getData(myData.get(i), socketBeanList.get(index).getType(), msg);
+                mmsg = ECUTools.getData(myData.get(i), 1, msg);
                 if (mmsg.equals(ECUTools.ERR)) {
                     myData.remove(i);
                     i--;
@@ -118,7 +112,7 @@ public class BaseInfoWorker {
                     break;
                 }
             }
-            if (myData.size() == 0) {
+            if(myData.size() == 0){
                 putData("返回数据异常");
                 return true;
             }
@@ -130,10 +124,10 @@ public class BaseInfoWorker {
     }
 
     private void putData(final String msg) {
-        BaseInfoWorker.this.activity.runOnUiThread(new Runnable() {
+        WriteDataWorker.this.activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                BaseInfoWorker.this.socketCallBack.getData(msg);
+                WriteDataWorker.this.socketCallBack.getData(msg);
             }
         });
     }
@@ -142,24 +136,25 @@ public class BaseInfoWorker {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                if (index < socketBeanList.size()) {
-                    msg = ECUagreement.a(socketBeanList.get(index).getData());
-                    if (replay()) {
-                        return;
-                    }
-                    String sblData = BaseInfoWorker.this.socketBeanList.get(index).getData();
-
-
-                    String mmsg = ECUTools.getData(myData.get(0), socketBeanList.get(index).getType(), msg);
-                    BaseInfoBean baseInfoBean = new BaseInfoBean();
-                    baseInfoBean.setName(BaseInfoWorker.this.socketBeanList.get(index).getName());
-                    baseInfoBean.setValue(mmsg);
-                    baseInfoBeanList.add(baseInfoBean);
-                    index++;
-                    next();
-                } else {
-                    putData(new Gson().toJson(baseInfoBeanList));
+                msg = ECUagreement.a("1003");
+                if (replay()) {
+                    return;
                 }
+                msg = ECUagreement.a("2701");
+                if (replay()) {
+                    return;
+                }
+                String data = myData.get(0);
+                msg = ECUagreement.a("2702" +
+                        StringTools.byte2hex(ECUTools._GetKey(StringTools.hex2byte(ECUTools.getData2(data, 1, msg)))));
+                if (replay()) {
+                    return;
+                }
+//                msg = ECUagreement.a(socketBean.getData());
+//                if (replay()) {
+//                    return;
+//                }
+                putData("刷写成功");
             }
         }).start();
     }

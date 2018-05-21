@@ -8,11 +8,20 @@ import android.view.View;
 import android.view.WindowManager;
 
 import com.cy.obdproject.app.MyApp;
+import com.cy.obdproject.bean.BaseBean;
 import com.cy.obdproject.bean.WebSocketBean;
 import com.cy.obdproject.constant.Constant;
 import com.cy.obdproject.socket.WebSocketService;
+import com.cy.obdproject.tools.NetTools;
 import com.cy.obdproject.tools.SPTools;
+import com.cy.obdproject.url.Urls;
 import com.google.gson.Gson;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class BaseActivity extends AppCompatActivity {
 
@@ -65,12 +74,28 @@ public class BaseActivity extends AppCompatActivity {
     private void setAllData(String data, String method) {
         if (isUserConnected) {// 用户连接
             String str = "{\"activity\":\"" + this.getLocalClassName() + "\",\"method\":\"" + method + "\",\"data\":\"" + data.replace("\"", "\\\"") + "\"}";
-            WebSocketBean webSocketBean = new WebSocketBean();
-            webSocketBean.setS("" + SPTools.INSTANCE.get(this, Constant.USERID, ""));
-            webSocketBean.setR("" + SPTools.INSTANCE.get(this, Constant.ZFORUID, ""));
-            webSocketBean.setC("D");
-            webSocketBean.setD(str);
-            WebSocketService.Companion.getIntance().sendMsg(new Gson().toJson(webSocketBean));
+            Map<String, String> map = new HashMap<>();
+            map.put("data", str);
+            NetTools.net(map, new Urls().updateMsg, this, new NetTools.MyCallBack() {
+                @Override
+                public void getData(BaseBean response) {
+                    if (response != null && "0".equals(response.getCode())) {
+                        try {
+                            JSONObject jsonObject = new JSONObject(response.getData());
+                            WebSocketBean webSocketBean = new WebSocketBean();
+                            webSocketBean.setS("" + SPTools.INSTANCE.get(BaseActivity.this, Constant.USERID, ""));
+                            // ---------------------------- cyf 需要修改-----------------------------
+                            webSocketBean.setR("2" + SPTools.INSTANCE.get(BaseActivity.this, Constant.ZFORUID, ""));
+                            webSocketBean.setC("D");
+                            webSocketBean.setD(jsonObject.optString("id"));
+                            webSocketBean.setE("");
+                            WebSocketService.Companion.getIntance().sendMsg(new Gson().toJson(webSocketBean));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }, "正在加载...", false, false);
         }
     }
 
@@ -97,13 +122,27 @@ public class BaseActivity extends AppCompatActivity {
         if (WebSocketService.Companion.getIntance() != null && (int) SPTools.INSTANCE.get(this, Constant.USERTYPE, 0) == Constant.userProfessional) {
             // 点击事件的远程控制
             String str = "{\"activity\":\"" + className + "\",\"tag\":\"" + tag + "\"}";
-            WebSocketBean webSocketBean = new WebSocketBean();
-            webSocketBean.setS(SPTools.INSTANCE.get(this, Constant.USERID, "").toString());// 自己（专家）id
-            webSocketBean.setR(SPTools.INSTANCE.get(this, Constant.ZFORUID, "").toString());
-            webSocketBean.setC("D");
-            webSocketBean.setD(str);// 自定义的json串
-            webSocketBean.setE("");
-            WebSocketService.Companion.getIntance().sendMsg(new Gson().toJson(webSocketBean));
+            Map<String, String> map = new HashMap<>();
+            map.put("data", str);
+            NetTools.net(map, new Urls().updateMsg, this, new NetTools.MyCallBack() {
+                @Override
+                public void getData(BaseBean response) {
+                    if (response != null && "0".equals(response.getCode())) {
+                        try {
+                            JSONObject jsonObject = new JSONObject(response.getData());
+                            WebSocketBean webSocketBean = new WebSocketBean();
+                            webSocketBean.setS("" + SPTools.INSTANCE.get(BaseActivity.this, Constant.USERID, ""));
+                            webSocketBean.setR("" + SPTools.INSTANCE.get(BaseActivity.this, Constant.ZFORUID, ""));
+                            webSocketBean.setC("D");
+                            webSocketBean.setD(jsonObject.optString("id"));
+                            webSocketBean.setE("");
+                            WebSocketService.Companion.getIntance().sendMsg(new Gson().toJson(webSocketBean));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }, "正在加载...", false, false);
         }
     }
 

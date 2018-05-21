@@ -12,14 +12,20 @@ import com.cy.obdproject.activity.MainActivity
 import com.cy.obdproject.activity.RequestListActivity
 import com.cy.obdproject.app.MyApp
 import com.cy.obdproject.base.BaseActivity
+import com.cy.obdproject.bean.BaseBean
 import com.cy.obdproject.bean.WebSocketBean
 import com.cy.obdproject.constant.Constant
 import com.cy.obdproject.tools.SPTools
 import com.cy.obdproject.url.Urls
 import com.google.gson.Gson
+import com.zhy.http.okhttp.OkHttpUtils
+import com.zhy.http.okhttp.callback.Callback
+import okhttp3.Call
+import okhttp3.Response
 import org.java_websocket.WebSocket
 import org.java_websocket.drafts.Draft_17
 import org.json.JSONObject
+import java.lang.Exception
 import java.net.URI
 
 
@@ -95,35 +101,68 @@ class WebSocketService : Service() {
                         if (webSocketBean.d.toString() == "") {
 
                         } else {
-                            val jsonObject = JSONObject(webSocketBean.d.toString())
-                            val activityName = jsonObject.opt("activity").toString()
-                            if (WebSocketService.getIntance() != null && SPTools[this@WebSocketService, Constant.USERTYPE, 0] == Constant.userProfessional) {
-                                // 用户端传过来的信息处理显示数据的事件
-                                val data = jsonObject.opt("data").toString()
-                                val method = jsonObject.opt("method").toString()
-                                for (i in 0 until (application as MyApp).activityList.size) {
-                                    if ((application as MyApp).activityList[i].localClassName.contains(activityName)) {
-                                        when (method) {
-                                            "setData" -> ((application as MyApp).activityList[i] as BaseActivity).setData(data)
-                                            "setData1" -> ((application as MyApp).activityList[i] as BaseActivity).setData1(data)
-                                            "setData2" -> ((application as MyApp).activityList[i] as BaseActivity).setData2(data)
+
+                            val map = hashMapOf<String, String>()
+                            map["id"] = webSocketBean.d.toString()
+                            OkHttpUtils.postString().url(Urls().getMsg).addHeader(Constant.TOKEN, SPTools[this@WebSocketService, Constant.TOKEN, ""] as String?)
+                                    .content(Gson().toJson(map)).build()
+                                    .execute(object : Callback<BaseBean>() {
+
+                                        override fun parseNetworkResponse(response: Response?, id: Int): BaseBean {
+                                            val json = response!!.body().string()
+                                            Log.e("cyf7", "response : $json")
+                                            val jsonObject = JSONObject(json)
+                                            val bean = BaseBean()
+                                            bean.code = jsonObject.optString("code")
+                                            bean.msg = jsonObject.optString("msg")
+                                            val json2 = jsonObject.optString("data")
+                                            if ("" != json2 && "{}" != json2 && "{ }" != json2) {
+                                                bean.data = json2
+                                            }
+                                            return bean
                                         }
-                                        break
-                                    }
-                                }
-                            }
-                            if (WebSocketService.getIntance() != null && SPTools[this@WebSocketService, Constant.USERTYPE, 0] == Constant.userNormal) {
-                                // 专家端传来的信息处理点击事件
-                                val tag = jsonObject.opt("tag").toString()
-                                for (i in 0 until (application as MyApp).activityList.size) {
-                                    if ((application as MyApp).activityList[i].localClassName.contains(activityName)) {
-                                        ((application as MyApp).activityList[i] as BaseActivity).runOnUiThread {
-                                            ((application as MyApp).activityList[i] as BaseActivity.ClickMethoListener).doMethod(tag)
+
+                                        override fun onResponse(response: BaseBean?, id: Int) {
+                                            if (response != null && "0" == response.code) {
+                                                val jo = JSONObject(response.data)
+                                                val msg = jo.optString("msg")
+                                                val jsonObject = JSONObject(msg)
+                                                val activityName = jsonObject.opt("activity").toString()
+                                                if (WebSocketService.getIntance() != null && SPTools[this@WebSocketService, Constant.USERTYPE, 0] == Constant.userProfessional) {
+                                                    // 用户端传过来的信息处理显示数据的事件
+                                                    val data = jsonObject.opt("data").toString()
+                                                    val method = jsonObject.opt("method").toString()
+                                                    for (i in 0 until (application as MyApp).activityList.size) {
+                                                        if ((application as MyApp).activityList[i].localClassName.contains(activityName)) {
+                                                            when (method) {
+                                                                "setData" -> ((application as MyApp).activityList[i] as BaseActivity).setData(data)
+                                                                "setData1" -> ((application as MyApp).activityList[i] as BaseActivity).setData1(data)
+                                                                "setData2" -> ((application as MyApp).activityList[i] as BaseActivity).setData2(data)
+                                                            }
+                                                            break
+                                                        }
+                                                    }
+                                                }
+                                                if (WebSocketService.getIntance() != null && SPTools[this@WebSocketService, Constant.USERTYPE, 0] == Constant.userNormal) {
+                                                    // 专家端传来的信息处理点击事件
+                                                    val tag = jsonObject.opt("tag").toString()
+                                                    for (i in 0 until (application as MyApp).activityList.size) {
+                                                        if ((application as MyApp).activityList[i].localClassName.contains(activityName)) {
+                                                            ((application as MyApp).activityList[i] as BaseActivity).runOnUiThread {
+                                                                ((application as MyApp).activityList[i] as BaseActivity.ClickMethoListener).doMethod(tag)
+                                                            }
+                                                            break
+                                                        }
+                                                    }
+                                                }
+                                            }
                                         }
-                                        break
-                                    }
-                                }
-                            }
+
+                                        override fun onError(call: Call?, e: Exception?, id: Int) {
+
+                                        }
+
+                                    })
                         }
                     }
                 } else if (webSocketBean.c == "L") {//登录

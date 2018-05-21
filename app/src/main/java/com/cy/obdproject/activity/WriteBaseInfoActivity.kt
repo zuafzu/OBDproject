@@ -1,11 +1,13 @@
 package com.cy.obdproject.activity
 
+import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.support.v7.app.AlertDialog
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
 import android.widget.EditText
 import com.cy.obdproject.R
@@ -201,6 +203,10 @@ class WriteBaseInfoActivity : BaseActivity(), BaseActivity.ClickMethoListener, A
                     sendClick(this@WriteBaseInfoActivity.localClassName, "")
                     dismiss()
                 }.create()
+        dialog!!.setOnDismissListener {
+            val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS)
+        }
         dialog!!.show()
     }
 
