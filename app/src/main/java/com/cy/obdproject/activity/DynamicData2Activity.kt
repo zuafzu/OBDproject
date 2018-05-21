@@ -13,6 +13,7 @@ import com.cy.obdproject.base.BaseActivity
 import com.cy.obdproject.bean.DynamicDataBean
 import com.cy.obdproject.constant.Constant
 import kotlinx.android.synthetic.main.activity_dynamic_data2.*
+import org.jetbrains.anko.toast
 
 class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
     private var listData: ArrayList<DynamicDataBean>? = null
@@ -33,6 +34,7 @@ class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
 
         if (intent.hasExtra("listData")) {
             listData = intent.getSerializableExtra("listData") as ArrayList<DynamicDataBean>?
+            Log.e("zj","listData = "+listData.toString())
             if (listData!!.size > 0) {
                 pageCount = (listData!!.size - 1) / 10 + 1;
 
@@ -43,12 +45,18 @@ class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
                     btn_nextPage.setBackgroundResource(R.drawable.shape_btn_colorhint)
                 }
                 if (adapter == null) {
+
+                    Log.e("zj","11111")
                     adapter = ControlDynamicDataAdapter(listData!!, this)
                     listView!!.adapter = adapter
                 } else {
+                    Log.e("zj","2222")
+
                     adapter!!.notifyDataSetChanged()
                 }
             }
+        }else{
+            toast("shujuqueshi")
         }
     }
 
