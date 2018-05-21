@@ -38,9 +38,7 @@ class ErrorCodeActivity : BaseActivity(), BaseActivity.ClickMethoListener {
         adapter!!.setOnErrorCodeClick { id, position ->
             toast("" + position)
         }
-
     }
-
 
     override fun doMethod(string: String?) {
         when (string) {

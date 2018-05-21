@@ -35,7 +35,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
-                android:text="本项目消费明细查询"
+                android:text=""
                 android:textColor="@android:color/black"
                 android:textSize="12sp" />
 

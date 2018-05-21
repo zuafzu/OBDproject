@@ -35,7 +35,6 @@ class ConnentOBDActivity : BaseActivity(), BaseActivity.ClickMethoListener {
         mIntent2 = Intent(this, SocketService::class.java)
         startWorker = OBDStart1Worker()
         wifiTools = WifiTools(this)
-
     }
 
     @SuppressLint("SetTextI18n")

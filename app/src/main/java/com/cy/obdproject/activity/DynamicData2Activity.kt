@@ -99,22 +99,19 @@ class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
         }
         // 值的长度减去前几页的长度，剩下的就是这一页的长度，如果这一页的长度比View_Count小，表示这是最后的一页了，后面在没有了。
         // 将向后翻页的按钮设为不可用。
+        // 否则将2个按钮都设为可用的。
         if (listData!!.size - Constant.pageIndex * Constant.pageSize <= Constant.pageSize) {
             btn_nextPage.isEnabled = false
             btn_nextPage.setBackgroundResource(R.drawable.shape_btn_colorhint)
         } else {
             btn_nextPage.isEnabled = true
             btn_nextPage.setBackgroundResource(R.drawable.shape_btn_colorprimary)
-        }// 否则将2个按钮都设为可用的。
+        }
         // 刷新ListView里面的数值。
         if (listData!!.size - Constant.pageIndex * Constant.pageSize > 0) {
             adapter!!.notifyDataSetChanged()
         }
     }
-
-//    var VIEW_COUNT = 10
-//    // 用于显示页号的索引
-//    var index = 0
 
     inner class ControlDynamicDataAdapter(private val items: ArrayList<DynamicDataBean>, private val context: Context) : BaseAdapter() {
 
