@@ -68,7 +68,7 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
         val scaledBitmap = BitmapFactory.decodeResource(res, R.mipmap.ic_background)
 
         //        scaledBitmap为目标图像，10是缩放的倍数（越大模糊效果越高）
-        val blurBitmap = FastBlurUtil.toBlur(scaledBitmap, 5)
+        val blurBitmap = FastBlurUtil.toBlur(scaledBitmap, 2)
         iv_background.scaleType = ImageView.ScaleType.CENTER_CROP
         iv_background.setImageBitmap(blurBitmap)
 
