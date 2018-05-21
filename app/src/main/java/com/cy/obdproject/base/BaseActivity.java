@@ -51,20 +51,20 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     public void setData(String data) {
-        setAllData(data);
+        setAllData(data, "setData");
     }
 
     public void setData1(String data) {
-        setAllData(data);
+        setAllData(data, "setData1");
     }
 
     public void setData2(String data) {
-        setAllData(data);
+        setAllData(data, "setData2");
     }
 
-    private void setAllData(String data){
+    private void setAllData(String data, String method) {
         if (isUserConnected) {// 用户连接
-            String str = "{\"activity\":\"" + this.getLocalClassName() + "\",\"method\":\"" + "setData" + "\",\"data\":\"" + data.replace("\"", "\\\"") + "\"}";
+            String str = "{\"activity\":\"" + this.getLocalClassName() + "\",\"method\":\"" + method + "\",\"data\":\"" + data.replace("\"", "\\\"") + "\"}";
             WebSocketBean webSocketBean = new WebSocketBean();
             webSocketBean.setS("" + SPTools.INSTANCE.get(this, Constant.USERID, ""));
             webSocketBean.setR("" + SPTools.INSTANCE.get(this, Constant.ZFORUID, ""));
