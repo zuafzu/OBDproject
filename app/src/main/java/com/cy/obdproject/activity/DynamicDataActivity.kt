@@ -24,13 +24,10 @@ class DynamicDataActivity : BaseActivity(), BaseActivity.ClickMethoListener, Ada
         initView()
     }
 
-
     private fun initView() {
         list = ArrayList()
         setClickMethod(iv_back)
         setClickMethod(btn_next)
-
-
 
         for (i in 0 until 50) {
 
