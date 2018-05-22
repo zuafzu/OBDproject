@@ -101,7 +101,6 @@ class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
         }
     }
     private fun initData() {
-
         if (isProfessionalConnected) {// 专家连接
 
         } else {
