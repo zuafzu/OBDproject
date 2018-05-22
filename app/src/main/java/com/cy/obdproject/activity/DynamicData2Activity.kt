@@ -63,6 +63,7 @@ class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
                 if (adapter == null) {
 
                     Log.e("zj","11111")
+
                     adapter = ControlDynamicDataAdapter(listData!!, this)
                     listView!!.adapter = adapter
                 } else {
@@ -70,6 +71,8 @@ class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
 
                     adapter!!.notifyDataSetChanged()
                 }
+
+              Log.e("zj","count = "+  adapter!!.count)
             }
         }else{
             toast("shujuqueshi")
@@ -195,7 +198,11 @@ class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
             // 值的总个数-前几页的个数就是这一页要显示的个数，如果比默认的值小，说明这是最后一页，只需显示这么多就可以了
             return if (items!!.size - ori < Constant.pageSize) {
                 items!!.size - ori
+
+//                Log.e("zj","getCount 111= "+(items!!.size - ori))
             } else {
+//                Log.e("zj","getCount 222 = "+Constant.pageSize)
+
                 Constant.pageSize
             }// 如果比默认的值还要大，说明一页显示不完，还要用换一页显示，这一页用默认的值显示满就可以了。
         }
@@ -222,7 +229,6 @@ class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
             } else {
                 holder = convertView.tag as Holder
             }
-
             holder.tv_name!!.text = items.get(position + pageIndex * Constant.pageSize).name
             holder.tv_value!!.text = items.get(position + pageIndex * Constant.pageSize).value
 
