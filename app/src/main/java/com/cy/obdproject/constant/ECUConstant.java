@@ -92,7 +92,7 @@ public class ECUConstant {
      */
     public static ArrayList<SocketBean> getDynamicBaseInfoData() {
         ArrayList socketBeanList = new ArrayList();
-        socketBeanList.add(new SocketBean("模式配置：", 1, "22F100"));
+        socketBeanList.add(new SocketBean("模式配置1：", 1, "22F100"));
         socketBeanList.add(new SocketBean("FAW ECU启动软件版本号：", 3, "22F180"));
         socketBeanList.add(new SocketBean("FAW ECU应用软件版本号：", 3, "22F181"));
         socketBeanList.add(new SocketBean("生产文件号：", 3, "22F182"));

@@ -10,14 +10,22 @@ import android.widget.BaseAdapter
 import android.widget.TextView
 import com.cy.obdproject.R
 import com.cy.obdproject.base.BaseActivity
+import com.cy.obdproject.bean.BaseInfoBean
 import com.cy.obdproject.bean.DynamicDataBean
 import com.cy.obdproject.constant.Constant
+import com.cy.obdproject.constant.ECUConstant
+import com.cy.obdproject.socket.SocketService
+import com.cy.obdproject.worker.BaseInfoWorker
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.activity_dynamic_data2.*
 import org.jetbrains.anko.toast
 
 class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
     private var listData: ArrayList<DynamicDataBean>? = null
     private var adapter: ControlDynamicDataAdapter? = null
+    private var isStart:Boolean = true
+    var pageIndex = 0
 
     private var pageCount = 0
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,7 +34,15 @@ class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
         initView()
     }
 
+    private var readBaseInfoWorker: BaseInfoWorker?= null
+
     private fun initView() {
+        //worker待更改
+        readBaseInfoWorker = BaseInfoWorker()
+        readBaseInfoWorker!!.init(this, ECUConstant.getDynamicBaseInfoData()) { data ->
+            setData(data)
+        }
+
         setClickMethod(iv_back)
         setClickMethod(btn_lastPage)
         setClickMethod(btn_nextPage)
@@ -60,6 +76,47 @@ class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
         }
     }
 
+    override fun setData(data: String?) {
+        runOnUiThread {
+            Log.i("cyf", "data : $data")
+            dismissProgressDialog()
+            try {
+                val mlist = Gson().fromJson<List<DynamicDataBean>>(data, object : TypeToken<ArrayList<DynamicDataBean>>() {}.type) as ArrayList<DynamicDataBean>?
+                listData!!.clear()
+                listData!!.addAll(mlist!!)
+                if (adapter == null) {
+                    adapter = ControlDynamicDataAdapter(listData!!, this)
+                    listView!!.adapter = adapter
+                } else {
+                    adapter!!.notifyDataSetChanged()
+                }
+            } catch (e: Exception) {
+                Log.i("cyf", "e : ${e.message}")
+                toast(data!!)
+            }
+            super.setData(data)
+        }
+    }
+    private fun initData() {
+
+        if (isProfessionalConnected) {// 专家连接
+
+        } else {
+            showProgressDialog()
+            if (SocketService.getIntance() != null && SocketService.getIntance()!!.isConnected()) {
+                readBaseInfoWorker!!.start()
+            } else {
+                listData!!.clear()
+                for (i in 0 until ECUConstant.getDynamicBaseInfoData().size) {
+                    val bean = DynamicDataBean()
+                    bean.name = ECUConstant.getReadBaseInfoData()[i].name
+                    listData!!.add(bean)
+                }
+                setData(Gson().toJson(listData))
+            }
+        }
+    }
+
     override fun doMethod(string: String?) {
         when (string) {
             "iv_back" -> {
@@ -76,20 +133,28 @@ class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
                 }
             }
             "btn_start" -> {
-                Log.e("zj", "当前页 List = " + getPageList(listData!!, Constant.pageSize)[Constant.pageIndex])
+                Log.e("zj", "当前页 List = " + getPageList(listData!!, Constant.pageSize)[pageIndex])
+                if (isStart){
+                    btn_start.setText("停止")
+                    isStart = false
+                }else{
+                    btn_start.setText("开始")
+                    isStart = true
+                }
+                initData()
             }
         }
     }
 
     private fun preView() {
-        Constant.pageIndex--
+        pageIndex--
         // 检查Button是否可用。
         checkButton()
     }
 
     // 点击右边的Button，表示向后翻页，索引值要加1.
     private fun nextView() {
-        Constant.pageIndex++
+        pageIndex++
         // 检查Button是否可用。
         checkButton()
     }
@@ -97,7 +162,7 @@ class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
     private fun checkButton() {
         // 索引值小于等于0，表示不能向前翻页了，以经到了第一页了。
         // 将向前翻页的按钮设为不可用。
-        if (Constant.pageIndex <= 0) {
+        if (pageIndex <= 0) {
             btn_lastPage.isEnabled = false
             btn_lastPage.setBackgroundResource(R.drawable.shape_btn_colorhint)
         } else {
@@ -108,7 +173,7 @@ class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
         // 值的长度减去前几页的长度，剩下的就是这一页的长度，如果这一页的长度比View_Count小，表示这是最后的一页了，后面在没有了。
         // 将向后翻页的按钮设为不可用。
         // 否则将2个按钮都设为可用的。
-        if (listData!!.size - Constant.pageIndex * Constant.pageSize <= Constant.pageSize) {
+        if (listData!!.size - pageIndex * Constant.pageSize <= Constant.pageSize) {
             btn_nextPage.isEnabled = false
             btn_nextPage.setBackgroundResource(R.drawable.shape_btn_colorhint)
         } else {
@@ -116,7 +181,7 @@ class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
             btn_nextPage.setBackgroundResource(R.drawable.shape_btn_colorprimary)
         }
         // 刷新ListView里面的数值。
-        if (listData!!.size - Constant.pageIndex * Constant.pageSize > 0) {
+        if (listData!!.size - pageIndex * Constant.pageSize > 0) {
             adapter!!.notifyDataSetChanged()
         }
     }
@@ -125,7 +190,7 @@ class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
 
         override fun getCount(): Int {
             // ori表示到目前为止的前几页的总共的个数。
-            val ori = Constant.pageSize * Constant.pageIndex
+            val ori = Constant.pageSize * pageIndex
 
             // 值的总个数-前几页的个数就是这一页要显示的个数，如果比默认的值小，说明这是最后一页，只需显示这么多就可以了
             return if (items!!.size - ori < Constant.pageSize) {
@@ -158,8 +223,8 @@ class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
                 holder = convertView.tag as Holder
             }
 
-            holder.tv_name!!.text = items.get(position + Constant.pageIndex * Constant.pageSize).name
-            holder.tv_value!!.text = items.get(position + Constant.pageIndex * Constant.pageSize).value
+            holder.tv_name!!.text = items.get(position + pageIndex * Constant.pageSize).name
+            holder.tv_value!!.text = items.get(position + pageIndex * Constant.pageSize).value
 
             //        if (position != (getCount() - 1)) {
             //            holder.view_line.setVisibility(View.VISIBLE);
