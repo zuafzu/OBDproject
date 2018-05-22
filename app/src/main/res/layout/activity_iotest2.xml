@@ -73,6 +73,8 @@
         android:layout_marginRight="8dp"
         android:layout_marginLeft="8dp"
         android:layout_weight="1"
+        android:scrollbars="vertical"
+        android:fadeScrollbars="false"
         android:tag="tv_log" />
 
     <LinearLayout
