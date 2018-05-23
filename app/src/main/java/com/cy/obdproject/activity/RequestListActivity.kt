@@ -1,8 +1,11 @@
 package com.cy.obdproject.activity
 
+import android.content.Intent
 import android.os.Bundle
+import android.support.v7.app.AlertDialog
 import com.cy.obdproject.R
 import com.cy.obdproject.adapter.SelectRequestAdapter
+import com.cy.obdproject.app.MyApp
 import com.cy.obdproject.base.BaseActivity
 import com.cy.obdproject.bean.RequestBean
 import com.cy.obdproject.bean.WebSocketBean
@@ -24,7 +27,9 @@ class RequestListActivity : BaseActivity(), BaseActivity.ClickMethoListener {
     }
 
     private fun initView() {
+        SPTools.put(this@RequestListActivity, Constant.ISLOGIN, "1")
         setClickMethod(iv_back)
+        setClickMethod(iv_quit)
 
         list = ArrayList()
 
@@ -54,6 +59,21 @@ class RequestListActivity : BaseActivity(), BaseActivity.ClickMethoListener {
             "iv_back" -> {
                 finish()
             }
+            "iv_quit" -> {
+                AlertDialog.Builder(this).setTitle("提示").setMessage("确认退出当前账号？").setPositiveButton("确认") { _, _ ->
+                    SPTools.clear(this@RequestListActivity)
+                    for (i in 0 until (application as MyApp).activityList.size) {
+                        (application as MyApp).activityList[i].finish()
+                    }
+                    startActivity(Intent(this@RequestListActivity, LoginActivity::class.java))
+                }.setNegativeButton("取消") { _, _ -> }.show()
+            }
+
         }
     }
+
+    override fun onBackPressed() {
+        finish()
+    }
+
 }

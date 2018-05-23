@@ -24,6 +24,7 @@ import okhttp3.Call
 import okhttp3.Response
 import org.java_websocket.WebSocket
 import org.java_websocket.drafts.Draft_17
+import org.jetbrains.anko.toast
 import org.json.JSONObject
 import java.lang.Exception
 import java.net.URI
@@ -50,12 +51,12 @@ class WebSocketService : Service() {
     override fun onCreate() {
         super.onCreate()
         Log.e("cyf", "WebSocketServie 开始服务")
-        webSocketServie = this
-        createWebSocket()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.e("cyf", "WebSocketServie onStartCommand")
+        webSocketServie = this
+        createWebSocket()
         return super.onStartCommand(intent, flags, startId)
     }
 
@@ -145,13 +146,15 @@ class WebSocketService : Service() {
                                                 }
                                                 if (WebSocketService.getIntance() != null && SPTools[this@WebSocketService, Constant.USERTYPE, 0] == Constant.userNormal) {
                                                     // 专家端传来的信息处理点击事件
-                                                    val tag = jsonObject.opt("tag").toString()
-                                                    for (i in 0 until (application as MyApp).activityList.size) {
-                                                        if ((application as MyApp).activityList[i].localClassName.contains(activityName)) {
-                                                            ((application as MyApp).activityList[i] as BaseActivity).runOnUiThread {
-                                                                ((application as MyApp).activityList[i] as BaseActivity.ClickMethoListener).doMethod(tag)
+                                                    val tag = jsonObject.opt("tag")
+                                                    if (tag != null) {
+                                                        for (i in 0 until (application as MyApp).activityList.size) {
+                                                            if ((application as MyApp).activityList[i].localClassName.contains(activityName)) {
+                                                                ((application as MyApp).activityList[i] as BaseActivity).runOnUiThread {
+                                                                    ((application as MyApp).activityList[i] as BaseActivity.ClickMethoListener).doMethod(tag.toString())
+                                                                }
+                                                                break
                                                             }
-                                                            break
                                                         }
                                                     }
                                                 }
@@ -190,13 +193,18 @@ class WebSocketService : Service() {
                             for (i in 0 until (application as MyApp).activityList.size) {
                                 if ((application as MyApp).activityList[i].localClassName.contains("LoginActivity")) {
                                     ((application as MyApp).activityList[i] as BaseActivity).runOnUiThread {
-                                        var mIntent = Intent(((application as MyApp).activityList[i] as LoginActivity),
+                                        val mIntent = Intent(((application as MyApp).activityList[i] as LoginActivity),
                                                 RequestListActivity::class.java)
                                         mIntent.addFlags(FLAG_ACTIVITY_NEW_TASK)
                                         startActivity(mIntent)
                                         (application as MyApp).activityList[i].finish()
                                     }
                                     break
+                                }
+                            }
+                            for (i in 0 until (application as MyApp).activityList.size) {
+                                if (!(application as MyApp).activityList[i].localClassName.contains("RequestListActivity")) {
+                                    (application as MyApp).activityList[i].finish()
                                 }
                             }
                         }
@@ -234,7 +242,7 @@ class WebSocketService : Service() {
                                                 MainActivity::class.java)
                                         mIntent.addFlags(FLAG_ACTIVITY_NEW_TASK)
                                         startActivity(mIntent)
-                                        ((application as MyApp).activityList[i] as RequestListActivity).finish()
+                                        // ((application as MyApp).activityList[i] as RequestListActivity).finish()
                                     }
                                     break
                                 }
@@ -250,6 +258,22 @@ class WebSocketService : Service() {
                         }
                     }
                 } else if (webSocketBean.c == "K") {
+                    if (msgClient != null) {
+                        msgClient!!.close()
+                    }
+                    toast("协助已断开！")
+                    for (i in 0 until (application as MyApp).activityList.size) {
+                        if ((application as MyApp).activityList[i].localClassName.contains("MainActivity")) {
+                            ((application as MyApp).activityList[i] as BaseActivity).runOnUiThread {
+                                val mIntent = Intent(((application as MyApp).activityList[i] as MainActivity),
+                                        MainActivity::class.java)
+                                mIntent.addFlags(FLAG_ACTIVITY_NEW_TASK)
+                                startActivity(mIntent)
+                                ((application as MyApp).activityList[i] as MainActivity).finish()
+                            }
+                            break
+                        }
+                    }
                     stopSelf()
                 }
             }

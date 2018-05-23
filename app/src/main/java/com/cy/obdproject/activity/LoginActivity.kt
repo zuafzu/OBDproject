@@ -29,10 +29,10 @@ class LoginActivity : BaseActivity(), BaseActivity.ClickMethoListener {
 
         // 判断是否自动登录
         if (SPTools[this@LoginActivity, Constant.ISLOGIN, ""] != "") {
-            for (i in 0 until (application as MyApp).activityList.size) {
-                (application as MyApp).activityList[i].finish()
-            }
             if (SPTools[this@LoginActivity, Constant.USERTYPE, 0] == Constant.userNormal) {
+                for (i in 0 until (application as MyApp).activityList.size) {
+                    (application as MyApp).activityList[i].finish()
+                }
                 startActivity(Intent(this@LoginActivity, MainActivity::class.java))
             } else {
                 showProgressDialog()
@@ -100,5 +100,8 @@ class LoginActivity : BaseActivity(), BaseActivity.ClickMethoListener {
         }, "正在加载...", true, false)
     }
 
+    override fun onBackPressed() {
+        finish()
+    }
 
 }

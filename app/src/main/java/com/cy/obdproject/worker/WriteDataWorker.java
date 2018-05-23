@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.os.Handler;
 import android.util.Log;
 
-import com.cy.obdproject.agreement.ECUagreement;
 import com.cy.obdproject.bean.WriteFileBean;
 import com.cy.obdproject.callback.SocketCallBack;
 import com.cy.obdproject.socket.MySocketClient;
@@ -54,7 +53,7 @@ public class WriteDataWorker {
     public void start(ArrayList<WriteFileBean> writeFileBeans) {
         this.writeFileBeans = writeFileBeans;
         if (SocketService.Companion.getIntance() != null && SocketService.Companion.getIntance().isConnected()) {
-            // next();
+            next();
         } else {
             putData("OBD未连接");
         }
@@ -72,8 +71,8 @@ public class WriteDataWorker {
         return sleep() || checkData();
     }
 
-    private boolean sleep(){
-        while (myData.size()==0) {
+    private boolean sleep() {
+        while (myData.size() == 0) {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
@@ -112,7 +111,7 @@ public class WriteDataWorker {
                     break;
                 }
             }
-            if(myData.size() == 0){
+            if (myData.size() == 0) {
                 putData("返回数据异常");
                 return true;
             }
@@ -136,25 +135,26 @@ public class WriteDataWorker {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                msg = ECUagreement.a("1003");
-                if (replay()) {
-                    return;
-                }
-                msg = ECUagreement.a("2701");
-                if (replay()) {
-                    return;
-                }
-                String data = myData.get(0);
-                msg = ECUagreement.a("2702" +
-                        StringTools.byte2hex(ECUTools._GetKey(StringTools.hex2byte(ECUTools.getData2(data, 1, msg)))));
-                if (replay()) {
-                    return;
-                }
+//                msg = ECUagreement.a("1003");
+//                if (replay()) {
+//                    return;
+//                }
+//                msg = ECUagreement.a("2701");
+//                if (replay()) {
+//                    return;
+//                }
+//                String data = myData.get(0);
+//                msg = ECUagreement.a("2702" +
+//                        StringTools.byte2hex(ECUTools._GetKey(StringTools.hex2byte(ECUTools.getData2(data, 1, msg)))));
+//                if (replay()) {
+//                    return;
+//                }
+//                SocketService.Companion.getIntance().sendMsg(writeFileBeans.get(0).getData(),connectLinstener);
 //                msg = ECUagreement.a(socketBean.getData());
 //                if (replay()) {
 //                    return;
 //                }
-                putData("刷写成功");
+//                putData("刷写成功");
             }
         }).start();
     }
