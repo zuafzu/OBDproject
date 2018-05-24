@@ -12,7 +12,7 @@ public class ECUagreement {
      * @return
      */
     public static String a(String data) {
-        String length = Integer.toHexString(data.length() / 2);
+        String length = Integer.toHexString(data.replace(" ", "").length() / 2);
         if (length.length() == 1) {
             length = "000" + length;
         } else if (length.length() == 2) {

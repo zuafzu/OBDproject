@@ -116,40 +116,6 @@ public class ECUTools {
         return parseAscii(data);
     }
 
-    public static byte[] _GetKey(byte[] seed) {
-        return _GetKey(0x4a68795b, seed, 4);
-    }
-
-    public static byte[] _GetKey(int mask, byte[] seed, int seedLen) {
-
-        int retLen = 0;
-        byte[] bytes = new byte[4];
-        byte[] key = new byte[4];
-        int wort;
-        if (seed[1] == 0 && seed[2] == 0)
-            return null;
-        else {
-            retLen = seedLen - 1;
-            wort = seed[0] << 24 | seed[1] << 16 | seed[2] << 8 | seed[3];
-            for (int i = 0; i < 35; i++) {
-                if ((wort & 0x80000000) != 0) {
-                    wort = (wort << 1);
-                    wort = (wort ^ mask);
-                } else {
-                    wort = (wort << 1);
-                }
-            }
-            bytes[0] = (byte) wort;
-            bytes[1] = (byte) (wort >> 8);
-            bytes[2] = (byte) (wort >> 16);
-            bytes[3] = (byte) (wort >> 24);
-            for (int i = 0; i < 4; i++) {
-                key[3 - i] = bytes[i];
-            }
-        }
-        return key;
-    }
-
     public static String parseAscii(String str) {
         StringBuilder sb = new StringBuilder();
         byte[] bs = str.getBytes();

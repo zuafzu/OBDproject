@@ -9,6 +9,7 @@ import com.cy.obdproject.bean.SocketBean;
 import com.cy.obdproject.callback.SocketCallBack;
 import com.cy.obdproject.socket.MySocketClient;
 import com.cy.obdproject.socket.SocketService;
+import com.cy.obdproject.tools.ECU2Tools;
 import com.cy.obdproject.tools.ECUTools;
 import com.cy.obdproject.tools.StringTools;
 
@@ -146,7 +147,7 @@ public class WriteBaseInfoWorker {
                 }
                 String data = myData.get(0);
                 msg = ECUagreement.a("2702" +
-                        StringTools.byte2hex(ECUTools._GetKey(StringTools.hex2byte(ECUTools.getData2(data, 1, msg)))));
+                        StringTools.byte2hex(ECU2Tools._GetKey(StringTools.hex2byte(ECUTools.getData2(data, 1, msg)))));
                 if (replay()) {
                     return;
                 }

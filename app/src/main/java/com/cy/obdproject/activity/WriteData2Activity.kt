@@ -37,7 +37,7 @@ class WriteData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
         progressBar.progress = 0
         writeDataWorker = WriteDataWorker()
         writeDataWorker!!.init(this, { data ->
-
+            tv_msg.append("\n" + data)
         })
     }
 
