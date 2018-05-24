@@ -136,26 +136,6 @@ public class WriteDataWorker {
         new Thread(new Runnable() {
             @Override
             public void run() {
-//                msg = ECUagreement.a("1003");
-//                if (replay()) {
-//                    return;
-//                }
-//                msg = ECUagreement.a("2701");
-//                if (replay()) {
-//                    return;
-//                }
-//                String data = myData.get(0);
-//                msg = ECUagreement.a("2702" +
-//                        StringTools.byte2hex(ECUTools._GetKey(StringTools.hex2byte(ECUTools.getData2(data, 1, msg)))));
-//                if (replay()) {
-//                    return;
-//                }
-//                SocketService.Companion.getIntance().sendMsg(writeFileBeans.get(0).getData(),connectLinstener);
-//                msg = ECUagreement.a(socketBean.getData());
-//                if (replay()) {
-//                    return;
-//                }
-//                putData("刷写成功");
                 // 1、发送7DF  指令1003 长度2 不需要接收
                 msg = ECUagreement.a("1003");
                 // 2、发送7DF  指令 长度2  只发送不需要接收
@@ -164,6 +144,10 @@ public class WriteDataWorker {
                 msg = ECUagreement.a("8502");
                 // 4、发送7DF  指令 长度3  只发送不需要接收
                 msg = ECUagreement.a("280303");
+
+                ECUagreement.canId = "000007A2";
+                ECUagreement.reCanId = "000007AA";
+
                 // 5、发送7A2 指令1002 长度2 返回 7AA 5002
                 msg = ECUagreement.a("1002");
                 if (replay()){
@@ -174,8 +158,10 @@ public class WriteDataWorker {
                 if (replay()){
                     return;
                 }
-                //7、发送7A2 指令2704+seed运算后的数值   长度6   返回 7AA 6704
-                msg = ECUagreement.a("2704" +"seed的运算数值");
+                String data = myData.get(0);
+                //7、发送7A2 指令2704+seed运算后的数值   长度6   返回 7AA 6704(_GetKey方法需要替换)
+                msg = ECUagreement.a("2704" +
+                        StringTools.byte2hex(ECUTools._GetKey(StringTools.hex2byte(ECUTools.getData2(data, 1, msg)))));
                 if (replay()){
                     return;
                 }
@@ -189,6 +175,10 @@ public class WriteDataWorker {
                 if (replay()){
                     return;
                 }
+
+
+
+
                 //10、CANID 7A2   指令340044 00000000(EOl中的addr) 000003B2(eol中的len)   长度 11 返回 7AA  74...
                 msg = ECUagreement.a("34004400000000000003B2");
                 if (replay()){

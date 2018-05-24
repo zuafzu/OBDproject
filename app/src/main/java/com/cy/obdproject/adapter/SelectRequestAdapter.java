@@ -51,7 +51,7 @@ public class SelectRequestAdapter extends BaseAdapter {
             holder = (Holder) convertView.getTag();
         }
 
-        holder.tv_name.setText(items.get(position).getName());
+        holder.tv_name.setText(items.get(position).getRequestName());
 //        if (position != (getCount() - 1)) {
 //            holder.view_line.setVisibility(View.VISIBLE);
 //        } else {

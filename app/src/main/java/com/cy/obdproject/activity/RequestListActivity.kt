@@ -11,13 +11,18 @@ import com.cy.obdproject.bean.RequestBean
 import com.cy.obdproject.bean.WebSocketBean
 import com.cy.obdproject.constant.Constant
 import com.cy.obdproject.socket.WebSocketService
+import com.cy.obdproject.tools.NetTools
 import com.cy.obdproject.tools.SPTools
+import com.cy.obdproject.url.Urls
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.activity_request_list.*
+import org.jetbrains.anko.toast
 
+// 用户列表
 class RequestListActivity : BaseActivity(), BaseActivity.ClickMethoListener {
 
-    private var list: ArrayList<RequestBean>? = null
+    private var requestList: ArrayList<RequestBean>? = null
     private var adapter: SelectRequestAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,26 +31,19 @@ class RequestListActivity : BaseActivity(), BaseActivity.ClickMethoListener {
         initView()
     }
 
+    override fun onResume() {
+        super.onResume()
+        net_requestList(true)
+    }
+
     private fun initView() {
         SPTools.put(this@RequestListActivity, Constant.ISLOGIN, "1")
         setClickMethod(iv_back)
         setClickMethod(iv_quit)
-
-        list = ArrayList()
-
-        val bean = RequestBean("1", "请求协助1")
-        list!!.add(bean)
-
-        if (adapter == null) {
-            adapter = SelectRequestAdapter(list!!, this)
-            listView!!.adapter = adapter
-        } else {
-            adapter!!.notifyDataSetChanged()
-        }
-
+        requestList = ArrayList()
         listView!!.setOnItemClickListener { _, _, position, _ ->
             showProgressDialog()
-            SPTools.put(this, Constant.ZFORUID, "" + list!![position].id)
+            SPTools.put(this, Constant.ZFORUID, "" + requestList!![position].requestId)
             val webSocketBean = WebSocketBean()
             webSocketBean.s = SPTools[this, Constant.USERID, ""]!!.toString()
             webSocketBean.r = SPTools[this, Constant.ZFORUID, ""]!!.toString()
@@ -74,6 +72,28 @@ class RequestListActivity : BaseActivity(), BaseActivity.ClickMethoListener {
 
     override fun onBackPressed() {
         finish()
+    }
+
+    fun net_requestList(isShow: Boolean) {
+        val map = hashMapOf<String, String>()
+        map["requestUserType"] = "s"
+        NetTools.net(map, Urls().requestList, this, { response ->
+            if (response.code == "0") {
+                val beans = Gson().fromJson<List<RequestBean>>(response.data, object : TypeToken<ArrayList<RequestBean>>() {}.type) as ArrayList<RequestBean>?
+                requestList!!.clear()
+                requestList!!.addAll(beans!!)
+                if (adapter == null) {
+                    adapter = SelectRequestAdapter(requestList!!, this)
+                    if (listView != null) {
+                        listView!!.adapter = adapter
+                    }
+                } else {
+                    adapter!!.notifyDataSetChanged()
+                }
+            } else {
+                toast(response.msg!!)
+            }
+        }, "正在加载...", isShow, true)
     }
 
 }

@@ -18,6 +18,7 @@ import android.widget.TextView
 import com.cy.obdproject.R
 import com.cy.obdproject.app.MyApp
 import com.cy.obdproject.base.BaseActivity
+import com.cy.obdproject.bean.WebSocketBean
 import com.cy.obdproject.constant.Constant
 import com.cy.obdproject.socket.SocketService
 import com.cy.obdproject.socket.WebSocketService
@@ -25,11 +26,11 @@ import com.cy.obdproject.tools.FastBlurUtil
 import com.cy.obdproject.tools.SPTools
 import com.cy.obdproject.tools.WifiTools
 import com.cy.obdproject.worker.OBDStart1Worker
+import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.dip
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.toast
-
 
 
 class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
@@ -58,6 +59,16 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
             tv_obd_state.text = "未连接"
             tv_connnect_obd.text = "连接OBD"
         }
+        if (WebSocketService.getIntance() != null && WebSocketService.getIntance()!!.isConnected()) {
+            tv_ycxz.text = "断开协助"
+        }
+        if (SPTools[this, Constant.USERTYPE, Constant.userNormal] == Constant.userNormal) {
+            ibtn_setting.visibility = View.VISIBLE
+        } else {
+            ibtn_setting.visibility = View.INVISIBLE
+            ll_obd.visibility = View.INVISIBLE
+        }
+        dismissProgressDialog()
     }
 
     private fun initView() {
@@ -106,6 +117,10 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
         recyclerview.adapter = HomeAdapter()
     }
 
+    override fun setData(data: String?) {
+
+    }
+
     @SuppressLint("SetTextI18n")
     override fun doMethod(string: String?) {
         when (string) {
@@ -115,13 +130,26 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
             "tv_ycxz" -> {//远程协作
                 showProgressDialog()
                 if ("远程协助" == tv_ycxz.text) {
-//                    startActivity(Intent(this@MainActivity, ResponseListActivity::class.java))
-
-                    tv_ycxz.text = "断开协助"
-                    startService(mIntent1)
+                    // 正常逻辑，后期开放
+//                    if (SocketService.getIntance() == null || !SocketService.getIntance()!!.isConnected()) {
+//                        toast("请先连接obd")
+//                        return
+//                    }
+                    startActivity(Intent(this@MainActivity, ResponseListActivity::class.java))
                 } else {
-                    tv_ycxz.text = "远程协助"
-                    stopService(mIntent1)
+                    if (SPTools[this, Constant.USERTYPE, Constant.userProfessional] == Constant.userProfessional) {
+                        showProgressDialog()
+                        val webSocketBean = WebSocketBean()
+                        webSocketBean.s = SPTools[this@MainActivity, Constant.USERID, ""]!!.toString()
+                        webSocketBean.r = SPTools[this@MainActivity, Constant.ZFORUID, ""]!!.toString()
+                        webSocketBean.c = "K"
+                        if (WebSocketService.getIntance() != null) {
+                            WebSocketService.getIntance()!!.sendMsg(Gson().toJson(webSocketBean))
+                        }
+                    } else {
+//                        tv_ycxz.text = "远程协助"
+//                        stopService(mIntent1)
+                    }
                 }
             }
             "ll_main1" -> {//读基本信息
@@ -156,17 +184,23 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
 
     override fun onDestroy() {
         super.onDestroy()
-        stopService(mIntent1)
+        if (SPTools[this, Constant.USERTYPE, Constant.userNormal] == Constant.userNormal) {
+            stopService(mIntent1)
+        }
         stopService(mIntent2)
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            if (System.currentTimeMillis() - mExitTime > 2000) {
-                toast("再按一次退出程序")
-                mExitTime = System.currentTimeMillis()
-            } else {
+            if (SPTools[this, Constant.USERTYPE, Constant.userProfessional] == Constant.userProfessional) {
                 finish()
+            } else {
+                if (System.currentTimeMillis() - mExitTime > 2000) {
+                    toast("再按一次退出程序")
+                    mExitTime = System.currentTimeMillis()
+                } else {
+                    finish()
+                }
             }
             return true
         }

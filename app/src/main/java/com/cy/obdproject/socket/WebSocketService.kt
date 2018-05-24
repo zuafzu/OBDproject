@@ -10,6 +10,7 @@ import android.widget.Toast
 import com.cy.obdproject.activity.LoginActivity
 import com.cy.obdproject.activity.MainActivity
 import com.cy.obdproject.activity.RequestListActivity
+import com.cy.obdproject.activity.ResponseListActivity
 import com.cy.obdproject.app.MyApp
 import com.cy.obdproject.base.BaseActivity
 import com.cy.obdproject.bean.BaseBean
@@ -51,12 +52,12 @@ class WebSocketService : Service() {
     override fun onCreate() {
         super.onCreate()
         Log.e("cyf", "WebSocketServie 开始服务")
+        webSocketServie = this
+        createWebSocket()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.e("cyf", "WebSocketServie onStartCommand")
-        webSocketServie = this
-        createWebSocket()
         return super.onStartCommand(intent, flags, startId)
     }
 
@@ -214,7 +215,16 @@ class WebSocketService : Service() {
                         // 呼叫失败
                         if (SPTools[this@WebSocketService, Constant.USERTYPE, 0] == Constant.userNormal) {
                             // 用户
-
+                            for (i in 0 until (application as MyApp).activityList.size) {
+                                if ((application as MyApp).activityList[i].localClassName.contains("ResponseListActivity")) {
+                                    ((application as MyApp).activityList[i] as BaseActivity).runOnUiThread {
+                                        Toast.makeText(((application as MyApp).activityList[i] as BaseActivity),
+                                                "申请协助失败", Toast.LENGTH_SHORT).show()
+                                        ((application as MyApp).activityList[i] as BaseActivity).dismissProgressDialog()
+                                    }
+                                    break
+                                }
+                            }
                         } else {
                             // 专家
                             for (i in 0 until (application as MyApp).activityList.size) {
@@ -232,17 +242,34 @@ class WebSocketService : Service() {
                         // 呼叫成功
                         if (SPTools[this@WebSocketService, Constant.USERTYPE, 0] == Constant.userNormal) {
                             // 用户
-
+                            for (i in 0 until (application as MyApp).activityList.size) {
+                                if ((application as MyApp).activityList[i].localClassName.contains("ResponseListActivity")) {
+                                    ((application as MyApp).activityList[i] as BaseActivity).runOnUiThread {
+                                        if (webSocketBean.s == "") {
+                                            // 弹等待窗
+                                            ((application as MyApp).activityList[i] as ResponseListActivity).showWaitDialog(true)
+                                        } else {
+                                            // 结束等待窗
+                                            ((application as MyApp).activityList[i] as ResponseListActivity).showWaitDialog(false)
+                                        }
+                                    }
+                                    break
+                                }
+                            }
                         } else {
                             // 专家
                             for (i in 0 until (application as MyApp).activityList.size) {
                                 if ((application as MyApp).activityList[i].localClassName.contains("RequestListActivity")) {
                                     ((application as MyApp).activityList[i] as BaseActivity).runOnUiThread {
-                                        val mIntent = Intent(((application as MyApp).activityList[i] as RequestListActivity),
-                                                MainActivity::class.java)
-                                        mIntent.addFlags(FLAG_ACTIVITY_NEW_TASK)
-                                        startActivity(mIntent)
-                                        // ((application as MyApp).activityList[i] as RequestListActivity).finish()
+                                        if (webSocketBean.s == "") {
+                                            val mIntent = Intent(((application as MyApp).activityList[i] as RequestListActivity),
+                                                    MainActivity::class.java)
+                                            mIntent.addFlags(FLAG_ACTIVITY_NEW_TASK)
+                                            startActivity(mIntent)
+                                            // ((application as MyApp).activityList[i] as RequestListActivity).finish()
+                                        } else {
+                                            ((application as MyApp).activityList[i] as RequestListActivity).net_requestList(false)
+                                        }
                                     }
                                     break
                                 }
@@ -258,23 +285,28 @@ class WebSocketService : Service() {
                         }
                     }
                 } else if (webSocketBean.c == "K") {
-                    if (msgClient != null) {
-                        msgClient!!.close()
-                    }
-                    toast("协助已断开！")
                     for (i in 0 until (application as MyApp).activityList.size) {
                         if ((application as MyApp).activityList[i].localClassName.contains("MainActivity")) {
                             ((application as MyApp).activityList[i] as BaseActivity).runOnUiThread {
-                                val mIntent = Intent(((application as MyApp).activityList[i] as MainActivity),
-                                        MainActivity::class.java)
-                                mIntent.addFlags(FLAG_ACTIVITY_NEW_TASK)
-                                startActivity(mIntent)
-                                ((application as MyApp).activityList[i] as MainActivity).finish()
+                                if (SPTools[this@WebSocketService, Constant.USERTYPE, Constant.userProfessional] == Constant.userProfessional) {
+                                    toast("协助已断开！")
+                                    ((application as MyApp).activityList[i] as MainActivity).finish()
+                                } else {
+                                    toast("协助已断开！")
+                                    val mIntent = Intent(((application as MyApp).activityList[i] as MainActivity),
+                                            MainActivity::class.java)
+                                    mIntent.addFlags(FLAG_ACTIVITY_NEW_TASK)
+                                    startActivity(mIntent)
+                                    ((application as MyApp).activityList[i] as MainActivity).finish()
+                                    if (msgClient != null) {
+                                        msgClient!!.close()
+                                    }
+                                    stopSelf()
+                                }
                             }
                             break
                         }
                     }
-                    stopSelf()
                 }
             }
         }

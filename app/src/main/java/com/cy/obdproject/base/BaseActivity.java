@@ -71,7 +71,7 @@ public class BaseActivity extends AppCompatActivity {
         setAllData(data, "setData2");
     }
 
-    private void setAllData(String data, String method) {
+    public void setAllData(String data, String method) {
         if (isUserConnected) {// 用户连接
             String str = "{\"activity\":\"" + this.getLocalClassName() + "\",\"method\":\"" + method + "\",\"data\":\"" + data.replace("\"", "\\\"") + "\"}";
             Map<String, String> map = new HashMap<>();
@@ -85,7 +85,7 @@ public class BaseActivity extends AppCompatActivity {
                             WebSocketBean webSocketBean = new WebSocketBean();
                             webSocketBean.setS("" + SPTools.INSTANCE.get(BaseActivity.this, Constant.USERID, ""));
                             // ---------------------------- cyf 需要修改-----------------------------
-                            webSocketBean.setR("2" + SPTools.INSTANCE.get(BaseActivity.this, Constant.ZFORUID, ""));
+                            webSocketBean.setR("" + SPTools.INSTANCE.get(BaseActivity.this, Constant.ZFORUID, ""));
                             webSocketBean.setC("D");
                             webSocketBean.setD(jsonObject.optString("id"));
                             webSocketBean.setE("");
@@ -136,7 +136,9 @@ public class BaseActivity extends AppCompatActivity {
                             webSocketBean.setC("D");
                             webSocketBean.setD(jsonObject.optString("id"));
                             webSocketBean.setE("");
-                            WebSocketService.Companion.getIntance().sendMsg(new Gson().toJson(webSocketBean));
+                            if (WebSocketService.Companion.getIntance() != null && WebSocketService.Companion.getIntance().isConnected()) {
+                                WebSocketService.Companion.getIntance().sendMsg(new Gson().toJson(webSocketBean));
+                            }
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
