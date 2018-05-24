@@ -3,9 +3,11 @@ package com.cy.obdproject.activity
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
+import android.util.Log
 import com.cy.obdproject.R
 import com.cy.obdproject.adapter.SelectRequestAdapter
 import com.cy.obdproject.base.BaseActivity
+import com.cy.obdproject.bean.ErrorCodeBean
 import com.cy.obdproject.bean.RequestBean
 import com.cy.obdproject.bean.WebSocketBean
 import com.cy.obdproject.constant.Constant
@@ -22,6 +24,7 @@ import org.json.JSONObject
 import java.util.HashMap
 import kotlin.collections.ArrayList
 import kotlin.collections.set
+import kotlin.math.log
 
 
 // 专家列表
@@ -69,31 +72,34 @@ class ResponseListActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                 mAlertDialog!!.dismiss()
             }.show()
         } else {
-            // 给专家端发送首页信息
-            if (isUserConnected) {// 用户连接
-                var data = ""
-                val str = "{\"activity\":\"" + "MainActivity" + "\",\"method\":\"" + "setData" + "\",\"data\":\"" + data.replace("\"", "\\\"") + "\"}"
-                val map = HashMap<String, String>()
-                map["data"] = str
-                NetTools.net(map, Urls().updateMsg, this, { response ->
-                    if (response != null && "0" == response.code) {
-                        try {
-                            val jsonObject = JSONObject(response.data)
-                            val webSocketBean = WebSocketBean()
-                            webSocketBean.s = "" + SPTools[this@ResponseListActivity, Constant.USERID, ""]!!
-                            // ---------------------------- cyf 需要修改-----------------------------
-                            webSocketBean.r = "" + SPTools[this@ResponseListActivity, Constant.ZFORUID, ""]!!
-                            webSocketBean.c = "D"
-                            webSocketBean.d = jsonObject.optString("id")
-                            webSocketBean.e = ""
-                            WebSocketService.getIntance()!!.sendMsg(Gson().toJson(webSocketBean))
-                        } catch (e: JSONException) {
-                            e.printStackTrace()
-                        }
-
+            // 给专家端发送首页信息  用户连接
+            var data = ""
+            var bean: ErrorCodeBean = ErrorCodeBean()
+            bean.code = SPTools.get(this, Constant.CARTYPE, "1").toString()//车型
+            bean.msg = SPTools.get(this, Constant.CARNAME, "").toString()// 车名
+            data = Gson().toJson(bean)
+            val str = "{\"activity\":\"" + "MainActivity" + "\",\"method\":\"" + "setData" + "\",\"data\":\"" + data.replace("\"", "\\\"") + "\"}"
+            val map = HashMap<String, String>()
+            map["data"] = str
+            NetTools.net(map, Urls().updateMsg, this, { response ->
+                if (response != null && "0" == response.code) {
+                    try {
+                        val jsonObject = JSONObject(response.data)
+                        val webSocketBean = WebSocketBean()
+                        webSocketBean.s = "" + SPTools[this@ResponseListActivity, Constant.USERID, ""]!!
+                        // ---------------------------- cyf 需要修改-----------------------------
+                        webSocketBean.r = "" + SPTools[this@ResponseListActivity, Constant.ZFORUID, ""]!!
+                        webSocketBean.c = "D"
+                        webSocketBean.d = jsonObject.optString("id")
+                        webSocketBean.e = ""
+                        WebSocketService.getIntance()!!.sendMsg(Gson().toJson(webSocketBean))
+                    } catch (e: JSONException) {
+                        e.printStackTrace()
                     }
-                }, "正在加载...", false, false)
-            }
+
+                }
+            }, "正在加载...", false, false)
+
             // 返回主页面
             if (mAlertDialog != null && mAlertDialog!!.isShowing) {
                 mAlertDialog!!.dismiss()

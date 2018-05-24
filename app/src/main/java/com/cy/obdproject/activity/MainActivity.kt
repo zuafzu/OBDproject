@@ -18,6 +18,7 @@ import android.widget.TextView
 import com.cy.obdproject.R
 import com.cy.obdproject.app.MyApp
 import com.cy.obdproject.base.BaseActivity
+import com.cy.obdproject.bean.ErrorCodeBean
 import com.cy.obdproject.bean.WebSocketBean
 import com.cy.obdproject.constant.Constant
 import com.cy.obdproject.socket.SocketService
@@ -27,6 +28,7 @@ import com.cy.obdproject.tools.SPTools
 import com.cy.obdproject.tools.WifiTools
 import com.cy.obdproject.worker.OBDStart1Worker
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.dip
 import org.jetbrains.anko.matchParent
@@ -118,6 +120,21 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
     }
 
     override fun setData(data: String?) {
+        var bean:ErrorCodeBean = Gson().fromJson(data,object :TypeToken<ErrorCodeBean>(){}.type)
+        var carName = bean.msg
+        var carType = bean.code
+        tv_carName.setText(carName)
+        homes = null
+        homes = ArrayList()
+        if ("1" == carType) {
+            items = "221,222,223,224,225"
+        } else if ("2" == carType) {
+            items = "226"
+        }
+
+        homes = items.split(",")
+        recyclerview.layoutManager = GridLayoutManager(this, 2)
+        recyclerview.adapter = HomeAdapter()
 
     }
 
