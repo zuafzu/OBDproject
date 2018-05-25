@@ -30,6 +30,9 @@ public class MyWebSocketClient extends WebSocketClient {
     public void onOpen(ServerHandshake handshakedata) {
         Log.e("CyfMsgClient", "onOpen");
         // if you plan to refuse connection based on ip or httpfields overload: onWebsocketHandshakeReceivedAsClient
+        if (WebSocketService.Companion.getIntance() != null) {
+            WebSocketService.Companion.getIntance().startLogin();
+        }
     }
 
 
@@ -56,5 +59,8 @@ public class MyWebSocketClient extends WebSocketClient {
         ex.printStackTrace();
         Log.e("CyfMsgClient", "onError " + ex.getMessage());
         // if the error is fatal then onClose will be called additionally
+        if (WebSocketService.Companion.getIntance() != null) {
+            WebSocketService.Companion.getIntance().onErr();
+        }
     }
 }

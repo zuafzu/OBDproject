@@ -3,7 +3,6 @@ package com.cy.obdproject.socket
 import android.app.Service
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
-import android.os.Handler
 import android.os.IBinder
 import android.util.Log
 import android.widget.Toast
@@ -52,12 +51,13 @@ class WebSocketService : Service() {
     override fun onCreate() {
         super.onCreate()
         Log.e("cyf", "WebSocketServie 开始服务")
-        webSocketServie = this
-        createWebSocket()
+
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.e("cyf", "WebSocketServie onStartCommand")
+        webSocketServie = this
+        createWebSocket()
         return super.onStartCommand(intent, flags, startId)
     }
 
@@ -310,31 +310,51 @@ class WebSocketService : Service() {
                 }
             }
         }
-        msgClient!!.connect()
         // 开始连接
-        // -----------------------------后期可优化---------------------------------
-        Handler().postDelayed({
-            if (msgClient!!.isOpen) {
-                val webSocketBean = WebSocketBean()
-                webSocketBean.s = SPTools[this, Constant.USERID, ""]!!.toString()// 自己（专家）id
-                webSocketBean.r = ""
-                webSocketBean.c = "L"
-                sendMsg(Gson().toJson(webSocketBean))
-            } else {
-                // 没连接上
-                for (i in 0 until (application as MyApp).activityList.size) {
-                    if ((application as MyApp).activityList[i].localClassName.contains("MainActivity")) {
-                        ((application as MyApp).activityList[i] as BaseActivity).runOnUiThread {
-                            Toast.makeText(((application as MyApp).activityList[i] as BaseActivity),
-                                    "与OBD连接失败", Toast.LENGTH_SHORT).show()
-                            ((application as MyApp).activityList[i] as BaseActivity).dismissProgressDialog()
-                        }
-                        break
+        if (!msgClient!!.isOpen) {
+            msgClient!!.connect()
+        }
+        Log.e("cyf", "WebSocketServie 开始连接")
+    }
+
+    fun startLogin() {
+        val webSocketBean = WebSocketBean()
+        webSocketBean.s = SPTools[this, Constant.USERID, ""]!!.toString()// 自己（专家）id
+        webSocketBean.r = ""
+        webSocketBean.c = "L"
+        sendMsg(Gson().toJson(webSocketBean))
+    }
+
+    fun onErr() {
+        // 没连接上
+        for (i in 0 until (application as MyApp).activityList.size) {
+            if (SPTools[this, Constant.USERTYPE, Constant.userProfessional] == Constant.userProfessional) {
+                if ((application as MyApp).activityList[i].localClassName.contains("LoginActivity")) {
+                    ((application as MyApp).activityList[i] as BaseActivity).runOnUiThread {
+                        Toast.makeText(((application as MyApp).activityList[i] as BaseActivity),
+                                "登录失败", Toast.LENGTH_SHORT).show()
+                        ((application as MyApp).activityList[i] as BaseActivity).dismissProgressDialog()
                     }
+                    break
+                }
+            } else {
+                if ((application as MyApp).activityList[i].localClassName.contains("MainActivity")) {
+                    ((application as MyApp).activityList[i] as BaseActivity).runOnUiThread {
+                        Toast.makeText(((application as MyApp).activityList[i] as BaseActivity),
+                                "连接失败", Toast.LENGTH_SHORT).show()
+                        ((application as MyApp).activityList[i] as BaseActivity).dismissProgressDialog()
+                    }
+                    break
                 }
             }
-        }, 3000)
-        Log.e("cyf", "WebSocketServie 开始连接")
+        }
+    }
+
+    fun close() {
+        if (msgClient != null) {
+            msgClient!!.close()
+        }
+        stopSelf()
     }
 
     fun sendMsg(msg: String) {

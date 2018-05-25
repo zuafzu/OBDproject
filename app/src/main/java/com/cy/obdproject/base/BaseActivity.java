@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.WindowManager;
 
+import com.cy.obdproject.R;
 import com.cy.obdproject.app.MyApp;
 import com.cy.obdproject.bean.BaseBean;
 import com.cy.obdproject.bean.WebSocketBean;
@@ -45,6 +46,32 @@ public class BaseActivity extends AppCompatActivity {
         myApp.getActivityList().add(this);
         if (this instanceof ClickMethoListener) {
             clickMethoListener = (ClickMethoListener) this;
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        isUserConnected = WebSocketService.Companion.getIntance() != null &&
+                WebSocketService.Companion.getIntance().isConnected() &&
+                (int) SPTools.INSTANCE.get(this, Constant.USERTYPE, 0) == Constant.userNormal;
+        isProfessionalConnected = WebSocketService.Companion.getIntance() != null &&
+                WebSocketService.Companion.getIntance().isConnected() &&
+                (int) SPTools.INSTANCE.get(this, Constant.USERTYPE, 0) == Constant.userProfessional;
+        if (isUserConnected) {
+            if (findViewById(R.id.float_window) != null) {
+                findViewById(R.id.float_window).setVisibility(View.VISIBLE);
+                findViewById(R.id.float_window).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+                    }
+                });
+            }
+        } else {
+            if (findViewById(R.id.float_window) != null) {
+                findViewById(R.id.float_window).setVisibility(View.GONE);
+            }
         }
     }
 

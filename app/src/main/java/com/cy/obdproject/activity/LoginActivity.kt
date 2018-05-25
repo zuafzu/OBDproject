@@ -25,8 +25,10 @@ class LoginActivity : BaseActivity(), BaseActivity.ClickMethoListener {
     }
 
     private fun initView() {
+        if(WebSocketService.getIntance()!=null){
+            WebSocketService.getIntance()!!.close()
+        }
         setClickMethod(btn_login)
-
         // 判断是否自动登录
         if (SPTools[this@LoginActivity, Constant.ISLOGIN, ""] != "") {
             if (SPTools[this@LoginActivity, Constant.USERTYPE, 0] == Constant.userNormal) {

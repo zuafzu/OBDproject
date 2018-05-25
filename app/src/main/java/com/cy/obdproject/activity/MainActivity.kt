@@ -36,6 +36,7 @@ import org.jetbrains.anko.toast
 
 
 class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
+
     private var mExitTime: Long = 0
 
     private var mIntent1: Intent? = null
@@ -43,7 +44,7 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
     private var startWorker: OBDStart1Worker? = null
     private var wifiTools: WifiTools? = null
 
-    var items = "221,222,223,224,225,226"
+    private var items = "221,222,223,224,225,226"
     var homes: List<String>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -74,8 +75,7 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
     }
 
     private fun initView() {
-
-        //        获取需要被模糊的原图bitmap
+        // 获取需要被模糊的原图bitmap
         val res = resources
         val scaledBitmap = BitmapFactory.decodeResource(res, R.mipmap.ic_background)
 
@@ -120,7 +120,7 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
     }
 
     override fun setData(data: String?) {
-        var bean:ErrorCodeBean = Gson().fromJson(data,object :TypeToken<ErrorCodeBean>(){}.type)
+        var bean: ErrorCodeBean = Gson().fromJson(data, object : TypeToken<ErrorCodeBean>() {}.type)
         var carName = bean.msg
         var carType = bean.code
         tv_carName.setText(carName)

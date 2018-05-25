@@ -47,9 +47,11 @@ class WriteData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
                 btn_start.text = "刷写中......"
                 btn_start.isClickable = false
                 btn_start.setBackgroundResource(R.drawable.shape_btn_gary)
-                tv_msg.text = "下载刷写文件中......"
+                tv_msg.append("下载刷写文件中......")
+
                 list.clear()
-                download()
+                // download()
+                readData()
             }
         }
     }
@@ -61,7 +63,7 @@ class WriteData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
                 super.inProgress(progress, total, id)
                 progressBar.progress = (100 * progress).toInt()
                 if (progress == 1f) {
-                    progressBar.progress = 0
+                    // progressBar.progress = 0
                     tv_msg.append("\n读取刷写文件中......")
                     readData()
                 }

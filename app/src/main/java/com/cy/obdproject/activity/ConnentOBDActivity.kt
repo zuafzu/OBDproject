@@ -10,15 +10,19 @@ import com.cy.obdproject.R
 import com.cy.obdproject.base.BaseActivity
 import com.cy.obdproject.constant.Constant
 import com.cy.obdproject.socket.SocketService
+import com.cy.obdproject.tools.SPTools
 import com.cy.obdproject.tools.StringTools
 import com.cy.obdproject.tools.WifiTools
 import com.cy.obdproject.worker.OBDStart1Worker
+import com.cy.obdproject.worker.OBDStart2Worker
 import kotlinx.android.synthetic.main.activity_connent_obd.*
 import org.jetbrains.anko.toast
 
 class ConnentOBDActivity : BaseActivity(), BaseActivity.ClickMethoListener {
+
     private var mIntent2: Intent? = null
-    private var startWorker: OBDStart1Worker? = null
+    private var startWorker1: OBDStart1Worker? = null
+    private var startWorker2: OBDStart2Worker? = null
     private var wifiTools: WifiTools? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,7 +37,8 @@ class ConnentOBDActivity : BaseActivity(), BaseActivity.ClickMethoListener {
         setClickMethod(btn_ok)
 
         mIntent2 = Intent(this, SocketService::class.java)
-        startWorker = OBDStart1Worker()
+        startWorker1 = OBDStart1Worker()
+        startWorker2 = OBDStart2Worker()
         wifiTools = WifiTools(this)
     }
 
@@ -107,7 +112,12 @@ class ConnentOBDActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                     }
                     Constant.mDstName = et_input_ip.text.toString()
                     startService(mIntent2)
-                    startWorker!!.init(this@ConnentOBDActivity, { data ->
+                    startWorker1!!.init(this@ConnentOBDActivity, { data ->
+                        this.finish()
+                        toast(data)
+                        dismissProgressDialog()
+                    })
+                    startWorker2!!.init(this@ConnentOBDActivity, { data ->
                         this.finish()
                         toast(data)
                         dismissProgressDialog()
@@ -115,7 +125,11 @@ class ConnentOBDActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                     Handler().postDelayed({
                         // 发送开始信息
                         if (SocketService.getIntance() != null && SocketService.getIntance()!!.isConnected()) {
-                            startWorker!!.start()
+                            if ("1" == SPTools[this@ConnentOBDActivity, Constant.CARTYPE, ""]) {
+                                startWorker1!!.start()
+                            } else {
+                                startWorker2!!.start()
+                            }
                         } else {
                             stopService(mIntent2)
                         }

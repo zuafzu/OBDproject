@@ -159,15 +159,19 @@ public class WriteDataWorker {
                 ECUagreement.reCanId = "000007AA";
                 // 1、发送7DF  指令1003 长度2 不需要接收
                 msg = ECUagreement.a("1003");
+                Log.e("cyf", "发送信息 : " + msg + "  ");
                 SocketService.Companion.getIntance().sendMsg(StringTools.hex2byte(msg), connectLinstener);
                 // 2、发送7DF  指令 长度2  只发送不需要接收
                 msg = ECUagreement.a("3E80");
+                Log.e("cyf", "发送信息 : " + msg + "  ");
                 SocketService.Companion.getIntance().sendMsg(StringTools.hex2byte(msg), connectLinstener);
                 // 3、发送7DF  指令8502 长度2  只发送不需要接收
                 msg = ECUagreement.a("8502");
+                Log.e("cyf", "发送信息 : " + msg + "  ");
                 SocketService.Companion.getIntance().sendMsg(StringTools.hex2byte(msg), connectLinstener);
                 // 4、发送7DF  指令 长度3  只发送不需要接收
                 msg = ECUagreement.a("280303");
+                Log.e("cyf", "发送信息 : " + msg + "  ");
                 SocketService.Companion.getIntance().sendMsg(StringTools.hex2byte(msg), connectLinstener);
                 ECUagreement.canId = "000007A2";
                 // 5、发送7A2 指令1002 长度2 返回 7AA 5002
@@ -199,6 +203,7 @@ public class WriteDataWorker {
                 }
                 int index = 0;
                 while (writeFileBeans.size() > index) {
+                    putData("开始刷写第" + (index + 1) + "段");
                     if (index != 0) {
                         //10、CANID 7A2 指令 3101FF0044 00FE0000(addr) 0009F230(len)(这条指令是数据擦除) 返回7AA 7101FF
                         msg = ECUagreement.a("3101FF0044" + writeFileBeans.get(index).getAddress() +
@@ -223,13 +228,11 @@ public class WriteDataWorker {
                         String xx = String.format("%02x", index2 % 255 + 1);
                         int byteLength = writeFileBeans.get(index).getData().length - (index2 * 1024);
                         if (byteLength < 1024) {
-                            bytes = ByteTools.byteMerger(StringTools.hex2byte(ECUagreement.a("36" + xx)),
-                                    ByteTools.subBytes(writeFileBeans.get(index).getData(), index2 * 1024, byteLength));
+                            msg = ECUagreement.a("36" + xx + StringTools.byte2hex(ByteTools.subBytes(writeFileBeans.get(index).getData(), index2 * 1024, byteLength)));
                         } else {
-                            bytes = ByteTools.byteMerger(StringTools.hex2byte(ECUagreement.a("36" + xx)),
-                                    ByteTools.subBytes(writeFileBeans.get(index).getData(), index2 * 1024, 1024));
+                            msg = ECUagreement.a("36" + xx + StringTools.byte2hex(ByteTools.subBytes(writeFileBeans.get(index).getData(), index2 * 1024, 1024)));
                         }
-                        if (replay2()) {
+                        if (replay()) {
                             return;
                         }
                         index2++;
@@ -240,10 +243,19 @@ public class WriteDataWorker {
                         return;
                     }
                     //14、CANID 7A2 指令 310102026E2ECDCD（一次性校验）  长度8 返回 71
-                    msg = ECUagreement.a("31010202" + ECU2Tools.Make_CRC(writeFileBeans.get(index).getData()));
+                    String crc = Long.toHexString(ECU2Tools.CalculationCheck(writeFileBeans.get(index).getData()));
+                    if (crc.length() == 1) {
+                        crc = "000" + crc;
+                    } else if (crc.length() == 2) {
+                        crc = "00" + crc;
+                    } else if (crc.length() == 3) {
+                        crc = "0" + crc;
+                    }
+                    msg = ECUagreement.a("31010202" + crc);
                     if (replay()) {
                         return;
                     }
+                    putData("第" + (index + 1) + "段刷写完成");
                     index++;
                 }
                 // 15、一致性校验
