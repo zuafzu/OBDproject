@@ -4,6 +4,8 @@ import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.support.v7.app.AlertDialog
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -24,7 +26,7 @@ import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.activity_write_base_info.*
 import org.jetbrains.anko.toast
 
-class WriteBaseInfoActivity : BaseActivity(), BaseActivity.ClickMethoListener, AdapterView.OnItemClickListener {
+class WriteBaseInfoActivity : BaseActivity(), BaseActivity.ClickMethoListener, AdapterView.OnItemClickListener, TextWatcher {
 
     private var readBaseInfoWorker: BaseInfoWorker? = null
     private var writeBaseInfoWorker: WriteBaseInfoWorker? = null
@@ -208,6 +210,18 @@ class WriteBaseInfoActivity : BaseActivity(), BaseActivity.ClickMethoListener, A
             imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS)
         }
         dialog!!.show()
+        edit!!.addTextChangedListener(this)
+    }
+
+    override fun afterTextChanged(s: Editable?) {
+    }
+
+    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+    }
+
+    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+        sendClick(this@WriteBaseInfoActivity.localClassName, "statusEdit" + edit!!.text.toString())
+
     }
 
     override fun doMethod(string: String?) {
@@ -224,7 +238,15 @@ class WriteBaseInfoActivity : BaseActivity(), BaseActivity.ClickMethoListener, A
                     }
                 }
                 else -> {
-                    onItemClick(null, null, string!!.toInt(), string.toLong())
+                    if (string!!.contains("statusEdit")) {
+                        var title: String = string!!.substring(0, 10)
+                        var content: String = string!!.substring(10, string.length)
+                        edit!!.setText(content)
+                        edit!!.setSelection(content!!.length)
+
+                    } else {
+                        onItemClick(null, null, string!!.toInt(), string.toLong())
+                    }
                 }
             }
         }
