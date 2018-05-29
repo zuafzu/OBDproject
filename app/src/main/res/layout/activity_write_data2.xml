@@ -50,12 +50,13 @@
 
         </LinearLayout>
 
-        <ProgressBar
+        <com.cy.obdproject.view.CustomProgressBar
             android:id="@+id/progressBar"
-            style="?android:attr/progressBarStyleHorizontal"
+            style="@style/ProgressBar_Mini"
             android:layout_width="match_parent"
-            android:layout_height="35dp"
-            android:progress="0" />
+            android:layout_height="wrap_content"
+            android:layout_marginTop="1px"
+            android:progress="50" />
 
         <TextView
             android:id="@+id/tv_msg"

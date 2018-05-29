@@ -131,7 +131,7 @@ public class NetTools {
                 } else if ("1002".equals(baseBean.getCode())) {
                     // 登录信息失效
                     Toast.makeText(context, baseBean.getMsg(), Toast.LENGTH_SHORT).show();
-
+                    SPTools.INSTANCE.put(context, Constant.ISLOGIN, "");
                     for (int i = 0; i < ((MyApp) context.getApplication()).getActivityList().size(); i++) {
                         ((MyApp) context.getApplication()).getActivityList().get(i).finish();
                     }

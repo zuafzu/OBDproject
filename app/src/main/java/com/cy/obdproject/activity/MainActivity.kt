@@ -26,7 +26,7 @@ import com.cy.obdproject.socket.WebSocketService
 import com.cy.obdproject.tools.FastBlurUtil
 import com.cy.obdproject.tools.SPTools
 import com.cy.obdproject.tools.WifiTools
-import com.cy.obdproject.worker.OBDStart1Worker
+import com.cy.obdproject.worker.OBDStopWorker
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.activity_main.*
@@ -41,11 +41,13 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
 
     private var mIntent1: Intent? = null
     private var mIntent2: Intent? = null
-    private var startWorker: OBDStart1Worker? = null
+    private var stopWorker: OBDStopWorker? = null
     private var wifiTools: WifiTools? = null
 
     private var items = "221,222,223,224,225,226"
     var homes: List<String>? = null
+
+    var isStopSocketService = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,7 +57,7 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
 
     override fun onResume() {
         super.onResume()
-        if (SocketService.getIntance() != null && SocketService.getIntance()!!.isConnected()) {
+        if (SocketService.getIntance() != null && SocketService.getIntance()!!.isConnected() && SocketService.isConnected) {
             tv_obd_state.text = "已连接"
             tv_connnect_obd.text = "断开OBD"
         } else {
@@ -67,8 +69,10 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
         }
         if (SPTools[this, Constant.USERTYPE, Constant.userNormal] == Constant.userNormal) {
             ibtn_setting.visibility = View.VISIBLE
+            iv_back.visibility = View.INVISIBLE
         } else {
             ibtn_setting.visibility = View.INVISIBLE
+            iv_back.visibility = View.INVISIBLE
             ll_obd.visibility = View.INVISIBLE
         }
         dismissProgressDialog()
@@ -97,12 +101,16 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
 
         mIntent1 = Intent(this, WebSocketService::class.java)
         mIntent2 = Intent(this, SocketService::class.java)
-        startWorker = OBDStart1Worker()
+        stopWorker = OBDStopWorker()
+        stopWorker!!.init(this, {
+
+        })
         wifiTools = WifiTools(this)
         setClickMethod(tv_connnect_obd)
         setClickMethod(tv_ycxz)
 
         setClickMethod(ibtn_setting)
+        setClickMethod(iv_back)
 
         tv_title.text = getString(R.string.app_name)
         tv_username.text = SPTools[this@MainActivity, Constant.USERNAME, ""].toString()
@@ -119,11 +127,25 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
         recyclerview.adapter = HomeAdapter()
     }
 
+    private fun click(string: String?) {
+        if (SocketService.getIntance() != null && SocketService.getIntance()!!.isConnected() && SocketService.isConnected) {
+            sendClick(this@MainActivity.localClassName, string)
+            doMethod(string)
+        } else {
+            if (isProfessionalConnected) {
+                sendClick(this@MainActivity.localClassName, string)
+                doMethod(string)
+            } else {
+                toast("请先连接obd")
+            }
+        }
+    }
+
     override fun setData(data: String?) {
         var bean: ErrorCodeBean = Gson().fromJson(data, object : TypeToken<ErrorCodeBean>() {}.type)
         var carName = bean.msg
         var carType = bean.code
-        tv_carName.setText(carName)
+        tv_carName.text = carName
         homes = null
         homes = ArrayList()
         if ("1" == carType) {
@@ -147,12 +169,13 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
             "tv_ycxz" -> {//远程协作
                 showProgressDialog()
                 if ("远程协助" == tv_ycxz.text) {
+                    // startActivity(Intent(this@MainActivity, ResponseListActivity::class.java))
                     // 正常逻辑，后期开放
-//                    if (SocketService.getIntance() == null || !SocketService.getIntance()!!.isConnected()) {
-//                        toast("请先连接obd")
-//                        return
-//                    }
-                    startActivity(Intent(this@MainActivity, ResponseListActivity::class.java))
+                    if (SocketService.getIntance() != null && SocketService.getIntance()!!.isConnected() && SocketService.isConnected) {
+                        startActivity(Intent(this@MainActivity, ResponseListActivity::class.java))
+                    } else {
+                        toast("请先连接obd")
+                    }
                 } else {
                     if (SPTools[this, Constant.USERTYPE, Constant.userProfessional] == Constant.userProfessional) {
                         showProgressDialog()
@@ -190,32 +213,48 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
             "ibtn_setting" -> {
                 AlertDialog.Builder(this).setTitle("提示").setMessage("确认退出当前账号？").setPositiveButton("确认") { _, _ ->
                     SPTools.clear(this@MainActivity)
+                    isStopSocketService = true
                     for (i in 0 until (application as MyApp).activityList.size) {
                         (application as MyApp).activityList[i].finish()
                     }
                     startActivity(Intent(this@MainActivity, LoginActivity::class.java))
                 }.setNegativeButton("取消") { _, _ -> }.show()
             }
+            "iv_back" -> {
+                finish()
+            }
         }
     }
 
     override fun onDestroy() {
-        super.onDestroy()
+        // 关闭obd连接
+        if (isStopSocketService) {
+            if (SocketService.getIntance() != null && SocketService.getIntance()!!.isConnected() && SocketService.isConnected) {
+                stopWorker!!.start()
+            }
+            SocketService.isConnected = false
+            if (SocketService.getIntance() != null) {
+                SocketService.getIntance()!!.stopSelf()
+            }
+            stopService(mIntent2)
+        }
+        // 关闭远程连接
         if (SPTools[this, Constant.USERTYPE, Constant.userNormal] == Constant.userNormal) {
             stopService(mIntent1)
         }
-        stopService(mIntent2)
+        super.onDestroy()
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             if (SPTools[this, Constant.USERTYPE, Constant.userProfessional] == Constant.userProfessional) {
-                finish()
+                // finish()
             } else {
                 if (System.currentTimeMillis() - mExitTime > 2000) {
                     toast("再按一次退出程序")
                     mExitTime = System.currentTimeMillis()
                 } else {
+                    isStopSocketService = true
                     finish()
                 }
             }
@@ -248,8 +287,7 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
             when (homes!![position]) {
                 "221" -> {
                     holder.ll_main!!.setOnClickListener {
-                        sendClick(this@MainActivity.localClassName, "ll_main1")
-                        doMethod("ll_main1")
+                        click("ll_main1")
                     }
                     holder.textView!!.text = getString(R.string.djbxx)
                     holder.imageView!!.setImageResource(R.mipmap.ic_card1)
@@ -257,8 +295,7 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                 }
                 "222" -> {
                     holder.ll_main!!.setOnClickListener {
-                        sendClick(this@MainActivity.localClassName, "ll_main2")
-                        doMethod("ll_main2")
+                        click("ll_main2")
                     }
                     holder.textView!!.text = getString(R.string.xjbxx)
                     holder.imageView!!.setImageResource(R.mipmap.ic_card2)//4f5d73
@@ -266,8 +303,7 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                 }
                 "223" -> {
                     holder.ll_main!!.setOnClickListener {
-                        sendClick(this@MainActivity.localClassName, "ll_main3")
-                        doMethod("ll_main3")
+                        click("ll_main3")
                     }
                     holder.textView!!.text = getString(R.string.gzdm)
                     holder.imageView!!.setImageResource(R.mipmap.ic_card3)
@@ -275,8 +311,7 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                 }
                 "224" -> {
                     holder.ll_main!!.setOnClickListener {
-                        sendClick(this@MainActivity.localClassName, "ll_main4")
-                        doMethod("ll_main4")
+                        click("ll_main4")
                     }
                     holder.textView!!.text = getString(R.string.dtsj)
                     holder.imageView!!.setImageResource(R.mipmap.ic_card4)
@@ -284,8 +319,7 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                 }
                 "225" -> {
                     holder.ll_main!!.setOnClickListener {
-                        sendClick(this@MainActivity.localClassName, "ll_main5")
-                        doMethod("ll_main5")
+                        click("ll_main5")
                     }
                     holder.textView!!.text = getString(R.string.iotest)
                     holder.imageView!!.setImageResource(R.mipmap.ic_card5)
@@ -293,8 +327,7 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                 }
                 "226" -> {
                     holder.ll_main!!.setOnClickListener {
-                        sendClick(this@MainActivity.localClassName, "ll_main6")
-                        doMethod("ll_main6")
+                        click("ll_main6")
                     }
                     holder.textView!!.text = getString(R.string.sxwj)
                     holder.imageView!!.setImageResource(R.mipmap.ic_card6)

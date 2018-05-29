@@ -9,16 +9,18 @@ public class WriteFileBean implements Serializable{
     private String endAddress;
     private String length;
     private byte[] data;
+    private short[] data2;
 
     public WriteFileBean() {
         super();
     }
 
-    public WriteFileBean(String address, String endAddress, byte[] data, String length) {
+    public WriteFileBean(String address, String endAddress, String length, byte[] data, short[] data2) {
         this.address = address;
         this.endAddress = endAddress;
         this.length = length;
         this.data = data;
+        this.data2 = data2;
     }
 
     public String getAddress() {
@@ -53,6 +55,14 @@ public class WriteFileBean implements Serializable{
         this.data = data;
     }
 
+    public short[] getData2() {
+        return data2;
+    }
+
+    public void setData2(short[] data2) {
+        this.data2 = data2;
+    }
+
     @Override
     public String toString() {
         return "WriteFileBean{" +
@@ -60,6 +70,7 @@ public class WriteFileBean implements Serializable{
                 ", endAddress='" + endAddress + '\'' +
                 ", length='" + length + '\'' +
                 ", data=" + Arrays.toString(data) +
+                ", data2=" + Arrays.toString(data2) +
                 '}';
     }
 }

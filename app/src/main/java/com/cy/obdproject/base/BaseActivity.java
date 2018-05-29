@@ -108,15 +108,16 @@ public class BaseActivity extends AppCompatActivity {
                 public void getData(BaseBean response) {
                     if (response != null && "0".equals(response.getCode())) {
                         try {
-                            JSONObject jsonObject = new JSONObject(response.getData());
-                            WebSocketBean webSocketBean = new WebSocketBean();
-                            webSocketBean.setS("" + SPTools.INSTANCE.get(BaseActivity.this, Constant.USERID, ""));
-                            // ---------------------------- cyf 需要修改-----------------------------
-                            webSocketBean.setR("" + SPTools.INSTANCE.get(BaseActivity.this, Constant.ZFORUID, ""));
-                            webSocketBean.setC("D");
-                            webSocketBean.setD(jsonObject.optString("id"));
-                            webSocketBean.setE("");
-                            WebSocketService.Companion.getIntance().sendMsg(new Gson().toJson(webSocketBean));
+                            if (WebSocketService.Companion.getIntance() != null && WebSocketService.Companion.getIntance().isConnected()) {
+                                JSONObject jsonObject = new JSONObject(response.getData());
+                                WebSocketBean webSocketBean = new WebSocketBean();
+                                webSocketBean.setS("" + SPTools.INSTANCE.get(BaseActivity.this, Constant.USERID, ""));
+                                webSocketBean.setR("" + SPTools.INSTANCE.get(BaseActivity.this, Constant.ZFORUID, ""));
+                                webSocketBean.setC("D");
+                                webSocketBean.setD(jsonObject.optString("id"));
+                                webSocketBean.setE("");
+                                WebSocketService.Companion.getIntance().sendMsg(new Gson().toJson(webSocketBean));
+                            }
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }

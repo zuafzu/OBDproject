@@ -19,11 +19,13 @@
             android:translationZ="2dp">
 
             <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:background="@android:color/transparent"
-                android:padding="4dp"
-                android:src="@mipmap/logout"
+                android:id="@+id/iv_back"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:padding="12dp"
+                android:src="@mipmap/ic_back"
+                android:tag="iv_back"
                 android:visibility="invisible" />
 
             <TextView

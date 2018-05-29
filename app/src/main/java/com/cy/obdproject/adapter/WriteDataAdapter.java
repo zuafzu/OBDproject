@@ -5,11 +5,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.cy.obdproject.R;
-import com.cy.obdproject.bean.BaseInfoBean;
 import com.cy.obdproject.bean.WriteDataBean;
 
 import java.util.ArrayList;
@@ -53,7 +51,7 @@ public class WriteDataAdapter extends BaseAdapter {
             holder = (Holder) convertView.getTag();
         }
         holder.tv_name.setText(items.get(position).getFileName());
-
+        holder.tv_value.setVisibility(View.GONE);
 //        if (position != (getCount() - 1)) {
 //            holder.view_line.setVisibility(View.VISIBLE);
 //        } else {

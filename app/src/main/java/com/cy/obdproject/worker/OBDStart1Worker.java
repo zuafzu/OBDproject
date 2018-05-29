@@ -49,7 +49,8 @@ public class OBDStart1Worker {
     }
 
     public void start() {
-        if (SocketService.Companion.getIntance() != null && SocketService.Companion.getIntance().isConnected()) {
+        if (SocketService.Companion.getIntance() != null &&
+                SocketService.Companion.getIntance().isConnected()) {
             next();
         } else {
             putData("OBD未连接");
@@ -64,7 +65,8 @@ public class OBDStart1Worker {
         if (msg.length() > 8) {
             key = msg.substring(6, 8);
         }
-        if (SocketService.Companion.getIntance() != null && SocketService.Companion.getIntance().isConnected()) {
+        if (SocketService.Companion.getIntance() != null &&
+                SocketService.Companion.getIntance().isConnected()) {
             SocketService.Companion.getIntance().sendMsg(StringTools.hex2byte(msg), connectLinstener);
             startTime();
         }
@@ -132,30 +134,31 @@ public class OBDStart1Worker {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                msg = OBDagreement.a("10", "05", "0c");
+                msg = OBDagreement.a("05", "0c");
                 if (replay()) {
                     return;
                 }
-                msg = OBDagreement.b("10", "0007a120");
+                msg = OBDagreement.b("0007a120");
                 if (replay()) {
                     return;
                 }
-                msg = OBDagreement.c("10", "FC600000", "01000000");
+                msg = OBDagreement.c("FC600000", "01000000");
                 if (replay()) {
                     return;
                 }
-                msg = OBDagreement.d("10", "000007E3", "000007EB");
+                msg = OBDagreement.d("000007E3", "000007EB");
                 if (replay()) {
                     return;
                 }
-                msg = OBDagreement.e("10", "00");
+                msg = OBDagreement.e("00");
                 if (replay()) {
                     return;
                 }
-                msg = OBDagreement.f("10", "00");
+                msg = OBDagreement.f("00");
                 if (replay()) {
                     return;
                 }
+                SocketService.Companion.setConnected(true);
                 putData("连接成功");
             }
         }).start();

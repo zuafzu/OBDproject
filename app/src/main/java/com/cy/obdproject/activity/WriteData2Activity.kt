@@ -9,20 +9,28 @@ import android.util.Log
 import com.cy.obdproject.R
 import com.cy.obdproject.base.BaseActivity
 import com.cy.obdproject.bean.WriteFileBean
+import com.cy.obdproject.constant.Constant
+import com.cy.obdproject.socket.SocketService
 import com.cy.obdproject.tools.ByteTools
+import com.cy.obdproject.tools.FileUtil
+import com.cy.obdproject.tools.SPTools
 import com.cy.obdproject.tools.StringTools
 import com.cy.obdproject.worker.WriteDataWorker
 import com.zhy.http.okhttp.OkHttpUtils
 import com.zhy.http.okhttp.callback.FileCallBack
 import kotlinx.android.synthetic.main.activity_write_data2.*
 import okhttp3.Call
+import okhttp3.Request
+import org.jetbrains.anko.toast
 import java.io.File
 
 class WriteData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
 
     private var url = ""
+    private var name = ""
     private var writeDataWorker: WriteDataWorker? = null
     private var list = ArrayList<WriteFileBean>()
+    private var mData = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,14 +38,29 @@ class WriteData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
         initView()
     }
 
+    override fun onBackPressed() {
+        if (iv_back.isClickable) {
+            super.onBackPressed()
+        }
+    }
+
     private fun initView() {
-        url = intent.getStringExtra("url")
+        if (intent.hasExtra("url")) {
+            url = intent.getStringExtra("url")
+        }
+        if (intent.hasExtra("name")) {
+            name = intent.getStringExtra("name")
+        }
         tv_msg.movementMethod = ScrollingMovementMethod.getInstance()
         setClickMethod(btn_start)
+        setClickMethod(iv_back)
         progressBar.progress = 0
         writeDataWorker = WriteDataWorker()
         writeDataWorker!!.init(this, { data ->
-            tv_msg.append("\n" + data)
+            if (mData != data) {
+                mData = data
+                setData(data)
+            }
         })
     }
 
@@ -45,53 +68,112 @@ class WriteData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
         when (string) {
             "btn_start" -> {
                 btn_start.text = "刷写中......"
+                iv_back.isClickable = false
                 btn_start.isClickable = false
                 btn_start.setBackgroundResource(R.drawable.shape_btn_gary)
-                tv_msg.append("下载刷写文件中......")
-
                 list.clear()
-                // download()
-                readData()
+                if (SPTools[this, Constant.USERTYPE, Constant.userNormal] == Constant.userNormal) {
+                    download()
+                }
+            }
+            "iv_back" -> {
+                finish()
             }
         }
     }
 
+    override fun setData(data: String?) {
+        Log.e("cyf88", "data = $data")
+        runOnUiThread {
+            if (data!!.contains("-")) {
+                val str = data!!.replace("-", "")
+                progressBar.progress = str.toInt()
+            } else {
+                if (data == "下载刷写文件中......") {
+                    tv_msg.text = "下载刷写文件中......"
+                } else if (data == "返回数据超时" || data == "OBD未连接") {
+                    btn_start.text = getString(R.string.write)
+                    iv_back.isClickable = true
+                    btn_start.isClickable = true
+                    btn_start.setBackgroundResource(R.drawable.shape_btn_colorprimary)
+                } else {
+                    tv_msg.append("\n" + data)
+                    if (data == "刷写完成") {
+                        toast("刷写完成")
+                        btn_start.text = getString(R.string.write)
+                        iv_back.isClickable = true
+                        btn_start.isClickable = true
+                        btn_start.setBackgroundResource(R.drawable.shape_btn_colorprimary)
+                    }
+                }
+            }
+        }
+        super.setData(data)
+    }
+
     private fun download() {
-        OkHttpUtils.get().url(url).build().execute(object : FileCallBack(Environment.getExternalStorageDirectory().absolutePath, "测试.apk") {
+        OkHttpUtils.get().url(url).addHeader("Accept-Encoding", "identity").build().execute(object : FileCallBack(Environment.getExternalStorageDirectory().absolutePath, name) {
+
+            var mProgress = 0F
+
+            override fun onBefore(request: Request?, id: Int) {
+                super.onBefore(request, id)
+                setData("下载刷写文件")
+            }
 
             override fun inProgress(progress: Float, total: Long, id: Int) {
                 super.inProgress(progress, total, id)
-                progressBar.progress = (100 * progress).toInt()
-                if (progress == 1f) {
-                    // progressBar.progress = 0
-                    tv_msg.append("\n读取刷写文件中......")
-                    readData()
+                if (progress >= 0) {
+                    if (progress == 1f) {
+                        mProgress = 1f
+                        setData("-" + (100 * progress).toInt())
+                    } else {
+                        if (progress - mProgress > 0.1f) {
+                            mProgress = progress
+                            setData("-" + (100 * progress).toInt())
+                        }
+                    }
                 }
             }
 
             override fun onError(call: Call, e: Exception, id: Int) {
-
+                setData("下载刷写文件失败")
             }
 
             override fun onResponse(response: File, id: Int) {
-
+                if (mProgress == 1f) {
+                    setData("下载刷写文件完成\n读取刷写文件")
+                    if (SocketService.getIntance() != null && SocketService.getIntance()!!.isConnected()) {
+                        readData(response)
+                    } else {
+                        if (isUserConnected) {
+                            setData("OBD未连接")
+                        }
+                    }
+                }
             }
         })
     }
 
     @SuppressLint("StaticFieldLeak")
-    fun readData() {
-        object : AsyncTask<String, Void, String>() {
-            override fun doInBackground(vararg p0: String?): String {
-                val mIs = assets.open("HS3EV_EPS_20180327.eol")
-                val length = mIs.available()
-                val buffer = ByteArray(length)
-                mIs.read(buffer)
+    fun readData(response: File) {
+        object : AsyncTask<File, Void, String>() {
+
+            var num = 0
+
+            override fun doInBackground(vararg p0: File?): String {
+//                val mIs = assets.open("HS5_SW_20180328.eol")
+//                val length = mIs.available()
+//                val buffer = ByteArray(length)
+//                mIs.read(buffer)
+
+                val buffer = FileUtil.readFile(p0[0])
                 val ba0 = ByteArray(1)
                 ba0[0] = buffer[6]
                 val piece = StringTools.byte2hex(ba0)
+                num = piece.toInt()
                 var a = 0
-                for (i in 0 until piece.toInt()) {
+                for (i in 0 until num) {
                     val ba1 = ByteArray(4)
                     ba1[0] = buffer[i * 8 + 10 + a]
                     ba1[1] = buffer[i * 8 + 9 + a]
@@ -109,8 +191,12 @@ class WriteData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
                     bean.endAddress = str2
                     val b = (str2.toInt(16) - str.toInt(16) + 1)
                     bean.length = "" + b
-
-                    bean.data = ByteTools.subBytes(buffer, i * 8 + 14 + a + 4, b)
+                    bean.data = ByteTools.subBytes(buffer, i * 8 + 14 + a + 1, b)
+                    val aa = ShortArray(bean.data.size)
+                    for (j in 0 until bean.data.size) {
+                        aa[j] = ByteTools.toShort(bean.data[j])
+                    }
+                    bean.data2 = aa
                     list.add(bean)
                     a += b
                     Log.i("cyf88", bean.toString())
@@ -120,11 +206,11 @@ class WriteData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
 
             override fun onPostExecute(result: String?) {
                 super.onPostExecute(result)
-                tv_msg.append("\n刷写文件中......")
+                setData("刷写文件中（共" + num + "段）")
                 writeDataWorker!!.start(list)
             }
 
-        }.execute()
+        }.execute(response)
     }
 
 }

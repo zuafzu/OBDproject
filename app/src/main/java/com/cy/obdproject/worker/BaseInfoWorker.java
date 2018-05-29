@@ -59,7 +59,9 @@ public class BaseInfoWorker {
     public void start() {
         baseInfoBeanList.clear();
         index = 0;
-        if (SocketService.Companion.getIntance() != null && SocketService.Companion.getIntance().isConnected()) {
+        if (SocketService.Companion.getIntance() != null &&
+                SocketService.Companion.getIntance().isConnected() &&
+                SocketService.Companion.isConnected()) {
             next();
         } else {
             putData("OBD未连接");
@@ -71,7 +73,9 @@ public class BaseInfoWorker {
             myData.remove(0);
         }
         Log.e("cyf", "发送信息 : " + msg + "  ");
-        if (SocketService.Companion.getIntance() != null && SocketService.Companion.getIntance().isConnected()) {
+        if (SocketService.Companion.getIntance() != null &&
+                SocketService.Companion.getIntance().isConnected() &&
+                SocketService.Companion.isConnected()) {
             SocketService.Companion.getIntance().sendMsg(StringTools.hex2byte(msg), connectLinstener);
             startTime();
         }
@@ -139,6 +143,10 @@ public class BaseInfoWorker {
     }
 
     private void next() {
+        // 更改canId和reCanId
+        ECUagreement.canId = "000007E3";
+        ECUagreement.reCanId = "000007EB";
+
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -147,9 +155,6 @@ public class BaseInfoWorker {
                     if (replay()) {
                         return;
                     }
-                    String sblData = BaseInfoWorker.this.socketBeanList.get(index).getData();
-
-
                     String mmsg = ECUTools.getData(myData.get(0), socketBeanList.get(index).getType(), msg);
                     BaseInfoBean baseInfoBean = new BaseInfoBean();
                     baseInfoBean.setName(BaseInfoWorker.this.socketBeanList.get(index).getName());

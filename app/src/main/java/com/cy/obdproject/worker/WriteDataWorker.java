@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.util.Log;
 
 import com.cy.obdproject.agreement.ECUagreement;
+import com.cy.obdproject.agreement.OBDagreement;
 import com.cy.obdproject.bean.WriteFileBean;
 import com.cy.obdproject.callback.SocketCallBack;
 import com.cy.obdproject.socket.MySocketClient;
@@ -27,12 +28,14 @@ public class WriteDataWorker {
     private Activity activity;
     private SocketCallBack socketCallBack;
     private String msg = "";
-    private byte[] bytes;
+    private String key = "";
     private MySocketClient.ConnectLinstener connectLinstener;
     private Long sysTime1 = 0L;
     private Long sysTime2 = 0L;
     private Handler handler;
     private Runnable runnable;
+
+    private int updateNum = 0;
 
     public void init(Activity activity, SocketCallBack socketCallBack) {
         this.activity = activity;
@@ -56,7 +59,9 @@ public class WriteDataWorker {
 
     public void start(ArrayList<WriteFileBean> writeFileBeans) {
         this.writeFileBeans = writeFileBeans;
-        if (SocketService.Companion.getIntance() != null && SocketService.Companion.getIntance().isConnected()) {
+        if (SocketService.Companion.getIntance() != null &&
+                SocketService.Companion.getIntance().isConnected() &&
+                SocketService.Companion.isConnected()) {
             next();
         } else {
             putData("OBD未连接");
@@ -68,7 +73,9 @@ public class WriteDataWorker {
             myData.remove(0);
         }
         Log.e("cyf", "发送信息 : " + msg + "  ");
-        if (SocketService.Companion.getIntance() != null && SocketService.Companion.getIntance().isConnected()) {
+        if (SocketService.Companion.getIntance() != null &&
+                SocketService.Companion.getIntance().isConnected() &&
+                SocketService.Companion.isConnected()) {
             SocketService.Companion.getIntance().sendMsg(StringTools.hex2byte(msg), connectLinstener);
             startTime();
         }
@@ -79,15 +86,17 @@ public class WriteDataWorker {
         if (myData.size() > 0) {
             myData.remove(0);
         }
-        if (bytes == null) {
-            putData("刷写文件数据异常！");
-            return true;
+        Log.e("cyf", "发送信息 : " + msg + "  ");
+        if (msg.length() > 8) {
+            key = msg.substring(6, 8);
         }
-        if (SocketService.Companion.getIntance() != null && SocketService.Companion.getIntance().isConnected()) {
-            SocketService.Companion.getIntance().sendMsg(bytes, connectLinstener);
+        if (SocketService.Companion.getIntance() != null &&
+                SocketService.Companion.getIntance().isConnected() &&
+                SocketService.Companion.isConnected()) {
+            SocketService.Companion.getIntance().sendMsg(StringTools.hex2byte(msg), connectLinstener);
             startTime();
         }
-        return sleep() || checkData();
+        return sleep() || checkData2();
     }
 
     private boolean sleep() {
@@ -141,6 +150,32 @@ public class WriteDataWorker {
         return false;
     }
 
+    private boolean checkData2() {
+        handler.removeCallbacks(runnable);
+        sysTime2 = new Date().getTime();
+        if (sysTime2 - sysTime1 <= timeOut) {
+            for (int i = 0; i < myData.size(); i++) {
+                String mKey = myData.get(i).substring(6, 8);
+                int length = Integer.parseInt(Integer.parseInt(myData.get(i).substring(2, 4), 16) + ""
+                        + Integer.parseInt(myData.get(i).substring(4, 6), 16));
+                if (mKey.equals(key) && length == ((myData.get(i).length() - 8) / 2) && myData.get(i).endsWith("00AA")) {
+                    break;
+                } else {
+                    myData.remove(i);
+                    i--;
+                }
+            }
+            if (myData.size() == 0) {
+                putData("返回数据异常");
+                return true;
+            }
+        } else {
+            putData("返回数据超时");
+            return true;
+        }
+        return false;
+    }
+
     private void putData(final String msg) {
         WriteDataWorker.this.activity.runOnUiThread(new Runnable() {
             @Override
@@ -151,6 +186,7 @@ public class WriteDataWorker {
     }
 
     private void next() {
+        updateNum = 0;
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -173,6 +209,12 @@ public class WriteDataWorker {
                 msg = ECUagreement.a("280303");
                 Log.e("cyf", "发送信息 : " + msg + "  ");
                 SocketService.Companion.getIntance().sendMsg(StringTools.hex2byte(msg), connectLinstener);
+                // 4-2、start 3e
+                msg = OBDagreement.g();
+                if (replay2()) {
+                    return;
+                }
+                // 更改canId
                 ECUagreement.canId = "000007A2";
                 // 5、发送7A2 指令1002 长度2 返回 7AA 5002
                 msg = ECUagreement.a("1002");
@@ -187,7 +229,7 @@ public class WriteDataWorker {
                 String data = myData.get(0);
                 //7、发送7A2 指令2704+seed运算后的数值   长度6   返回 7AA 6704
                 msg = ECUagreement.a("2704" +
-                        StringTools.byte2hex(ECU2Tools.getBootKey(StringTools.hex2byte(ECUTools.getData2(data, 1, msg)))));
+                        StringTools.byte2hex(ECU2Tools._GetBootKey(Long.valueOf(ECUTools.getData2(data, 1, msg), 16))));
                 if (replay()) {
                     return;
                 }
@@ -201,6 +243,16 @@ public class WriteDataWorker {
                 if (replay()) {
                     return;
                 }
+                // 计算总数
+                int totalNum = 0;
+                for (int i = 0; i < writeFileBeans.size(); i++) {
+                    int total = writeFileBeans.get(i).getData().length / 1024;
+                    if (writeFileBeans.get(i).getData().length % 1024 != 0) {
+                        total = total + 1;
+                    }
+                    totalNum = totalNum + total;
+                }
+                // 开始循环刷写流程
                 int index = 0;
                 while (writeFileBeans.size() > index) {
                     putData("开始刷写第" + (index + 1) + "段");
@@ -235,6 +287,10 @@ public class WriteDataWorker {
                         if (replay()) {
                             return;
                         }
+                        int x = (updateNum * 100 / totalNum);
+                        updateNum++;
+                        // Log.e("cyf88", updateNum + " * 100 / " + totalNum + " = " + x);
+                        putData("-" + x);
                         index2++;
                     }
                     //13、CANID 7A2 指令 37  长度1 返回 77
@@ -243,19 +299,27 @@ public class WriteDataWorker {
                         return;
                     }
                     //14、CANID 7A2 指令 310102026E2ECDCD（一次性校验）  长度8 返回 71
-                    String crc = Long.toHexString(ECU2Tools.CalculationCheck(writeFileBeans.get(index).getData()));
+                    String crc = Long.toHexString(ECU2Tools.CRC(writeFileBeans.get(index).getData2()));
                     if (crc.length() == 1) {
-                        crc = "000" + crc;
+                        crc = "0000000" + crc;
                     } else if (crc.length() == 2) {
-                        crc = "00" + crc;
+                        crc = "000000" + crc;
                     } else if (crc.length() == 3) {
+                        crc = "00000" + crc;
+                    } else if (crc.length() == 4) {
+                        crc = "0000" + crc;
+                    } else if (crc.length() == 5) {
+                        crc = "000" + crc;
+                    } else if (crc.length() == 6) {
+                        crc = "00" + crc;
+                    } else if (crc.length() == 7) {
                         crc = "0" + crc;
                     }
                     msg = ECUagreement.a("31010202" + crc);
                     if (replay()) {
                         return;
                     }
-                    putData("第" + (index + 1) + "段刷写完成");
+                    // putData("第" + (index + 1) + "段刷写完成");
                     index++;
                 }
                 // 15、一致性校验
@@ -280,15 +344,22 @@ public class WriteDataWorker {
                 // 19、发送7DF  指令8501 长度2  只发送不需要接收
                 msg = ECUagreement.a("8501");
                 SocketService.Companion.getIntance().sendMsg(StringTools.hex2byte(msg), connectLinstener);
+                // 19-2、stop 3e
+                msg = OBDagreement.h();
+                if (replay2()) {
+                    return;
+                }
                 // 20、发送7DF  指令1001 长度2  只发送不需要接收
                 msg = ECUagreement.a("1001");
                 SocketService.Companion.getIntance().sendMsg(StringTools.hex2byte(msg), connectLinstener);
+                // 更改canId
                 ECUagreement.canId = "000007A2";
                 // 21、物理寻址 14 FF FF FF
                 msg = ECUagreement.a("14FFFFFF");
                 if (replay()) {
                     return;
                 }
+                putData("-100");
                 putData("刷写完成");
             }
         }).start();

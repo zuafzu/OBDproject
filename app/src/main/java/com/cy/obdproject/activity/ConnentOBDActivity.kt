@@ -51,7 +51,9 @@ class ConnentOBDActivity : BaseActivity(), BaseActivity.ClickMethoListener {
             tv_wifiState.text = "热点是否开启：未开启"
         }
 
-        if (SocketService.getIntance() != null && SocketService.getIntance()!!.isConnected()) {
+        if (SocketService.getIntance() != null &&
+                SocketService.getIntance()!!.isConnected() &&
+                SocketService.isConnected) {
             btn_ok.text = "断开OBD"
             et_input_ip.setText(Constant.mDstName)
         } else {
@@ -75,10 +77,9 @@ class ConnentOBDActivity : BaseActivity(), BaseActivity.ClickMethoListener {
 
                 } else {
                     tv_wifiState.text = "热点是否开启：未开启"
-                    ll_ip.visibility = View.GONE
-                    ll_input_ip.visibility = View.GONE
-                    ll_ok.visibility = View.GONE
-
+//                    ll_ip.visibility = View.GONE
+//                    ll_input_ip.visibility = View.GONE
+//                    ll_ok.visibility = View.GONE
                 }
             }
             "btn_seeIp" -> {
@@ -122,6 +123,7 @@ class ConnentOBDActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                         toast(data)
                         dismissProgressDialog()
                     })
+                    // 等待长连接建立，然后开始发送连接obd
                     Handler().postDelayed({
                         // 发送开始信息
                         if (SocketService.getIntance() != null && SocketService.getIntance()!!.isConnected()) {

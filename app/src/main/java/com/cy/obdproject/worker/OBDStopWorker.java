@@ -4,28 +4,24 @@ import android.app.Activity;
 import android.os.Handler;
 import android.util.Log;
 
-import com.cy.obdproject.agreement.ECUagreement;
-import com.cy.obdproject.bean.SocketBean;
+import com.cy.obdproject.agreement.OBDagreement;
 import com.cy.obdproject.callback.SocketCallBack;
 import com.cy.obdproject.socket.MySocketClient;
 import com.cy.obdproject.socket.SocketService;
-import com.cy.obdproject.tools.ECU2Tools;
-import com.cy.obdproject.tools.ECUTools;
 import com.cy.obdproject.tools.StringTools;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class WriteBaseInfoWorker {
-
-    private SocketBean socketBean;
+public class OBDStopWorker {
 
     private List<String> myData = new ArrayList<>();
     private final int timeOut = 3000;// 超时时间
     private Activity activity;
     private SocketCallBack socketCallBack;
     private String msg = "";
+    private String key = "";
     private MySocketClient.ConnectLinstener connectLinstener;
     private Long sysTime1 = 0L;
     private Long sysTime2 = 0L;
@@ -40,7 +36,7 @@ public class WriteBaseInfoWorker {
             @Override
             public void run() {
                 if (sysTime2 == 0) {
-                    putData("返回数据超时");
+                    putData("连接超时");
                 }
             }
         };
@@ -52,8 +48,7 @@ public class WriteBaseInfoWorker {
         };
     }
 
-    public void start(SocketBean socketBean) {
-        this.socketBean = socketBean;
+    public void start() {
         if (SocketService.Companion.getIntance() != null &&
                 SocketService.Companion.getIntance().isConnected() &&
                 SocketService.Companion.isConnected()) {
@@ -68,6 +63,9 @@ public class WriteBaseInfoWorker {
             myData.remove(0);
         }
         Log.e("cyf", "发送信息 : " + msg + "  ");
+        if (msg.length() > 8) {
+            key = msg.substring(6, 8);
+        }
         if (SocketService.Companion.getIntance() != null &&
                 SocketService.Companion.getIntance().isConnected() &&
                 SocketService.Companion.isConnected()) {
@@ -77,8 +75,8 @@ public class WriteBaseInfoWorker {
         return sleep() || checkData();
     }
 
-    private boolean sleep(){
-        while (myData.size()==0) {
+    private boolean sleep() {
+        while (myData.size() == 0) {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
@@ -103,21 +101,18 @@ public class WriteBaseInfoWorker {
         handler.removeCallbacks(runnable);
         sysTime2 = new Date().getTime();
         if (sysTime2 - sysTime1 <= timeOut) {
-            String mmsg = "";
             for (int i = 0; i < myData.size(); i++) {
-                mmsg = ECUTools.getData(myData.get(i), 1, msg);
-                if (mmsg.equals(ECUTools.ERR)) {
+                String mKey = myData.get(i).substring(6, 8);
+                int length = Integer.parseInt(Integer.parseInt(myData.get(i).substring(2, 4), 16) + ""
+                        + Integer.parseInt(myData.get(i).substring(4, 6), 16));
+                if (mKey.equals(key) && length == ((myData.get(i).length() - 8) / 2) && myData.get(i).endsWith("00AA")) {
+                    break;
+                } else {
                     myData.remove(i);
                     i--;
-                } else if (mmsg.equals(ECUTools.WAIT)) {
-                    myData.remove(i);
-                    startTime();
-                    return sleep() || checkData();
-                } else {
-                    break;
                 }
             }
-            if(myData.size() == 0){
+            if (myData.size() == 0) {
                 putData("返回数据异常");
                 return true;
             }
@@ -129,41 +124,23 @@ public class WriteBaseInfoWorker {
     }
 
     private void putData(final String msg) {
-        WriteBaseInfoWorker.this.activity.runOnUiThread(new Runnable() {
+        OBDStopWorker.this.activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                WriteBaseInfoWorker.this.socketCallBack.getData(msg);
+                OBDStopWorker.this.socketCallBack.getData(msg);
             }
         });
     }
 
     private void next() {
-        // 更改canId和reCanId
-        ECUagreement.canId = "000007E3";
-        ECUagreement.reCanId = "000007EB";
-
         new Thread(new Runnable() {
             @Override
             public void run() {
-                msg = ECUagreement.a("1003");
+                msg = OBDagreement.i();
                 if (replay()) {
                     return;
                 }
-                msg = ECUagreement.a("2701");
-                if (replay()) {
-                    return;
-                }
-                String data = myData.get(0);
-                msg = ECUagreement.a("2702" +
-                        StringTools.byte2hex(ECU2Tools._GetKey(StringTools.hex2byte(ECUTools.getData2(data, 1, msg)))));
-                if (replay()) {
-                    return;
-                }
-                msg = ECUagreement.a(socketBean.getData());
-                if (replay()) {
-                    return;
-                }
-                putData("修改成功");
+                putData("停止成功");
             }
         }).start();
     }

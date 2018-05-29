@@ -42,11 +42,6 @@ public class MyWebSocketClient extends WebSocketClient {
         message.matches("/^id: (.*)\n(content-type: (.*)\n)?\n/m");
     }
 
-   /* @Override
-    public void onFragment( Framedata fragment ) {
-        System.out.println( "received fragment: " + new String( fragment.getPayloadData().array() ) );
-    }*/
-
     @Override
     public void onClose(int code, String reason, boolean remote) {
         Log.e("CyfMsgClient", "onClose " + reason);
