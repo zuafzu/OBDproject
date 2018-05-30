@@ -3,6 +3,8 @@ package com.cy.obdproject.activity
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
+import android.view.KeyEvent
+import android.view.View
 import com.cy.obdproject.R
 import com.cy.obdproject.adapter.SelectRequestAdapter
 import com.cy.obdproject.app.MyApp
@@ -21,6 +23,8 @@ import org.jetbrains.anko.toast
 
 // 用户列表
 class RequestListActivity : BaseActivity(), BaseActivity.ClickMethoListener {
+
+    private var mExitTime: Long = 0
 
     private var requestList: ArrayList<RequestBean>? = null
     private var adapter: SelectRequestAdapter? = null
@@ -50,6 +54,7 @@ class RequestListActivity : BaseActivity(), BaseActivity.ClickMethoListener {
             webSocketBean.c = "C"
             WebSocketService.getIntance()!!.sendMsg(Gson().toJson(webSocketBean))
         }
+        iv_quit.visibility = View.INVISIBLE
     }
 
     override fun doMethod(string: String?) {
@@ -70,8 +75,18 @@ class RequestListActivity : BaseActivity(), BaseActivity.ClickMethoListener {
         }
     }
 
-    override fun onBackPressed() {
-        finish()
+    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if (System.currentTimeMillis() - mExitTime > 2000) {
+                toast("再按一次退出程序")
+                mExitTime = System.currentTimeMillis()
+            } else {
+                SPTools.clear(this@RequestListActivity)
+                finish()
+            }
+            return true
+        }
+        return super.onKeyDown(keyCode, event)
     }
 
     fun net_requestList(isShow: Boolean) {

@@ -44,9 +44,11 @@ class SelectRoleActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                 if ("受控端" == list!![position].toString()) {
                     SPTools.put(this@SelectRoleActivity, Constant.USERTYPE, Constant.userNormal)
                     startActivity(Intent(this@SelectRoleActivity, SelectCarTypeActivity::class.java))
+                    finish()
                 } else if ("专家端" == list!![position].toString()) {
                     SPTools.put(this@SelectRoleActivity, Constant.USERTYPE, Constant.userProfessional)
                     startActivity(Intent(this@SelectRoleActivity, RequestListActivity::class.java))
+                    finish()
                 }
 
             }

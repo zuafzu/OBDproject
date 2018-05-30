@@ -35,7 +35,9 @@ class LoginActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                 for (i in 0 until (application as MyApp).activityList.size) {
                     (application as MyApp).activityList[i].finish()
                 }
-                startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+                // startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+                // startActivity(Intent(this@LoginActivity, SelectCarTypeActivity::class.java))
+                startActivity(Intent(this@LoginActivity, ConnentOBDActivity::class.java))
             } else {
                 showProgressDialog()
                 val mIntent1 = Intent(this@LoginActivity, WebSocketService::class.java)
@@ -81,7 +83,8 @@ class LoginActivity : BaseActivity(), BaseActivity.ClickMethoListener {
             if (list.size == 1) {
                 if ("受控端" == list!![0]) {
                     SPTools.put(this@LoginActivity, Constant.USERTYPE, Constant.userNormal)
-                    startActivity(Intent(this@LoginActivity, SelectCarTypeActivity::class.java))
+                    startActivity(Intent(this@LoginActivity, ConnentOBDActivity::class.java))
+                    // startActivity(Intent(this@LoginActivity, SelectCarTypeActivity::class.java))
                     finish()
                 } else if ("专家端" == list[0]) {
                     SPTools.put(this@LoginActivity, Constant.USERTYPE, Constant.userProfessional)

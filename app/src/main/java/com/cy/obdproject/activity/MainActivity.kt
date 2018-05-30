@@ -5,6 +5,7 @@ import android.content.Intent
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.os.Bundle
+import android.os.Handler
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -26,6 +27,8 @@ import com.cy.obdproject.socket.WebSocketService
 import com.cy.obdproject.tools.FastBlurUtil
 import com.cy.obdproject.tools.SPTools
 import com.cy.obdproject.tools.WifiTools
+import com.cy.obdproject.worker.OBDStart1Worker
+import com.cy.obdproject.worker.OBDStart2Worker
 import com.cy.obdproject.worker.OBDStopWorker
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -37,43 +40,70 @@ import org.jetbrains.anko.toast
 
 class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
 
-    private var mExitTime: Long = 0
-
-    private var mIntent1: Intent? = null
-    private var mIntent2: Intent? = null
     private var stopWorker: OBDStopWorker? = null
     private var wifiTools: WifiTools? = null
 
-    private var items = "221,222,223,224,225,226"
+    private var startWorker1: OBDStart1Worker? = null
+    private var startWorker2: OBDStart2Worker? = null
+
+    private var items = ""
     var homes: List<String>? = null
 
-    var isStopSocketService = false
+    private var isStopSocketService = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        initView()
+        initOBDStart()
+    }
+
+    private fun initOBDStart() {
+        // 启动OBD
+        startWorker1 = OBDStart1Worker()
+        startWorker2 = OBDStart2Worker()
+        startWorker1!!.init(this@MainActivity, { data ->
+            changOBDState()
+            toast(data)
+            dismissProgressDialog()
+        })
+        startWorker2!!.init(this@MainActivity, { data ->
+            changOBDState()
+            toast(data)
+            dismissProgressDialog()
+        })
+        if (SPTools[this, Constant.USERTYPE, Constant.userProfessional] == Constant.userProfessional) {
+
+        } else {
+            if (SocketService.getIntance() != null && SocketService.getIntance()!!.isConnected()) {
+                showProgressDialog()
+                if ("1" == SPTools[this@MainActivity, Constant.CARTYPE, ""]) {
+                    startWorker1!!.start()
+                } else {
+                    startWorker2!!.start()
+                }
+            } else {
+                toast("OBD未连接")
+            }
+        }
     }
 
     override fun onResume() {
         super.onResume()
-        if (SocketService.getIntance() != null && SocketService.getIntance()!!.isConnected() && SocketService.isConnected) {
-            tv_obd_state.text = "已连接"
-            tv_connnect_obd.text = "断开OBD"
-        } else {
-            tv_obd_state.text = "未连接"
-            tv_connnect_obd.text = "连接OBD"
-        }
+        initView()
+        changOBDState()
         if (WebSocketService.getIntance() != null && WebSocketService.getIntance()!!.isConnected()) {
             tv_ycxz.text = "断开协助"
         }
         if (SPTools[this, Constant.USERTYPE, Constant.userNormal] == Constant.userNormal) {
-            ibtn_setting.visibility = View.VISIBLE
-            iv_back.visibility = View.INVISIBLE
-        } else {
             ibtn_setting.visibility = View.INVISIBLE
-            iv_back.visibility = View.INVISIBLE
-            ll_obd.visibility = View.INVISIBLE
+            iv_back.visibility = View.VISIBLE
+            tv_connnect_obd.visibility = View.INVISIBLE
+        } else {
+            tv_obd_state.text = "已连接"
+            ibtn_setting.visibility = View.INVISIBLE
+            iv_back.visibility = View.VISIBLE
+            // ll_obd.visibility = View.INVISIBLE
+            tv_connnect_obd.visibility = View.INVISIBLE
         }
         dismissProgressDialog()
     }
@@ -92,15 +122,12 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
         if (null != SelectRoleActivity.INSTANCE) {
             SelectRoleActivity.INSTANCE!!.finish()
         }
-        if (null != SelectCarTypeActivity.INSTANCE) {
-            SelectCarTypeActivity.INSTANCE!!.finish()
-        }
-        if (null != SelectSystemActivity.INSTANCE) {
-            SelectSystemActivity.INSTANCE!!.finish()
+        if (SPTools[this, Constant.USERTYPE, Constant.userProfessional] == Constant.userProfessional) {
+            if (null != SelectCarTypeActivity.INSTANCE) {
+                SelectCarTypeActivity.INSTANCE!!.finish()
+            }
         }
 
-        mIntent1 = Intent(this, WebSocketService::class.java)
-        mIntent2 = Intent(this, SocketService::class.java)
         stopWorker = OBDStopWorker()
         stopWorker!!.init(this, {
 
@@ -114,17 +141,21 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
 
         tv_title.text = getString(R.string.app_name)
         tv_username.text = SPTools[this@MainActivity, Constant.USERNAME, ""].toString()
-        tv_carName.text = SPTools[this@MainActivity, Constant.CARNAME, ""].toString()
-        homes = ArrayList()
-        if ("1" == SPTools[this@MainActivity, Constant.CARTYPE, ""]) {
-            items = "221,222,223,224,225"
-        } else if ("2" == SPTools[this@MainActivity, Constant.CARTYPE, ""]) {
-            items = "226"
-        }
 
-        homes = items.split(",")
-        recyclerview.layoutManager = GridLayoutManager(this, 2)
-        recyclerview.adapter = HomeAdapter()
+        val bean = ErrorCodeBean()
+        bean.code = SPTools[this, Constant.CARTYPE, "1"].toString()//车型
+        bean.msg = SPTools[this, Constant.CARNAME, ""].toString()// 车名
+        setData(Gson().toJson(bean))
+    }
+
+    private fun changOBDState() {
+        if (SocketService.getIntance() != null && SocketService.getIntance()!!.isConnected() && SocketService.isConnected) {
+            tv_obd_state.text = "已连接"
+            tv_connnect_obd.text = "断开OBD"
+        } else {
+            tv_obd_state.text = "未连接"
+            tv_connnect_obd.text = "连接OBD"
+        }
     }
 
     private fun click(string: String?) {
@@ -142,32 +173,34 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
     }
 
     override fun setData(data: String?) {
-        var bean: ErrorCodeBean = Gson().fromJson(data, object : TypeToken<ErrorCodeBean>() {}.type)
-        var carName = bean.msg
-        var carType = bean.code
-        tv_carName.text = carName
-        homes = null
-        homes = ArrayList()
-        if ("1" == carType) {
-            items = "221,222,223,224,225"
-        } else if ("2" == carType) {
-            items = "226"
+        runOnUiThread {
+            var bean: ErrorCodeBean = Gson().fromJson(data, object : TypeToken<ErrorCodeBean>() {}.type)
+            var carName = bean.msg
+            var carType = bean.code
+            tv_carName.text = carName
+            homes = null
+            homes = ArrayList()
+            if ("1" == carType) {
+                items = "221,222,223,224,225"
+            } else if ("2" == carType) {
+                items = "226"
+            }
+
+            homes = items.split(",")
+            recyclerview.layoutManager = GridLayoutManager(this, 2)
+            recyclerview.adapter = HomeAdapter()
         }
-
-        homes = items.split(",")
-        recyclerview.layoutManager = GridLayoutManager(this, 2)
-        recyclerview.adapter = HomeAdapter()
-
+        super.setData(data)
     }
 
     @SuppressLint("SetTextI18n")
     override fun doMethod(string: String?) {
         when (string) {
             "tv_connnect_obd" -> {//连接obd
-                startActivity(Intent(this@MainActivity, ConnentOBDActivity::class.java))
+                startActivity(Intent(this@MainActivity, ConnentOBD2Activity::class.java))
             }
             "tv_ycxz" -> {//远程协作
-                showProgressDialog()
+                // showProgressDialog()
                 if ("远程协助" == tv_ycxz.text) {
                     // startActivity(Intent(this@MainActivity, ResponseListActivity::class.java))
                     // 正常逻辑，后期开放
@@ -175,6 +208,7 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                         startActivity(Intent(this@MainActivity, ResponseListActivity::class.java))
                     } else {
                         toast("请先连接obd")
+                        dismissProgressDialog()
                     }
                 } else {
                     if (SPTools[this, Constant.USERTYPE, Constant.userProfessional] == Constant.userProfessional) {
@@ -186,9 +220,11 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                         if (WebSocketService.getIntance() != null) {
                             WebSocketService.getIntance()!!.sendMsg(Gson().toJson(webSocketBean))
                         }
+                        Handler().postDelayed({
+                            this@MainActivity.finish()
+                        }, 3000)
                     } else {
-//                        tv_ycxz.text = "远程协助"
-//                        stopService(mIntent1)
+
                     }
                 }
             }
@@ -221,26 +257,23 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                 }.setNegativeButton("取消") { _, _ -> }.show()
             }
             "iv_back" -> {
-                finish()
+                if (SPTools[this, Constant.USERTYPE, Constant.userProfessional] == Constant.userProfessional) {
+                    startActivity(Intent(this@MainActivity, SelectCarTypeActivity::class.java))
+                } else {
+                    isStopSocketService = true
+                    finish()
+                }
             }
         }
     }
 
     override fun onDestroy() {
-        // 关闭obd连接
+        // obd关闭
         if (isStopSocketService) {
             if (SocketService.getIntance() != null && SocketService.getIntance()!!.isConnected() && SocketService.isConnected) {
                 stopWorker!!.start()
             }
             SocketService.isConnected = false
-            if (SocketService.getIntance() != null) {
-                SocketService.getIntance()!!.stopSelf()
-            }
-            stopService(mIntent2)
-        }
-        // 关闭远程连接
-        if (SPTools[this, Constant.USERTYPE, Constant.userNormal] == Constant.userNormal) {
-            stopService(mIntent1)
         }
         super.onDestroy()
     }
@@ -248,15 +281,10 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             if (SPTools[this, Constant.USERTYPE, Constant.userProfessional] == Constant.userProfessional) {
-                // finish()
+
             } else {
-                if (System.currentTimeMillis() - mExitTime > 2000) {
-                    toast("再按一次退出程序")
-                    mExitTime = System.currentTimeMillis()
-                } else {
-                    isStopSocketService = true
-                    finish()
-                }
+                isStopSocketService = true
+                finish()
             }
             return true
         }
