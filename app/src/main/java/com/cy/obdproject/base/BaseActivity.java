@@ -2,6 +2,7 @@ package com.cy.obdproject.base;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -72,6 +73,16 @@ public class BaseActivity extends AppCompatActivity {
             if (findViewById(R.id.float_window) != null) {
                 findViewById(R.id.float_window).setVisibility(View.GONE);
             }
+        }
+        // 专家端进入界面延迟3秒再操作，防止操作过快丢数据
+        if (isProfessionalConnected) {
+            showProgressDialog();
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    dismissProgressDialog();
+                }
+            }, 3000);
         }
     }
 

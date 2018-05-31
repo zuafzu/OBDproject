@@ -31,6 +31,7 @@ class WriteData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
     private var writeDataWorker: WriteDataWorker? = null
     private var list = ArrayList<WriteFileBean>()
     private var mData = ""
+    private var mFile: File? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -82,6 +83,7 @@ class WriteData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     override fun setData(data: String?) {
         Log.e("cyf88", "data = $data")
         runOnUiThread {
@@ -89,9 +91,14 @@ class WriteData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
                 val str = data!!.replace("-", "")
                 progressBar.progress = str.toInt()
             } else {
-                if (data == "下载刷写文件中......") {
-                    tv_msg.text = "下载刷写文件中......"
+                if (data == "下载刷写文件中") {
+                    tv_msg.text = "下载刷写文件中"
                 } else if (data == "返回数据超时" || data == "OBD未连接") {
+                    if (data == "返回数据超时") {
+                        tv_msg.append("\n返回数据超时")
+                    } else {
+                        tv_msg.text = "OBD未连接"
+                    }
                     btn_start.text = getString(R.string.write)
                     iv_back.isClickable = true
                     btn_start.isClickable = true
@@ -104,6 +111,10 @@ class WriteData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
                         iv_back.isClickable = true
                         btn_start.isClickable = true
                         btn_start.setBackgroundResource(R.drawable.shape_btn_colorprimary)
+                        // 删除文件
+                        if (mFile != null) {
+                            mFile!!.deleteOnExit()
+                        }
                     }
                 }
             }
@@ -162,10 +173,7 @@ class WriteData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
             var num = 0
 
             override fun doInBackground(vararg p0: File?): String {
-//                val mIs = assets.open("HS5_SW_20180328.eol")
-//                val length = mIs.available()
-//                val buffer = ByteArray(length)
-//                mIs.read(buffer)
+                mFile = p0[0]
 
                 val buffer = FileUtil.readFile(p0[0])
                 val ba0 = ByteArray(1)

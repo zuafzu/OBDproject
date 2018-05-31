@@ -206,8 +206,12 @@ class WriteBaseInfoActivity : BaseActivity(), BaseActivity.ClickMethoListener, A
                     dismiss()
                 }.create()
         dialog!!.setOnDismissListener {
-            val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS)
+            if (isUserConnected) {
+
+            } else {
+                val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS)
+            }
         }
         dialog!!.show()
         edit!!.addTextChangedListener(this)

@@ -1,5 +1,6 @@
 package com.cy.obdproject.socket
 
+import android.app.Activity
 import android.app.Service
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
@@ -286,12 +287,20 @@ class WebSocketService : Service() {
                     }
                 } else if (webSocketBean.c == "K") {
                     for (i in 0 until (application as MyApp).activityList.size) {
-                        if ((application as MyApp).activityList[i].localClassName.contains("MainActivity")) {
-                            ((application as MyApp).activityList[i] as BaseActivity).runOnUiThread {
-                                if (SPTools[this@WebSocketService, Constant.USERTYPE, Constant.userProfessional] == Constant.userProfessional) {
-                                    toast("协助已断开！")
-                                    ((application as MyApp).activityList[i] as MainActivity).finish()
-                                } else {
+                        if (SPTools[this@WebSocketService, Constant.USERTYPE, Constant.userProfessional] == Constant.userProfessional) {
+                            if (!(application as MyApp).activityList[i].localClassName.contains("RequestListActivity")) {
+                                ((application as MyApp).activityList[i] as Activity).finish()
+                            } else {
+                                ((application as MyApp).activityList[i] as RequestListActivity).net_requestList(false)
+                            }
+                            if (i == (application as MyApp).activityList.size - 1) {
+                                ((application as MyApp).activityList[i] as BaseActivity).runOnUiThread {
+                                    toast("用户断开连接！")
+                                }
+                            }
+                        } else {
+                            if ((application as MyApp).activityList[i].localClassName.contains("MainActivity")) {
+                                ((application as MyApp).activityList[i] as BaseActivity).runOnUiThread {
                                     toast("协助已断开！")
                                     val mIntent = Intent(((application as MyApp).activityList[i] as MainActivity),
                                             MainActivity::class.java)
@@ -303,8 +312,8 @@ class WebSocketService : Service() {
                                     }
                                     stopSelf()
                                 }
+                                break
                             }
-                            break
                         }
                     }
                 }

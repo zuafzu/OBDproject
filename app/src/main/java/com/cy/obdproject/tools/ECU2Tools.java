@@ -129,4 +129,186 @@ public class ECU2Tools {
         return data & 0x0FFFFFFFFl;
     }
 
+    public static void VCIAlg(Boolean bIsEncript, int CMD, byte CRT, byte[] pInData, int iInDataSize, byte[] pOutData, int pOutDataSize) {
+
+        int CMD_SET_CAN_PIN = 0x01;        //设置CAN线可配置引脚
+        int CMD_SET_K_PIN = 0x02;        //设置K线可配置引脚
+        int CMD_SET_L_PIN = 0x03;        //设置L线可配置引脚
+        int CMD_SET_LIN_PIN = 0x04;        //设置LIN线可配置引脚
+        int CMD_BEAT = 0x0A;        //心跳包
+        int CMD_DISCONNECT_LINK = 0x0F;        //通知通信控制器断开逻辑链路
+
+        int CMD_SET_K_SPEED = 0x10;        //设置K通信速率命令字
+        int CMD_SET_K_TIMING_P1MIN = 0x11;        //设置K通信时间参数P1min
+        int CMD_SET_K_TIMING_P1MAX = 0x12;        //设置K通信时间参数P1max
+        int CMD_SET_K_TIMING_P4MIN = 0x13;        //设置K通信时间参数P4min
+        int CMD_SET_K_TIMING_P4MAX = 0x14;        //设置K通信时间参数P4max
+        int CMD_SET_K_WUP = 0x15;        //设置K线Wakeup时间
+        int CMD_SET_K_IDLE = 0x16;        //设置K线总线空闲时间
+        int CMD_SET_K_INIT = 0x17;        //设置K线低电平时间
+        int CMD_K_START_COMM = 0x18;        //K线启动通信
+        int CMD_K_TRANSMIT_DATA = 0x19;        //K线转发数据
+        int CMD_K_PULL_UP_VOLTAGE = 0x1A;        //控制K线电压
+        int CMD_SET_K_UART = 0x1B;        //配置奇偶校验、数据位、停止位
+        int CMD_K_INIT_ADDRESS_TYPE = 0x1C;        //K线初始化地址方式
+        int CMD_SET_K_TIMING_W1MAX = 0x1D;        //设置K线W1MAX时间
+        int CMD_SET_K_TIMING_W1MIN = 0x1E;        //设置K线W1MIN时间
+        int CMD_SET_K_TIMING_W2MAX = 0x1F;        //设置K线W2MAX时间
+        int CMD_SET_K_TIMING_W2MIN = 0x20;        //设置K线W2MIN时间
+        int CMD_SET_K_TIMING_W3MAX = 0x21;        //设置K线W3MAX时间
+        int CMD_SET_K_TIMING_W3MIN = 0x22;        //设置K线W3MIN时间
+        int CMD_SET_K_TIMING_W4MAX = 0x23;        //设置K线W4MAX时间
+        int CMD_SET_K_TIMING_W4MIN = 0x24;        //设置K线W4MIN时间
+        int CMD_SET_5BAUD_INIT_TYPE = 0x25;        //设置5波特率初始化类型
+        int CMD_SET_5BAUD_INIT_PHYS_ADDRESS = 0x26;        //5波特率初始化物理地址寻址
+        int CMD_SET_5BAUD_INIT_FUNC_ADDRESS = 0x27;        //5波特率初始化功能地址寻址
+        int CMD_K_INIT_SETTINGS = 0x28;        //K线初始化设置
+        int CMD_SET_TESTER_PRESENT_SEND_TYPE = 0x2A;        //诊断仪在线发送方式(0--周期发送, 1--空闲发送)
+        int CMD_SET_TESTER_PRESENT_TIME = 0x2B;        //诊断仪在线发送最大时间间隔
+        int CMD_TESTER_PRESENT_START_K = 0x2C;        //启动诊断仪在线K线功能
+        int CMD_TESTER_PRESENT_STOP = 0x2D;        //停止诊断仪在线
+        int CMD_TESTER_PRESENT_START_CAN_STD = 0x2F;        //启动诊断仪在线CAN线标准帧功能
+        int CMD_TESTER_PRESENT_START_CAN_EXT = 0x30;        //启动诊断仪在线CAN线扩展帧功能
+        int CMD_ECAS_COMM = 0x48;        //ECAS转发数据
+
+
+        int CMD_SET_CAN_SPEED = 0x41;        //设置CAN通信速率命令字
+        int CMD_SET_CAN_MASK = 0x42;        //设置CAN屏蔽字
+        int CMD_CAN_TRANSMIT_STANDARD_FRAME = 0x44;        //CAN线转发标准帧
+        int CMD_CAN_TRANSMIT_EXTEND_FRAME = 0x43;        //CAN线转发扩展帧
+
+        int CMD_GET_SW_INFO = 0x50;        //获取软件信息
+        int CMD_SET_HW_INFO = 0x51;        //设置硬件信息
+        int CMD_GET_HW_INFO = 0x52;        //获取硬件信息
+
+        int CMD_VCI_SAVE_BUFFER = 0x54;        //通知VCI硬件缓存数据
+        int CMD_VCI_FLASH_SWITCH = 0x55;        //VCI硬件刷写开关
+        int CMD_VCI_FLASH_CF_STMIN = 0x56;        //快速刷写时发送连续帧的时间间隔
+
+        int CMD_GET_BATTERY_VOLTAGE = 0x63;        //获取电池电压
+        int CMD_VCI_TESTERPRESENT_SWITCH = 0x64;        //VCI发送诊断仪在线功能
+
+        int CMD_VCI_SET_15765_CANID = 0x70;        //ISO15765网络层设置CANID
+        int CMD_VCI_SET_15765_StminInFC = 0x71;        //ISO15765网络层在流控中的Stmin时间
+        int CMD_VCI_SET_15765_SF_INTERAL_TIME = 0x72;        //15765发送连续帧的时间间隔
+        int CMD_VCI_SET_15765_BlockSizeInFC = 0x73;        //ISO15765网络层在流控中的BlockSize时间
+        int CMD_VCI_SET_15765_SWITCH = 0x74;        //设置15765开关
+        int CMD_VCI_SET_15765_SEND = 0x75;        //15765发送数据
+        int CMD_VCI_SET_15765_RECV = 0x76;        //15765接收数据
+
+        int CMD_VCI_SET_WLAN_OBD_PASSWORD = 0x82;        //设置无线OBD密码
+
+        int CMD_VCI_START_RECORD_DATASTREAM = 0x85;        //启动VCI记录数据流
+
+        int CMD_SET_CAN_MASK_BY_CANID = 0xA0;        //通过CANID设置屏蔽字
+
+
+        if (CMD == CMD_SET_CAN_PIN || CMD == CMD_SET_CAN_SPEED || CMD == CMD_SET_CAN_MASK_BY_CANID) {
+            //case CMD_SET_CAN_PIN:
+            //case CMD_SET_CAN_SPEED:
+            //case CMD_SET_CAN_MASK_BY_CANID:
+
+            if (bIsEncript) {
+                //奇数位一个算法，偶数位一个算法
+                for (int i = 0; i < iInDataSize; i++) {
+                    if (i % 2 == 0) {
+                        pOutData[i] = (byte) ((pInData[i] ^ CRT) + CRT);
+                    } else {
+                        pOutData[i] = (byte) (~pInData[i] + CRT);
+                    }
+                }
+
+                //首尾互换
+                for (int i = 0; i < iInDataSize / 2; i++) {
+                    byte ucTemp = pOutData[i];
+                    pOutData[i] = pOutData[iInDataSize - i - 1];
+                    pOutData[iInDataSize - i - 1] = ucTemp;
+                }
+            } else {
+                for (int i = 0; i < iInDataSize / 2; i++) {
+                    byte ucTemp = pInData[i];
+                    pInData[i] = pInData[iInDataSize - i - 1];
+                    pInData[iInDataSize - i - 1] = ucTemp;
+                }
+
+                for (int i = 0; i < iInDataSize; i++) {
+                    if (i % 2 == 0) {
+                        pOutData[i] = (byte) ((pInData[i] - CRT) ^ CRT);
+                    } else {
+                        pOutData[i] = (byte) ~(pInData[i] - CRT);
+                    }
+                }
+            }
+
+            pOutDataSize = iInDataSize;
+
+        } else if (CMD == CMD_SET_K_PIN || CMD == CMD_SET_CAN_MASK || CMD == CMD_VCI_SET_15765_SWITCH) {
+            //case CMD_SET_K_PIN:
+            //case CMD_SET_CAN_MASK:
+            //case CMD_VCI_SET_15765_SWITCH:
+
+            if (bIsEncript) {
+                //奇数位一个算法，偶数位一个算法
+                for (int i = 0; i < iInDataSize; i++) {
+                    if (i % 2 == 0) {
+                        pOutData[i] = (byte) (~pInData[i] + CRT);
+                    } else {
+                        byte ucTemp = (byte) (((pInData[i] & 0x0F) << 4) | ((pInData[i] & 0xF0) >> 4));
+                        pOutData[i] = (byte) (ucTemp ^ CRT);
+                    }
+                }
+
+                //首尾互换
+                for (int i = 0; i < iInDataSize / 2; i++) {
+                    byte ucTemp = pOutData[i];
+                    pOutData[i] = pOutData[iInDataSize - i - 1];
+                    pOutData[iInDataSize - i - 1] = ucTemp;
+                }
+            } else {
+                for (int i = 0; i < iInDataSize / 2; i++) {
+                    byte ucTemp = pInData[i];
+                    pInData[i] = pInData[iInDataSize - i - 1];
+                    pInData[iInDataSize - i - 1] = ucTemp;
+                }
+
+                for (int i = 0; i < iInDataSize; i++) {
+                    if (i % 2 == 0) {
+                        pOutData[i] = (byte) ~(pInData[i] - CRT);
+                    } else {
+                        pInData[i] = (byte) (pInData[i] ^ CRT);
+                        pOutData[i] = (byte) (((pInData[i] & 0x0F) << 4) | ((pInData[i] & 0xF0) >> 4));
+                    }
+                }
+            }
+
+            pOutDataSize = iInDataSize;
+
+        } else if (CMD == CMD_SET_K_SPEED || CMD == CMD_VCI_FLASH_SWITCH)
+        //	case CMD_SET_K_SPEED:
+        //	case CMD_VCI_FLASH_SWITCH:
+        {
+            if (bIsEncript) {
+                for (int i = 0; i < iInDataSize; i++) {
+                    byte ucTemp = (byte) (((pInData[i] & 0x1F) << 3) | ((pInData[i] & 0xE0) >> 5));
+                    pOutData[i] = (byte) ((ucTemp ^ CRT) + (char) i);
+                }
+            } else {
+                for (int i = 0; i < iInDataSize; i++) {
+                    pOutData[i] = (byte) ((pInData[i] - (char) i) ^ CRT);
+                    pOutData[i] = (byte) (((pOutData[i] & 0xF8) >> 3) | ((pOutData[i] & 0x07) << 5));
+                }
+            }
+
+            pOutDataSize = iInDataSize;
+        } else {
+            for (int i = 0; i < iInDataSize; i++) {
+                pOutData[i] = pInData[i];
+            }
+
+            pOutDataSize = iInDataSize;
+        }
+
+
+    }
+
 }

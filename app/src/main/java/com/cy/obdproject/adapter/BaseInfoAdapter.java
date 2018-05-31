@@ -10,7 +10,6 @@ import android.widget.TextView;
 
 import com.cy.obdproject.R;
 import com.cy.obdproject.bean.BaseInfoBean;
-import com.cy.obdproject.socket.SocketService;
 
 import java.util.ArrayList;
 
@@ -67,7 +66,7 @@ public class BaseInfoAdapter extends BaseAdapter {
 //        } else {
 //            holder.view_line.setVisibility(View.GONE);
 //        }
-        if (SocketService.Companion.getIntance() != null && SocketService.Companion.getIntance().isConnected()) {
+//        if (SocketService.Companion.getIntance() != null && SocketService.Companion.getIntance().isConnected()) {
             if (items.get(position).getName().contains("车辆运输模式")) {
                 int value = -1;
                 try {
@@ -130,7 +129,7 @@ public class BaseInfoAdapter extends BaseAdapter {
                     holder.tv_value.setText("解析异常");
                 }
             }
-        }
+//        }
 
         return convertView;
     }
