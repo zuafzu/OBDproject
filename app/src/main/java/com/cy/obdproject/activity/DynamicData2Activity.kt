@@ -2,6 +2,7 @@ package com.cy.obdproject.activity
 
 import android.content.Context
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -10,38 +11,32 @@ import android.widget.BaseAdapter
 import android.widget.TextView
 import com.cy.obdproject.R
 import com.cy.obdproject.base.BaseActivity
-import com.cy.obdproject.bean.BaseInfoBean
 import com.cy.obdproject.bean.DynamicDataBean
 import com.cy.obdproject.constant.Constant
-import com.cy.obdproject.constant.ECUConstant
 import com.cy.obdproject.socket.SocketService
-import com.cy.obdproject.worker.BaseInfoWorker
+import com.cy.obdproject.worker.DynamicDataWorker
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.activity_dynamic_data2.*
 import org.jetbrains.anko.toast
 
 class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
+
+    private var dynamicDataWorker: DynamicDataWorker? = null
     private var listData: ArrayList<DynamicDataBean>? = null
     private var adapter: ControlDynamicDataAdapter? = null
-    private var isStart:Boolean = true
+    private var isStart: Boolean = true
     var pageIndex = 0
 
     private var pageCount = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dynamic_data2)
         initView()
     }
 
-    private var readBaseInfoWorker: BaseInfoWorker?= null
-
     private fun initView() {
-        //worker待更改
-        readBaseInfoWorker = BaseInfoWorker()
-        readBaseInfoWorker!!.init(this, ECUConstant.getDynamicBaseInfoData()) { data ->
-            setData(data)
-        }
 
         setClickMethod(iv_back)
         setClickMethod(btn_lastPage)
@@ -50,9 +45,20 @@ class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
 
         if (intent.hasExtra("listData")) {
             listData = intent.getSerializableExtra("listData") as ArrayList<DynamicDataBean>?
-            Log.e("zj","listData = "+listData.toString())
+            dynamicDataWorker = DynamicDataWorker()
+            dynamicDataWorker!!.init(this, listData) { data ->
+                setData(data)
+                if (!isStart) {
+                    Handler().postDelayed({
+                        if (!isStart) {
+                            dynamicDataWorker!!.start(getPageList(listData!!, Constant.pageSize)[pageIndex])
+                        }
+                    }, 3000)
+                }
+            }
+            Log.e("zj", "listData = " + listData.toString())
             if (listData!!.size > 0) {
-                pageCount = (listData!!.size - 1) / 10 + 1;
+                pageCount = (listData!!.size - 1) / 10 + 1
 
                 if (pageCount == 1) {
                     btn_lastPage.isEnabled = false
@@ -62,19 +68,19 @@ class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
                 }
                 if (adapter == null) {
 
-                    Log.e("zj","11111")
+                    Log.e("zj", "11111")
 
                     adapter = ControlDynamicDataAdapter(listData!!, this)
                     listView!!.adapter = adapter
                 } else {
-                    Log.e("zj","2222")
+                    Log.e("zj", "2222")
 
                     adapter!!.notifyDataSetChanged()
                 }
 
-              Log.e("zj","count = "+  adapter!!.count)
+                Log.e("zj", "count = " + adapter!!.count)
             }
-        }else{
+        } else {
             toast("shujuqueshi")
         }
     }
@@ -100,21 +106,14 @@ class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
             super.setData(data)
         }
     }
+
     private fun initData() {
         if (isProfessionalConnected) {// 专家连接
 
         } else {
             showProgressDialog()
             if (SocketService.getIntance() != null && SocketService.getIntance()!!.isConnected()) {
-                readBaseInfoWorker!!.start()
-            } else {
-                listData!!.clear()
-                for (i in 0 until ECUConstant.getDynamicBaseInfoData().size) {
-                    val bean = DynamicDataBean()
-                    bean.name = ECUConstant.getReadBaseInfoData()[i].name
-                    listData!!.add(bean)
-                }
-                setData(Gson().toJson(listData))
+                dynamicDataWorker!!.start(getPageList(listData!!, Constant.pageSize)[pageIndex])
             }
         }
     }
@@ -123,29 +122,41 @@ class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
         when (string) {
             "iv_back" -> {
                 finish()
+                btn_start.text = "开始"
+                isStart = true
             }
             "btn_lastPage" -> {
                 if (pageCount > 1 && Constant.pageSize > 0) {
                     preView()
                 }
+                btn_start.text = "开始"
+                isStart = true
             }
             "btn_nextPage" -> {
                 if (pageCount > 1) {
                     nextView()
                 }
+                btn_start.text = "开始"
+                isStart = true
             }
             "btn_start" -> {
                 Log.e("zj", "当前页 List = " + getPageList(listData!!, Constant.pageSize)[pageIndex])
-                if (isStart){
-                    btn_start.setText("停止")
+                if (isStart) {
+                    btn_start.text = "停止"
                     isStart = false
-                }else{
-                    btn_start.setText("开始")
+                    initData()
+                } else {
+                    btn_start.text = "开始"
                     isStart = true
                 }
-                initData()
             }
         }
+    }
+
+    override fun onBackPressed() {
+        btn_start.text = "开始"
+        isStart = true
+        super.onBackPressed()
     }
 
     private fun preView() {

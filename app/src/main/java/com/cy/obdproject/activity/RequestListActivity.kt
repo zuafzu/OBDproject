@@ -52,6 +52,7 @@ class RequestListActivity : BaseActivity(), BaseActivity.ClickMethoListener {
             webSocketBean.s = SPTools[this, Constant.USERID, ""]!!.toString()
             webSocketBean.r = SPTools[this, Constant.ZFORUID, ""]!!.toString()
             webSocketBean.c = "C"
+            webSocketBean.d = "z"
             WebSocketService.getIntance()!!.sendMsg(Gson().toJson(webSocketBean))
         }
         iv_quit.visibility = View.INVISIBLE

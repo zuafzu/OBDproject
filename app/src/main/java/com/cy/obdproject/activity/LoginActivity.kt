@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import com.cy.obdproject.R
-import com.cy.obdproject.app.MyApp
 import com.cy.obdproject.base.BaseActivity
 import com.cy.obdproject.bean.LoginBean
 import com.cy.obdproject.constant.Constant
@@ -30,20 +29,20 @@ class LoginActivity : BaseActivity(), BaseActivity.ClickMethoListener {
         }
         setClickMethod(btn_login)
         // 判断是否自动登录
-        if (SPTools[this@LoginActivity, Constant.ISLOGIN, ""] != "") {
-            if (SPTools[this@LoginActivity, Constant.USERTYPE, 0] == Constant.userNormal) {
-                for (i in 0 until (application as MyApp).activityList.size) {
-                    (application as MyApp).activityList[i].finish()
-                }
-                // startActivity(Intent(this@LoginActivity, MainActivity::class.java))
-                // startActivity(Intent(this@LoginActivity, SelectCarTypeActivity::class.java))
-                startActivity(Intent(this@LoginActivity, ConnentOBDActivity::class.java))
-            } else {
-                showProgressDialog()
-                val mIntent1 = Intent(this@LoginActivity, WebSocketService::class.java)
-                startService(mIntent1)
-            }
-        }
+//        if (SPTools[this@LoginActivity, Constant.ISLOGIN, ""] != "") {
+//            if (SPTools[this@LoginActivity, Constant.USERTYPE, 0] == Constant.userNormal) {
+//                for (i in 0 until (application as MyApp).activityList.size) {
+//                    (application as MyApp).activityList[i].finish()
+//                }
+//                // startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+//                // startActivity(Intent(this@LoginActivity, SelectCarTypeActivity::class.java))
+//                startActivity(Intent(this@LoginActivity, ConnentOBDActivity::class.java))
+//            } else {
+//                showProgressDialog()
+//                val mIntent1 = Intent(this@LoginActivity, WebSocketService::class.java)
+//                startService(mIntent1)
+//            }
+//        }
     }
 
     override fun doMethod(string: String?) {
@@ -69,6 +68,7 @@ class LoginActivity : BaseActivity(), BaseActivity.ClickMethoListener {
         val map = hashMapOf<String, String>()
         map["username"] = username
         map["pwd"] = pwd
+        map["loginType"] = ""
         NetTools.net(map, Urls().auth_login, this, { response ->
             Log.e("zj", "auth_login = " + response!!.data)
             var loginBean = Gson().fromJson(response.data, LoginBean::class.java)
@@ -95,6 +95,8 @@ class LoginActivity : BaseActivity(), BaseActivity.ClickMethoListener {
 
             } else if (list.size > 1) {
                 var intent = Intent(Intent(this@LoginActivity, SelectRoleActivity::class.java))
+                intent.putExtra("username", et_name.text.toString())
+                intent.putExtra("password", et_pw.text.toString())
                 intent.putExtra("list", list)
                 startActivity(intent)
                 finish()

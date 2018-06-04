@@ -43,7 +43,8 @@ public class OBDStart1Worker {
         connectLinstener = new MySocketClient.ConnectLinstener() {
             @Override
             public void onReceiveData(String data) {
-                myData.add(data);
+                myData.add(OBDagreement.unDecodeString(data));
+                Log.i("cyf","收到信息(解密) : "+OBDagreement.unDecodeString(data));
             }
         };
     }

@@ -58,9 +58,9 @@ public class StringTools {
          */
 
         String rexp = "^(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|[1-9])\\."
-                +"(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|\\d)\\."
-                +"(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|\\d)\\."
-                +"(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|\\d)$";
+                + "(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|\\d)\\."
+                + "(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|\\d)\\."
+                + "(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|\\d)$";
 //        String rexp = "([1-9]|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])(\\.(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])){3}";
         Pattern pat = Pattern.compile(rexp);
         Matcher mat = pat.matcher(addr);
@@ -85,4 +85,55 @@ public class StringTools {
         }
         return ipAddress;
     }
+
+    /**
+     * 将十六进制的字符串转换成二进制的字符串
+     *
+     * @param hexString
+     * @return
+     */
+    public static String hexStrToBinaryStr(String hexString) {
+
+        if (hexString == null || hexString.equals("")) {
+            return null;
+        }
+        StringBuffer sb = new StringBuffer();
+        // 将每一个十六进制字符分别转换成一个四位的二进制字符
+        for (int i = 0; i < hexString.length(); i++) {
+            String indexStr = hexString.substring(i, i + 1);
+            String binaryStr = Integer.toBinaryString(Integer.parseInt(indexStr, 16));
+            while (binaryStr.length() < 4) {
+                binaryStr = "0" + binaryStr;
+            }
+            sb.append(binaryStr);
+        }
+
+        return sb.toString();
+    }
+
+    /**
+     * 二进制字符串转换为十六进制字符串
+     * <p>
+     * 二进制字符串位数必须满足是4的倍数
+     *
+     * @param binaryStr
+     * @return
+     */
+    public static String binaryStrToHexStr(String binaryStr) {
+
+        if (binaryStr == null || binaryStr.equals("") || binaryStr.length() % 4 != 0) {
+            return null;
+        }
+
+        StringBuffer sbs = new StringBuffer();
+        // 二进制字符串是4的倍数，所以四位二进制转换成一位十六进制
+        for (int i = 0; i < binaryStr.length() / 4; i++) {
+            String subStr = binaryStr.substring(i * 4, i * 4 + 4);
+            String hexStr = Integer.toHexString(Integer.parseInt(subStr, 2));
+            sbs.append(hexStr);
+        }
+
+        return sbs.toString();
+    }
+
 }

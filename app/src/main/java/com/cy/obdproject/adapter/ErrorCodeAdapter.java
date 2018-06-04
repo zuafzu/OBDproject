@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.cy.obdproject.R;
@@ -56,6 +55,7 @@ public class ErrorCodeAdapter extends BaseAdapter {
         holder.tv_code.setText(items.get(position).getCode());
         holder.tv_msg.setText(items.get(position).getMsg());
 
+        holder.tv_freeze.setVisibility(View.GONE);
         holder.tv_freeze.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

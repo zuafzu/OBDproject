@@ -8,7 +8,7 @@ import com.cy.obdproject.R
 import com.cy.obdproject.adapter.DynamicDataAdapter
 import com.cy.obdproject.base.BaseActivity
 import com.cy.obdproject.bean.DynamicDataBean
-import com.cy.obdproject.worker.BaseInfoWorker
+import com.cy.obdproject.constant.ECUConstant
 import kotlinx.android.synthetic.main.activity_dynamic_data.*
 import org.jetbrains.anko.toast
 
@@ -16,7 +16,6 @@ class DynamicDataActivity : BaseActivity(), BaseActivity.ClickMethoListener, Ada
 
     private var list: ArrayList<DynamicDataBean>? = null
     private var adapter: DynamicDataAdapter? = null
-    private var readBaseInfoWorker: BaseInfoWorker? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,16 +24,9 @@ class DynamicDataActivity : BaseActivity(), BaseActivity.ClickMethoListener, Ada
     }
 
     private fun initView() {
-        list = ArrayList()
+        list = ECUConstant.getDynamicData()
         setClickMethod(iv_back)
         setClickMethod(btn_next)
-
-        for (i in 0 until 50) {
-
-            var bean = DynamicDataBean("" + i, "65摄氏度", "" + i, "0")
-            list!!.add(bean)
-        }
-
         if (adapter == null) {
             adapter = DynamicDataAdapter(list!!, this)
             listView!!.adapter = adapter
@@ -42,7 +34,7 @@ class DynamicDataActivity : BaseActivity(), BaseActivity.ClickMethoListener, Ada
             adapter!!.notifyDataSetChanged()
         }
 
-        listView.setOnItemClickListener(this)
+        listView.onItemClickListener = this
     }
 
     override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
@@ -53,7 +45,6 @@ class DynamicDataActivity : BaseActivity(), BaseActivity.ClickMethoListener, Ada
             list!![position].isSelect = "1"
         }
         adapter!!.notifyDataSetChanged()
-
     }
 
 

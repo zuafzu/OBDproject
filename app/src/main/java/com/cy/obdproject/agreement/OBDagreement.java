@@ -23,19 +23,30 @@ public class OBDagreement {
 
     /**
      * 加密
+     *
      * @param string
      * @return
      */
     public static String decodeString(String string) {
-        if (true) {
-            return string;
-        } else {
-            String crt = string.substring(8, 10);
-            byte[] oldByte = StringTools.hex2byte(string.substring(10, string.length() - 2));
-            byte[] newByte = new byte[oldByte.length];
-            ECU2Tools.VCIAlg(true, Integer.valueOf(string.substring(6, 8), 16), StringTools.hex2byte(crt)[0], oldByte, oldByte.length, newByte, newByte.length);
-            return string.substring(0, 10) + StringTools.byte2hex(newByte) + "55";
-        }
+        String crt = string.substring(8, 10);
+        byte[] oldByte = StringTools.hex2byte(string.substring(12, string.length() - 2));
+        byte[] newByte = new byte[oldByte.length];
+        ECU2Tools.VCIAlg(true, Integer.valueOf(string.substring(6, 8), 16), StringTools.hex2byte(crt)[0], oldByte, oldByte.length, newByte, newByte.length);
+        return string.substring(0, 12) + StringTools.byte2hex(newByte) + "55";
+    }
+
+    /**
+     * 解密
+     *
+     * @param string
+     * @return
+     */
+    public static String unDecodeString(String string) {
+        String crt = string.substring(8, 10);
+        byte[] oldByte = StringTools.hex2byte(string.substring(12, string.length() - 2));
+        byte[] newByte = new byte[oldByte.length];
+        ECU2Tools.VCIAlg(false, Integer.valueOf(string.substring(6, 8), 16), StringTools.hex2byte(crt)[0], oldByte, oldByte.length, newByte, newByte.length);
+        return string.substring(0, 12) + StringTools.byte2hex(newByte) + "AA";
     }
 
     /**

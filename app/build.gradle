@@ -43,5 +43,5 @@ dependencies {
     // Anko
     implementation "org.jetbrains.anko:anko-common:$anko_version"
     implementation 'org.jetbrains.anko:anko-sdk15:0.8.3'
-
+    implementation files('/Users/caoyingfu/Documents/android_app/ExlDemo/app/libs/jxl.jar')
 }

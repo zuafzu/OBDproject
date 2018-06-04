@@ -15,6 +15,18 @@ public class ECUTools {
      * @param myData
      * @return
      */
+    public static String getData(String data, String type, String myData) {
+        return getData(data, Integer.valueOf(type), myData);
+    }
+
+    /**
+     * 解析返回的数据(读数据)
+     *
+     * @param data
+     * @param type
+     * @param myData
+     * @return
+     */
     public static String getData(String data, int type, String myData) {
         if (data.contains("7F2278")) {
             return WAIT;

@@ -6,12 +6,11 @@ import android.text.TextWatcher
 import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.view.View
-import android.widget.*
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import com.cy.obdproject.R
 import com.cy.obdproject.base.BaseActivity
-import com.cy.obdproject.bean.DynamicDataBean
 import com.cy.obdproject.bean.IOTestBean
-import com.cy.obdproject.constant.ECUConstant
 import com.cy.obdproject.socket.SocketService
 import com.cy.obdproject.worker.BaseInfoWorker
 import com.google.gson.Gson
@@ -36,9 +35,9 @@ class IOTest2Activity : BaseActivity(), BaseActivity.ClickMethoListener, TextWat
     private fun initView() {
         //worker待更改
         readBaseInfoWorker = BaseInfoWorker()
-        readBaseInfoWorker!!.init(this, ECUConstant.getDynamicBaseInfoData()) { data ->
-            setData(data)
-        }
+//        readBaseInfoWorker!!.init(this, ECUConstant.getDynamicData()) { data ->
+//            setData(data)
+//        }
 
         setClickMethod(iv_back)
         setClickMethod(btn_startTest)

@@ -40,6 +40,7 @@ class ConnentOBDActivity : BaseActivity(), BaseActivity.ClickMethoListener {
         startWorker2 = OBDStart2Worker()
         wifiTools = WifiTools(this)
 
+        stopService(mIntent2)
         btn_ok.text = "下一步"
         iv_back.visibility = View.INVISIBLE
     }
@@ -47,20 +48,24 @@ class ConnentOBDActivity : BaseActivity(), BaseActivity.ClickMethoListener {
     @SuppressLint("SetTextI18n")
     override fun onResume() {
         super.onResume()
-        if (wifiTools!!.isWifiApEnabled) {
-            tv_wifiState.text = "热点是否开启：已开启"
-        } else {
-            tv_wifiState.text = "热点是否开启：未开启"
-        }
+        showProgressDialog()
+        Handler().postDelayed({
+            if (wifiTools!!.isWifiApEnabled) {
+                tv_wifiState.text = "热点是否开启：已开启"
+            } else {
+                tv_wifiState.text = "热点是否开启：未开启"
+            }
 
-        if (SocketService.getIntance() != null &&
-                SocketService.getIntance()!!.isConnected() &&
-                SocketService.isConnected) {
-            btn_ok.text = "断开OBD"
-            et_input_ip.setText(Constant.mDstName)
-        } else {
-            btn_ok.text = "下一步"
-        }
+            if (SocketService.getIntance() != null &&
+                    SocketService.getIntance()!!.isConnected() &&
+                    SocketService.isConnected) {
+                btn_ok.text = "断开OBD"
+                et_input_ip.setText(Constant.mDstName)
+            } else {
+                btn_ok.text = "下一步"
+            }
+            dismissProgressDialog()
+        }, 1000)
     }
 
     @SuppressLint("SetTextI18n")
@@ -113,23 +118,26 @@ class ConnentOBDActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                         dismissProgressDialog()
                         return
                     }
-                    Constant.mDstName = et_input_ip.text.toString()
-                    startService(mIntent2)
-                    startWorker1!!.init(this@ConnentOBDActivity, { data ->
-                        this.finish()
-                        toast(data)
-                        dismissProgressDialog()
-                    })
-                    startWorker2!!.init(this@ConnentOBDActivity, { data ->
-                        this.finish()
-                        toast(data)
-                        dismissProgressDialog()
-                    })
+                    stopService(mIntent2)
                     Handler().postDelayed({
-                        this.finish()
-                        startActivity(Intent(this@ConnentOBDActivity, SelectCarTypeActivity::class.java))
-                        dismissProgressDialog()
-                    }, 3000)
+                        Constant.mDstName = et_input_ip.text.toString()
+                        startService(mIntent2)
+                        startWorker1!!.init(this@ConnentOBDActivity, { data ->
+                            this.finish()
+                            toast(data)
+                            dismissProgressDialog()
+                        })
+                        startWorker2!!.init(this@ConnentOBDActivity, { data ->
+                            this.finish()
+                            toast(data)
+                            dismissProgressDialog()
+                        })
+                        Handler().postDelayed({
+                            this.finish()
+                            startActivity(Intent(this@ConnentOBDActivity, SelectCarTypeActivity::class.java))
+                            dismissProgressDialog()
+                        }, 2000)
+                    }, 1000)
                 }
             }
         }

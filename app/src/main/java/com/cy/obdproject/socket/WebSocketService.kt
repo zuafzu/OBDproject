@@ -1,9 +1,11 @@
 package com.cy.obdproject.socket
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Service
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
+import android.os.AsyncTask
 import android.os.IBinder
 import android.util.Log
 import android.widget.Toast
@@ -17,6 +19,7 @@ import com.cy.obdproject.bean.BaseBean
 import com.cy.obdproject.bean.WebSocketBean
 import com.cy.obdproject.constant.Constant
 import com.cy.obdproject.tools.SPTools
+import com.cy.obdproject.tools.StrZipUtil
 import com.cy.obdproject.url.Urls
 import com.google.gson.Gson
 import com.zhy.http.okhttp.OkHttpUtils
@@ -125,41 +128,53 @@ class WebSocketService : Service() {
                                             return bean
                                         }
 
+                                        @SuppressLint("StaticFieldLeak")
                                         override fun onResponse(response: BaseBean?, id: Int) {
                                             if (response != null && "0" == response.code) {
                                                 val jo = JSONObject(response.data)
                                                 val msg = jo.optString("msg")
-                                                val jsonObject = JSONObject(msg)
-                                                val activityName = jsonObject.opt("activity").toString()
-                                                if (WebSocketService.getIntance() != null && SPTools[this@WebSocketService, Constant.USERTYPE, 0] == Constant.userProfessional) {
-                                                    // 用户端传过来的信息处理显示数据的事件
-                                                    val data = jsonObject.opt("data").toString()
-                                                    val method = jsonObject.opt("method").toString()
-                                                    for (i in 0 until (application as MyApp).activityList.size) {
-                                                        if ((application as MyApp).activityList[i].localClassName.contains(activityName)) {
-                                                            when (method) {
-                                                                "setData" -> ((application as MyApp).activityList[i] as BaseActivity).setData(data)
-                                                                "setData1" -> ((application as MyApp).activityList[i] as BaseActivity).setData1(data)
-                                                                "setData2" -> ((application as MyApp).activityList[i] as BaseActivity).setData2(data)
-                                                            }
-                                                            break
-                                                        }
+
+                                                object :AsyncTask<String,Void,String>(){
+                                                    override fun doInBackground(vararg p0: String?): String {
+                                                        return StrZipUtil.uncompress(p0[0])
                                                     }
-                                                }
-                                                if (WebSocketService.getIntance() != null && SPTools[this@WebSocketService, Constant.USERTYPE, 0] == Constant.userNormal) {
-                                                    // 专家端传来的信息处理点击事件
-                                                    val tag = jsonObject.opt("tag")
-                                                    if (tag != null) {
-                                                        for (i in 0 until (application as MyApp).activityList.size) {
-                                                            if ((application as MyApp).activityList[i].localClassName.contains(activityName)) {
-                                                                ((application as MyApp).activityList[i] as BaseActivity).runOnUiThread {
-                                                                    ((application as MyApp).activityList[i] as BaseActivity.ClickMethoListener).doMethod(tag.toString())
+
+                                                    override fun onPostExecute(result: String?) {
+                                                        super.onPostExecute(result)
+                                                        val jsonObject = JSONObject(result)
+                                                        val activityName = jsonObject.opt("activity").toString()
+                                                        if (WebSocketService.getIntance() != null && SPTools[this@WebSocketService, Constant.USERTYPE, 0] == Constant.userProfessional) {
+                                                            // 用户端传过来的信息处理显示数据的事件
+                                                            val data = jsonObject.opt("data").toString()
+                                                            val method = jsonObject.opt("method").toString()
+                                                            for (i in 0 until (application as MyApp).activityList.size) {
+                                                                if ((application as MyApp).activityList[i].localClassName.contains(activityName)) {
+                                                                    when (method) {
+                                                                        "setData" -> ((application as MyApp).activityList[i] as BaseActivity).setData(data)
+                                                                        "setData1" -> ((application as MyApp).activityList[i] as BaseActivity).setData1(data)
+                                                                        "setData2" -> ((application as MyApp).activityList[i] as BaseActivity).setData2(data)
+                                                                    }
+                                                                    break
                                                                 }
-                                                                break
+                                                            }
+                                                        }
+                                                        if (WebSocketService.getIntance() != null && SPTools[this@WebSocketService, Constant.USERTYPE, 0] == Constant.userNormal) {
+                                                            // 专家端传来的信息处理点击事件
+                                                            val tag = jsonObject.opt("tag")
+                                                            if (tag != null) {
+                                                                for (i in 0 until (application as MyApp).activityList.size) {
+                                                                    if ((application as MyApp).activityList[i].localClassName.contains(activityName)) {
+                                                                        ((application as MyApp).activityList[i] as BaseActivity).runOnUiThread {
+                                                                            ((application as MyApp).activityList[i] as BaseActivity.ClickMethoListener).doMethod(tag.toString())
+                                                                        }
+                                                                        break
+                                                                    }
+                                                                }
                                                             }
                                                         }
                                                     }
-                                                }
+
+                                                }.execute(msg)
                                             }
                                         }
 
@@ -187,8 +202,9 @@ class WebSocketService : Service() {
                             // 用户
                             val webSocketBean = WebSocketBean()
                             webSocketBean.s = SPTools[this@WebSocketService, Constant.USERID, ""]!!.toString()
-                            webSocketBean.r = "2"
+                            webSocketBean.r = SPTools[this@WebSocketService, Constant.ZFORUID, ""]!!.toString()
                             webSocketBean.c = "C"
+                            webSocketBean.d = "s"
                             this@WebSocketService.sendMsg(Gson().toJson(webSocketBean))
                         } else {
                             // 专家
@@ -331,6 +347,11 @@ class WebSocketService : Service() {
         webSocketBean.s = SPTools[this, Constant.USERID, ""]!!.toString()// 自己（专家）id
         webSocketBean.r = ""
         webSocketBean.c = "L"
+        if(SPTools[this, Constant.USERTYPE, Constant.userNormal] == Constant.userNormal){
+            webSocketBean.d = "s"
+        }else{
+            webSocketBean.d = "z"
+        }
         sendMsg(Gson().toJson(webSocketBean))
     }
 

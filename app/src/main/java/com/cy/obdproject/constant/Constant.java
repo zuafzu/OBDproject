@@ -1,9 +1,15 @@
 package com.cy.obdproject.constant;
 
+import android.os.Environment;
+
 public class Constant {
 
     public static final int userNormal = 0;//普通用户
     public static final int userProfessional = 1;//专家
+
+    public static final String xlsFilePathSub = "test.xls";
+    public static final String xlsFilePath = Environment.getExternalStorageDirectory().getPath() + "/" + xlsFilePathSub;
+    public static final String assXlsFilePath = "test.xls";
 
     public static final String TOKEN = "token";
     public static final String ISLOGIN = "isLogin";

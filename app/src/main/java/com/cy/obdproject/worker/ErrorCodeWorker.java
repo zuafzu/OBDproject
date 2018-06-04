@@ -4,24 +4,29 @@ import android.app.Activity;
 import android.os.Handler;
 import android.util.Log;
 
-import com.cy.obdproject.agreement.OBDagreement;
+import com.cy.obdproject.agreement.ECUagreement;
+import com.cy.obdproject.bean.ErrorCodeBean;
 import com.cy.obdproject.callback.SocketCallBack;
+import com.cy.obdproject.constant.ECUConstant;
 import com.cy.obdproject.socket.MySocketClient;
 import com.cy.obdproject.socket.SocketService;
+import com.cy.obdproject.tools.ECUTools;
 import com.cy.obdproject.tools.StringTools;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class OBDStart2Worker {
+public class ErrorCodeWorker {
+
+    private List<ErrorCodeBean> errorCodeBeanList;
 
     private List<String> myData = new ArrayList<>();
     private final int timeOut = 3000;// 超时时间
     private Activity activity;
     private SocketCallBack socketCallBack;
     private String msg = "";
-    private String key = "";
     private MySocketClient.ConnectLinstener connectLinstener;
     private Long sysTime1 = 0L;
     private Long sysTime2 = 0L;
@@ -36,21 +41,22 @@ public class OBDStart2Worker {
             @Override
             public void run() {
                 if (sysTime2 == 0) {
-                    putData("连接超时");
+                    putData("返回数据超时");
                 }
             }
         };
         connectLinstener = new MySocketClient.ConnectLinstener() {
             @Override
             public void onReceiveData(String data) {
-                myData.add(OBDagreement.unDecodeString(data));
+                myData.add(data);
             }
         };
     }
 
     public void start() {
         if (SocketService.Companion.getIntance() != null &&
-                SocketService.Companion.getIntance().isConnected()) {
+                SocketService.Companion.getIntance().isConnected() &&
+                SocketService.Companion.isConnected()) {
             next();
         } else {
             putData("OBD未连接");
@@ -62,11 +68,9 @@ public class OBDStart2Worker {
             myData.remove(0);
         }
         Log.e("cyf", "发送信息 : " + msg + "  ");
-        if (msg.length() > 8) {
-            key = msg.substring(6, 8);
-        }
         if (SocketService.Companion.getIntance() != null &&
-                SocketService.Companion.getIntance().isConnected()) {
+                SocketService.Companion.getIntance().isConnected() &&
+                SocketService.Companion.isConnected()) {
             SocketService.Companion.getIntance().sendMsg(StringTools.hex2byte(msg), connectLinstener);
             startTime();
         }
@@ -99,15 +103,18 @@ public class OBDStart2Worker {
         handler.removeCallbacks(runnable);
         sysTime2 = new Date().getTime();
         if (sysTime2 - sysTime1 <= timeOut) {
+            String mmsg = "";
             for (int i = 0; i < myData.size(); i++) {
-                String mKey = myData.get(i).substring(6, 8);
-                int length = Integer.parseInt(Integer.parseInt(myData.get(i).substring(2, 4), 16) + ""
-                        + Integer.parseInt(myData.get(i).substring(4, 6), 16));
-                if (mKey.equals(key) && length == ((myData.get(i).length() - 8) / 2) && myData.get(i).endsWith("00AA")) {
-                    break;
-                } else {
+                mmsg = ECUTools.getData(myData.get(i), 1, msg);
+                if (mmsg.equals(ECUTools.ERR)) {
                     myData.remove(i);
                     i--;
+                } else if (mmsg.equals(ECUTools.WAIT)) {
+                    myData.remove(i);
+                    startTime();
+                    return sleep() || checkData();
+                } else {
+                    break;
                 }
             }
             if (myData.size() == 0) {
@@ -122,44 +129,69 @@ public class OBDStart2Worker {
     }
 
     private void putData(final String msg) {
-        OBDStart2Worker.this.activity.runOnUiThread(new Runnable() {
+        ErrorCodeWorker.this.activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                OBDStart2Worker.this.socketCallBack.getData(msg);
+                ErrorCodeWorker.this.socketCallBack.getData(msg);
             }
         });
     }
 
     private void next() {
+        // 更改canId和reCanId
+        ECUagreement.canId = "000007E3";
+        ECUagreement.reCanId = "000007EB";
+
         new Thread(new Runnable() {
             @Override
             public void run() {
-                msg = OBDagreement.a("05", "0c");
+                msg = ECUagreement.a("190201");
                 if (replay()) {
                     return;
                 }
-                msg = OBDagreement.b("0007a120");
-                if (replay()) {
-                    return;
+                String data = ECUTools.getData(myData.get(0), 1, msg);
+                errorCodeBeanList = new ArrayList<>();
+                for (int i = 0; i < data.length() / 8; i++) {
+                    // 550010760010000007EB0007590201 11111122 AA
+                    String a = data.substring(i * 8, ((i + 1) * 8) - 2);
+                    String item = StringTools.hexStrToBinaryStr(a);
+                    if (item.length() < 24) {
+                        for (int j = 0; j < 24 - item.length(); j++) {
+                            item = "0" + item;
+                        }
+                    }
+                    String starKey = item.substring(0, 2);
+                    switch (starKey) {
+                        case "00":
+                            starKey = "P";
+                            break;
+                        case "01":
+                            starKey = "B";
+                            break;
+                        case "10":
+                            starKey = "C";
+                            break;
+                        case "11":
+                            starKey = "U";
+                            break;
+                    }
+                    String b = item.substring(2, item.length());
+                    String endKey = StringTools.binaryStrToHexStr("00" + b);
+                    String code = starKey + endKey;
+                    List<ErrorCodeBean> list = ECUConstant.getErrorCodeData();
+                    boolean flag = true;
+                    for (int j = 0; j < list.size(); j++) {
+                        if (code.equals(list.get(j).getCode())) {
+                            errorCodeBeanList.add(list.get(j));
+                            flag = false;
+                            break;
+                        }
+                    }
+                    if (flag) {
+                        errorCodeBeanList.add(new ErrorCodeBean(code, "无效故障代码"));
+                    }
                 }
-                msg = OBDagreement.c("F5400000", "00000000");
-                if (replay()) {
-                    return;
-                }
-                msg = OBDagreement.d("000007A2", "000007AA");
-                if (replay()) {
-                    return;
-                }
-                msg = OBDagreement.e("00");
-                if (replay()) {
-                    return;
-                }
-                msg = OBDagreement.f("00");
-                if (replay()) {
-                    return;
-                }
-                SocketService.Companion.setConnected(true);
-                putData("连接成功");
+                putData(new Gson().toJson(errorCodeBeanList));
             }
         }).start();
     }

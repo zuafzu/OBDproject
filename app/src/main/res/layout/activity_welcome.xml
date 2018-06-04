@@ -37,7 +37,8 @@
         android:paddingLeft="8dp"
         android:paddingRight="8dp"
         android:text="users"
-        android:textSize="14sp" />
+        android:textSize="14sp"
+        android:visibility="invisible" />
 
     <EditText
         android:id="@+id/et_pw"
@@ -53,7 +54,8 @@
         android:paddingLeft="8dp"
         android:paddingRight="8dp"
         android:text="123"
-        android:textSize="14sp" />
+        android:textSize="14sp"
+        android:visibility="invisible" />
 
     <CheckBox
         android:id="@+id/cb_auto"
@@ -77,13 +79,13 @@
         android:text="@string/dl"
         android:textAllCaps="false"
         android:textColor="@android:color/white"
-        android:textSize="14sp" />
+        android:textSize="14sp"
+        android:visibility="invisible" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="启动中..."
-        android:visibility="invisible" />
+        android:text="启动中..." />
 
 </LinearLayout>
