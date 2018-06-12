@@ -19,6 +19,8 @@ public class Constant {
     public static final String CARTYPE = "carType";//1 红旗EV 2 红旗HS5
     public static final String CARNAME = "carName";
     public static final String USERNAME = "userName";
+    public static final String PASSWORD = "passWord";
+    public static final String IP = "ip";
 
     public static int pageSize = 10;
 

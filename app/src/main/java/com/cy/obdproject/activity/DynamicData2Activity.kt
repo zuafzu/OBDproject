@@ -19,21 +19,30 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.activity_dynamic_data2.*
 import org.jetbrains.anko.toast
+import java.util.concurrent.CopyOnWriteArrayList
 
 class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
 
     private var dynamicDataWorker: DynamicDataWorker? = null
-    private var listData: ArrayList<DynamicDataBean>? = null
+    private var listData = CopyOnWriteArrayList<DynamicDataBean>()
     private var adapter: ControlDynamicDataAdapter? = null
-    private var isStart: Boolean = true
     var pageIndex = 0
 
     private var pageCount = 0
+
+    companion object {
+        var isStart: Boolean = true
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dynamic_data2)
         initView()
+    }
+
+    override fun onDestroy() {
+        isStart = true
+        super.onDestroy()
     }
 
     private fun initView() {
@@ -44,17 +53,10 @@ class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
         setClickMethod(btn_start)
 
         if (intent.hasExtra("listData")) {
-            listData = intent.getSerializableExtra("listData") as ArrayList<DynamicDataBean>?
-            dynamicDataWorker = DynamicDataWorker()
-            dynamicDataWorker!!.init(this, listData) { data ->
-                setData(data)
-                if (!isStart) {
-                    Handler().postDelayed({
-                        if (!isStart) {
-                            dynamicDataWorker!!.start(getPageList(listData!!, Constant.pageSize)[pageIndex])
-                        }
-                    }, 3000)
-                }
+            listData.clear()
+            val list = intent.getSerializableExtra("listData") as ArrayList<DynamicDataBean>?
+            for (i in 0 until list!!.size) {
+                listData.add(list[i])
             }
             Log.e("zj", "listData = " + listData.toString())
             if (listData!!.size > 0) {
@@ -113,6 +115,17 @@ class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
         } else {
             showProgressDialog()
             if (SocketService.getIntance() != null && SocketService.getIntance()!!.isConnected()) {
+                dynamicDataWorker = DynamicDataWorker()
+                dynamicDataWorker!!.init(this, listData) { data ->
+                    setData(data)
+                    if (!isStart) {
+                        Handler().postDelayed({
+                            if (!isStart) {
+                                dynamicDataWorker!!.start(getPageList(listData!!, Constant.pageSize)[pageIndex])
+                            }
+                        }, 3000)
+                    }
+                }
                 dynamicDataWorker!!.start(getPageList(listData!!, Constant.pageSize)[pageIndex])
             }
         }
@@ -121,23 +134,50 @@ class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
     override fun doMethod(string: String?) {
         when (string) {
             "iv_back" -> {
-                finish()
-                btn_start.text = "开始"
+                var time = 3100L
+                if (isStart) {
+                    time = 0L
+                }
                 isStart = true
+                dynamicDataWorker = null
+                showProgressDialog()
+                Handler().postDelayed({
+                    btn_start.text = "开始"
+                    dismissProgressDialog()
+                    finish()
+                }, time)
             }
             "btn_lastPage" -> {
-                if (pageCount > 1 && Constant.pageSize > 0) {
-                    preView()
+                var time = 3100L
+                if (isStart) {
+                    time = 0L
                 }
-                btn_start.text = "开始"
                 isStart = true
+                dynamicDataWorker = null
+                showProgressDialog()
+                Handler().postDelayed({
+                    if (pageCount > 1 && Constant.pageSize > 0) {
+                        preView()
+                    }
+                    btn_start.text = "开始"
+                    dismissProgressDialog()
+                }, time)
             }
             "btn_nextPage" -> {
-                if (pageCount > 1) {
-                    nextView()
+                var time = 3100L
+                if (isStart) {
+                    time = 0L
                 }
-                btn_start.text = "开始"
                 isStart = true
+                dynamicDataWorker = null
+                showProgressDialog()
+                Handler().postDelayed({
+                    if (pageCount > 1) {
+                        nextView()
+                    }
+                    btn_start.text = "开始"
+                    dismissProgressDialog()
+                }, time)
             }
             "btn_start" -> {
                 Log.e("zj", "当前页 List = " + getPageList(listData!!, Constant.pageSize)[pageIndex])
@@ -146,8 +186,17 @@ class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
                     isStart = false
                     initData()
                 } else {
-                    btn_start.text = "开始"
+                    var time = 3100L
+                    if (isStart) {
+                        time = 0L
+                    }
                     isStart = true
+                    dynamicDataWorker = null
+                    showProgressDialog()
+                    Handler().postDelayed({
+                        dismissProgressDialog()
+                        btn_start.text = "开始"
+                    }, time)
                 }
             }
         }
@@ -199,7 +248,7 @@ class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
         }
     }
 
-    inner class ControlDynamicDataAdapter(private val items: ArrayList<DynamicDataBean>, private val context: Context) : BaseAdapter() {
+    inner class ControlDynamicDataAdapter(private val items: CopyOnWriteArrayList<DynamicDataBean>, private val context: Context) : BaseAdapter() {
 
         override fun getCount(): Int {
             // ori表示到目前为止的前几页的总共的个数。
@@ -257,12 +306,12 @@ class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
         }
     }
 
-    private fun getPageList(targe: ArrayList<DynamicDataBean>, size: Int): ArrayList<ArrayList<DynamicDataBean>> {
-        val listArr = ArrayList<ArrayList<DynamicDataBean>>()
+    private fun getPageList(targe: CopyOnWriteArrayList<DynamicDataBean>, size: Int): CopyOnWriteArrayList<CopyOnWriteArrayList<DynamicDataBean>> {
+        val listArr = CopyOnWriteArrayList<CopyOnWriteArrayList<DynamicDataBean>>()
         //获取被拆分的数组个数
         val arrSize = if (targe.size % size === 0) targe.size / size else targe.size / size + 1
         for (i in 0 until arrSize) {
-            val sub = ArrayList<DynamicDataBean>()
+            val sub = CopyOnWriteArrayList<DynamicDataBean>()
             //把指定索引数据放入到list中
             for (j in i * size until size * (i + 1)) {
                 if (j <= targe.size - 1) {

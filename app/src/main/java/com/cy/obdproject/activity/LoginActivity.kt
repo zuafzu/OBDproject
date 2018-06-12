@@ -2,11 +2,13 @@ package com.cy.obdproject.activity
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
 import com.cy.obdproject.R
 import com.cy.obdproject.base.BaseActivity
 import com.cy.obdproject.bean.LoginBean
 import com.cy.obdproject.constant.Constant
+import com.cy.obdproject.socket.SocketService
 import com.cy.obdproject.socket.WebSocketService
 import com.cy.obdproject.tools.NetTools
 import com.cy.obdproject.tools.SPTools
@@ -24,10 +26,11 @@ class LoginActivity : BaseActivity(), BaseActivity.ClickMethoListener {
     }
 
     private fun initView() {
-        if(WebSocketService.getIntance()!=null){
+        if (WebSocketService.getIntance() != null) {
             WebSocketService.getIntance()!!.close()
         }
         setClickMethod(btn_login)
+        setClickMethod(tv_setting)
         // 判断是否自动登录
 //        if (SPTools[this@LoginActivity, Constant.ISLOGIN, ""] != "") {
 //            if (SPTools[this@LoginActivity, Constant.USERTYPE, 0] == Constant.userNormal) {
@@ -49,6 +52,11 @@ class LoginActivity : BaseActivity(), BaseActivity.ClickMethoListener {
         when (string) {
             "iv_back" -> {
                 finish()
+            }
+            "tv_setting" -> {
+                val mIntent = Intent(this@LoginActivity, ConnentOBDActivity::class.java)
+                mIntent.putExtra("isSave", true)
+                startActivity(mIntent)
             }
             "btn_login" -> {
                 if (et_name.text.toString() == "") {
@@ -76,6 +84,7 @@ class LoginActivity : BaseActivity(), BaseActivity.ClickMethoListener {
             SPTools.put(this@LoginActivity, Constant.USERNAME, "" + et_name.text.toString())
             SPTools.put(this@LoginActivity, Constant.TOKEN, "" + loginBean.token)
             SPTools.put(this@LoginActivity, Constant.USERID, "" + loginBean.userId)
+            SPTools.put(this@LoginActivity, Constant.PASSWORD, "" + et_pw.text.toString())
 
             var list = ArrayList<String>()
             list.addAll(loginBean.userType.toLowerCase().replace("s", "受控端").replace("z", "专家端").split(","))
@@ -83,9 +92,31 @@ class LoginActivity : BaseActivity(), BaseActivity.ClickMethoListener {
             if (list.size == 1) {
                 if ("受控端" == list!![0]) {
                     SPTools.put(this@LoginActivity, Constant.USERTYPE, Constant.userNormal)
-                    startActivity(Intent(this@LoginActivity, ConnentOBDActivity::class.java))
-                    // startActivity(Intent(this@LoginActivity, SelectCarTypeActivity::class.java))
-                    finish()
+                    if (SPTools[this@LoginActivity, Constant.IP, ""].toString() == "") {
+                        // 第一次登录设置IP
+                        startActivity(Intent(this@LoginActivity, ConnentOBDActivity::class.java))
+                        finish()
+                    } else {
+                        // 默认连接
+                        val mIntent2 = Intent(this, SocketService::class.java)
+                        stopService(mIntent2)
+                        Handler().postDelayed({
+                            Constant.mDstName = SPTools[this@LoginActivity, Constant.IP, ""].toString()
+                            startService(mIntent2)
+                            Handler().postDelayed({
+                                dismissProgressDialog()
+                                if(SocketService.getIntance()!=null &&
+                                        SocketService.getIntance()!!.isConnected()){
+                                    this.finish()
+                                    startActivity(Intent(this@LoginActivity, SelectCarTypeActivity::class.java))
+                                }else{
+                                    toast("请先确认连接设备")
+                                    startActivity(Intent(this@LoginActivity, ConnentOBDActivity::class.java))
+                                    finish()
+                                }
+                            }, 2000)
+                        }, 1000)
+                    }
                 } else if ("专家端" == list[0]) {
                     SPTools.put(this@LoginActivity, Constant.USERTYPE, Constant.userProfessional)
                     val mIntent1 = Intent(this@LoginActivity, WebSocketService::class.java)

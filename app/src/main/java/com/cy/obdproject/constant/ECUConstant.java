@@ -6,6 +6,7 @@ import com.cy.obdproject.bean.SocketBean;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import jxl.Sheet;
 import jxl.Workbook;
@@ -118,8 +119,8 @@ public class ECUConstant {
      *
      * @return
      */
-    public static ArrayList<DynamicDataBean> getDynamicData() {
-        ArrayList<DynamicDataBean> dynamicDataBeans = new ArrayList<>();
+    public static CopyOnWriteArrayList<DynamicDataBean> getDynamicData() {
+        CopyOnWriteArrayList<DynamicDataBean> dynamicDataBeans = new CopyOnWriteArrayList<>();
         try {
             Workbook book = Workbook.getWorkbook(new File(Constant.xlsFilePath));
             // 获得第一个工作表对象
@@ -131,7 +132,7 @@ public class ECUConstant {
                         dynamicDataBean.setId("22" + (sheet.getCell(0, j)).getContents());
                         dynamicDataBean.setName((sheet.getCell(1, j)).getContents());
                         dynamicDataBean.setCoefficient((sheet.getCell(7, j)).getContents());
-                        dynamicDataBean.setOffset((sheet.getCell(8, j)).getContents());
+                        dynamicDataBean.setOffset((sheet.getCell(8, j)).getContents().replace(" ", ""));
                         dynamicDataBean.setParsingType((sheet.getCell(9, j)).getContents());
                         dynamicDataBean.setEnumValue((sheet.getCell(10, j)).getContents());
                         dynamicDataBean.setUnit((sheet.getCell(13, j)).getContents());

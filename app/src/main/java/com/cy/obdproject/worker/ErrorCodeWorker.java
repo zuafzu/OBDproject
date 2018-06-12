@@ -181,7 +181,7 @@ public class ErrorCodeWorker {
                     List<ErrorCodeBean> list = ECUConstant.getErrorCodeData();
                     boolean flag = true;
                     for (int j = 0; j < list.size(); j++) {
-                        if (code.equals(list.get(j).getCode())) {
+                        if (code.toLowerCase().equals(list.get(j).getCode().toLowerCase())) {
                             errorCodeBeanList.add(list.get(j));
                             flag = false;
                             break;

@@ -14,7 +14,7 @@ import com.cy.obdproject.tools.SPTools
 import kotlinx.android.synthetic.main.activity_select_car_type.*
 import org.jetbrains.anko.toast
 
-class SelectCarTypeActivity : BaseActivity(), BaseActivity.ClickMethoListener,AdapterView.OnItemClickListener {
+class SelectCarTypeActivity : BaseActivity(), BaseActivity.ClickMethoListener, AdapterView.OnItemClickListener {
 
     private var mExitTime: Long = 0
 
@@ -86,7 +86,9 @@ class SelectCarTypeActivity : BaseActivity(), BaseActivity.ClickMethoListener,Ad
                     toast("再按一次退出程序")
                     mExitTime = System.currentTimeMillis()
                 } else {
+                    val ip = SPTools[this@SelectCarTypeActivity, Constant.IP, ""]
                     SPTools.clear(this@SelectCarTypeActivity)
+                    SPTools.put(this@SelectCarTypeActivity, Constant.IP, ip!!)
                     finish()
                 }
             }

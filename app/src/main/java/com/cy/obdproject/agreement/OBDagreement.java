@@ -1,8 +1,5 @@
 package com.cy.obdproject.agreement;
 
-import com.cy.obdproject.tools.ECU2Tools;
-import com.cy.obdproject.tools.StringTools;
-
 public class OBDagreement {
 
     public static Integer num = 0;// 1个字节（2位的16进制）
@@ -28,11 +25,12 @@ public class OBDagreement {
      * @return
      */
     public static String decodeString(String string) {
-        String crt = string.substring(8, 10);
-        byte[] oldByte = StringTools.hex2byte(string.substring(12, string.length() - 2));
-        byte[] newByte = new byte[oldByte.length];
-        ECU2Tools.VCIAlg(true, Integer.valueOf(string.substring(6, 8), 16), StringTools.hex2byte(crt)[0], oldByte, oldByte.length, newByte, newByte.length);
-        return string.substring(0, 12) + StringTools.byte2hex(newByte) + "55";
+        return string;
+//        String crt = string.substring(8, 10);
+//        byte[] oldByte = StringTools.hex2byte(string.substring(12, string.length() - 2));
+//        byte[] newByte = new byte[oldByte.length];
+//        ECU2Tools.VCIAlg(true, Integer.valueOf(string.substring(6, 8), 16), StringTools.hex2byte(crt)[0], oldByte, oldByte.length, newByte, newByte.length);
+//        return string.substring(0, 12) + StringTools.byte2hex(newByte) + "55";
     }
 
     /**
@@ -42,11 +40,12 @@ public class OBDagreement {
      * @return
      */
     public static String unDecodeString(String string) {
-        String crt = string.substring(8, 10);
-        byte[] oldByte = StringTools.hex2byte(string.substring(12, string.length() - 2));
-        byte[] newByte = new byte[oldByte.length];
-        ECU2Tools.VCIAlg(false, Integer.valueOf(string.substring(6, 8), 16), StringTools.hex2byte(crt)[0], oldByte, oldByte.length, newByte, newByte.length);
-        return string.substring(0, 12) + StringTools.byte2hex(newByte) + "AA";
+        return string;
+//        String crt = string.substring(8, 10);
+//        byte[] oldByte = StringTools.hex2byte(string.substring(12, string.length() - 2));
+//        byte[] newByte = new byte[oldByte.length];
+//        ECU2Tools.VCIAlg(false, Integer.valueOf(string.substring(6, 8), 16), StringTools.hex2byte(crt)[0], oldByte, oldByte.length, newByte, newByte.length);
+//        return string.substring(0, 12) + StringTools.byte2hex(newByte) + "AA";
     }
 
     /**

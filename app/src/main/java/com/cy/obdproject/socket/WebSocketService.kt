@@ -134,7 +134,7 @@ class WebSocketService : Service() {
                                                 val jo = JSONObject(response.data)
                                                 val msg = jo.optString("msg")
 
-                                                object :AsyncTask<String,Void,String>(){
+                                                object : AsyncTask<String, Void, String>() {
                                                     override fun doInBackground(vararg p0: String?): String {
                                                         return StrZipUtil.uncompress(p0[0])
                                                     }
@@ -189,11 +189,11 @@ class WebSocketService : Service() {
                     if (webSocketBean.e != "0" && webSocketBean.e != "3") {
                         // 登录失败
                         for (i in 0 until (application as MyApp).activityList.size) {
-                            if ((application as MyApp).activityList[i].localClassName.contains("MainActivity")) {
+                            if ((application as MyApp).activityList[i].localClassName.contains("MainActivity") ||
+                                    (application as MyApp).activityList[i].localClassName.contains("ResponseListActivity")) {
                                 ((application as MyApp).activityList[i] as BaseActivity).runOnUiThread {
                                     ((application as MyApp).activityList[i] as BaseActivity).dismissProgressDialog()
                                 }
-                                break
                             }
                         }
                     } else {
@@ -347,9 +347,9 @@ class WebSocketService : Service() {
         webSocketBean.s = SPTools[this, Constant.USERID, ""]!!.toString()// 自己（专家）id
         webSocketBean.r = ""
         webSocketBean.c = "L"
-        if(SPTools[this, Constant.USERTYPE, Constant.userNormal] == Constant.userNormal){
+        if (SPTools[this, Constant.USERTYPE, Constant.userNormal] == Constant.userNormal) {
             webSocketBean.d = "s"
-        }else{
+        } else {
             webSocketBean.d = "z"
         }
         sendMsg(Gson().toJson(webSocketBean))

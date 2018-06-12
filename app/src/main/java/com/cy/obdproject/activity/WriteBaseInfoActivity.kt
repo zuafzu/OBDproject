@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.support.v7.app.AlertDialog
 import android.text.Editable
+import android.text.InputFilter
 import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
@@ -187,10 +188,31 @@ class WriteBaseInfoActivity : BaseActivity(), BaseActivity.ClickMethoListener, A
         sendClick(this@WriteBaseInfoActivity.localClassName, "" + position)
         view = LayoutInflater.from(this@WriteBaseInfoActivity).inflate(R.layout.alert_view, null)
         edit = view!!.findViewById(R.id.et) as EditText
+        if (list!![position].name.contains("模式配置")) {
+            edit!!.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(1)) //最大输入长度
+        } else if (list!![position].name.contains("FAW车辆识别号码")) {
+            edit!!.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(17)) //最大输入长度
+        } else if (list!![position].name.contains("维修店代码和/或诊断仪序列号")) {
+            edit!!.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(10)) //最大输入长度
+        } else if (list!![position].name.contains("ECU安装日期")) {
+            edit!!.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(4)) //最大输入长度
+        } else if (list!![position].name.contains("车辆规格编号")) {
+            edit!!.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(18)) //最大输入长度
+        } else if (list!![position].name.contains("FAW生产线中的汽车制造日期")) {
+            edit!!.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(4)) //最大输入长度
+        } else if (list!![position].name.contains("车辆运输模式")) {
+            edit!!.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(1)) //最大输入长度
+        } else if (list!![position].name.contains("车辆售后服务模式")) {
+            edit!!.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(1)) //最大输入长度
+        } else if (list!![position].name.contains("噪声Simu语音配置")) {
+            edit!!.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(1)) //最大输入长度
+        } else if (list!![position].name.contains("车辆配置信息")) {
+            edit!!.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(4)) //最大输入长度
+        }
         edit!!.setText("")
         if (list!![position].value != null) {
-            edit!!.setText(list!![position].value.toString())
-            edit!!.setSelection(list!![position].value.length)
+            // edit!!.setText(list!![position].value.toString())
+            // edit!!.setSelection(list!![position].value.length)
         }
         dialog = AlertDialog.Builder(this)
                 .setTitle(list!![position].name)

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Handler;
 import android.util.Log;
 
+import com.cy.obdproject.activity.DynamicData2Activity;
 import com.cy.obdproject.agreement.ECUagreement;
 import com.cy.obdproject.bean.DynamicDataBean;
 import com.cy.obdproject.callback.SocketCallBack;
@@ -16,11 +17,12 @@ import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class DynamicDataWorker {
 
-    private List<DynamicDataBean> dynamicDataBeans = new ArrayList<>();
-    private List<DynamicDataBean> dynamicDataBeans2 = new ArrayList<>();
+    private CopyOnWriteArrayList<DynamicDataBean> dynamicDataBeans = new CopyOnWriteArrayList<>();
+    private CopyOnWriteArrayList<DynamicDataBean> dynamicDataBeans2 = new CopyOnWriteArrayList<>();
 
     private List<String> myData = new ArrayList<>();
     private final int timeOut = 3000;// 超时时间
@@ -34,7 +36,7 @@ public class DynamicDataWorker {
     private Handler handler;
     private Runnable runnable;
 
-    public void init(Activity activity, List<DynamicDataBean> dynamicDataBeans, SocketCallBack socketCallBack) {
+    public void init(Activity activity, CopyOnWriteArrayList<DynamicDataBean> dynamicDataBeans, SocketCallBack socketCallBack) {
         this.activity = activity;
         this.dynamicDataBeans = dynamicDataBeans;
         this.socketCallBack = socketCallBack;
@@ -55,7 +57,7 @@ public class DynamicDataWorker {
         };
     }
 
-    public void start(List<DynamicDataBean> dynamicDataBeans) {
+    public void start(CopyOnWriteArrayList<DynamicDataBean> dynamicDataBeans) {
         this.dynamicDataBeans2 = dynamicDataBeans;
         index = 0;
         if (SocketService.Companion.getIntance() != null &&
@@ -69,7 +71,11 @@ public class DynamicDataWorker {
 
     private boolean replay() {
         if (myData.size() > 0) {
-            myData.remove(0);
+            try {
+                myData.remove(0);
+            } catch (Exception e) {
+                Log.e("cyf99", "e : " + e.getMessage());
+            }
         }
         Log.e("cyf", "发送信息 : " + msg + "  ");
         if (SocketService.Companion.getIntance() != null &&
@@ -109,16 +115,18 @@ public class DynamicDataWorker {
         if (sysTime2 - sysTime1 <= timeOut) {
             String mmsg = "";
             for (int i = 0; i < myData.size(); i++) {
-                mmsg = ECUTools.getData(myData.get(i), dynamicDataBeans.get(index).getParsingType(), msg);
-                if (mmsg.equals(ECUTools.ERR)) {
-                    myData.remove(i);
-                    i--;
-                } else if (mmsg.equals(ECUTools.WAIT)) {
-                    myData.remove(i);
-                    startTime();
-                    return sleep() || checkData();
-                } else {
-                    break;
+                if (myData.size() > i && dynamicDataBeans.size() > index) {
+                    mmsg = ECUTools.getData(myData.get(i), dynamicDataBeans.get(index).getParsingType(), msg);
+                    if (mmsg.equals(ECUTools.ERR)) {
+                        myData.remove(i);
+                        i--;
+                    } else if (mmsg.equals(ECUTools.WAIT)) {
+                        myData.remove(i);
+                        startTime();
+                        return sleep() || checkData();
+                    } else {
+                        break;
+                    }
                 }
             }
             if (myData.size() == 0) {
@@ -142,6 +150,9 @@ public class DynamicDataWorker {
     }
 
     private void next() {
+        if (DynamicData2Activity.Companion.isStart()) {
+            return;
+        }
         // 更改canId和reCanId
         ECUagreement.canId = "000007E3";
         ECUagreement.reCanId = "000007EB";
@@ -158,29 +169,43 @@ public class DynamicDataWorker {
                                     return;
                                 }
                                 String value = "无数据";
-                                try{
+                                try {
                                     // String mmsg = ECUTools.getData(myData.get(0), dynamicDataBeans.get(index).getParsingType(), msg);
                                     String mmsg = ECUTools.getData(myData.get(0), 1, msg);
                                     if (!mmsg.isEmpty()) {
-                                        int a = (int) (Long.valueOf(mmsg, 16)
-                                                * Integer.valueOf(dynamicDataBeans.get(index).getCoefficient())
-                                                + Integer.valueOf(dynamicDataBeans.get(index).getOffset()));
+                                        int a;
+                                        if (dynamicDataBeans.get(index).getOffset().contains("-")) {
+                                            a = (int) (Long.valueOf(mmsg, 16)
+                                                    * Float.valueOf(dynamicDataBeans.get(index).getCoefficient())
+                                                    - Integer.valueOf(dynamicDataBeans.get(index).getOffset().replace("-", "")));
+                                        } else {
+                                            a = (int) (Long.valueOf(mmsg, 16)
+                                                    * Float.valueOf(dynamicDataBeans.get(index).getCoefficient())
+                                                    + Integer.valueOf(dynamicDataBeans.get(index).getOffset()));
+                                        }
                                         value = a + "";
                                         if (!dynamicDataBeans.get(index).getEnumValue().isEmpty()) {
                                             String[] strs = dynamicDataBeans.get(index).getEnumValue().split("#");
-                                            value = strs[a].split("^")[1];
+                                            value = strs[a].split("\\^")[1];
                                         }
                                     }
-                                }catch (Exception e){
-
+                                    if (dynamicDataBeans.size() > index) {
+                                        dynamicDataBeans.get(index).setValue(value + " " + dynamicDataBeans.get(index).getUnit());
+                                    }
+                                } catch (Exception e) {
+                                    index = -1;
+                                    Log.e("cyf99", "e : " + e.getMessage());
                                 }
-                                dynamicDataBeans.get(index).setValue(value + " " + dynamicDataBeans.get(index).getUnit());
                                 break;
                             }
                         }
                     }
                     index++;
-                    next();
+                    if (!DynamicData2Activity.Companion.isStart()) {
+                        next();
+                    } else {
+                        Log.e("cyf99", "已经停止");
+                    }
                 } else {
                     putData(new Gson().toJson(dynamicDataBeans));
                 }

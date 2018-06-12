@@ -1,7 +1,6 @@
 package com.cy.obdproject.adapter;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,17 +9,16 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.cy.obdproject.R;
-import com.cy.obdproject.bean.BaseInfoBean;
 import com.cy.obdproject.bean.DynamicDataBean;
 
-import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class DynamicDataAdapter extends BaseAdapter {
 
-    private ArrayList<DynamicDataBean> items;
+    private CopyOnWriteArrayList<DynamicDataBean> items;
     private Context context;
 
-    public DynamicDataAdapter(ArrayList<DynamicDataBean> items, Context context) {
+    public DynamicDataAdapter(CopyOnWriteArrayList<DynamicDataBean> items, Context context) {
         this.items = items;
         this.context = context;
     }

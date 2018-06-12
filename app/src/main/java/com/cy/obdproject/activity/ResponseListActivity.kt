@@ -6,6 +6,7 @@ import android.support.v7.app.AlertDialog
 import com.cy.obdproject.R
 import com.cy.obdproject.adapter.SelectRequestAdapter
 import com.cy.obdproject.base.BaseActivity
+import com.cy.obdproject.bean.LoginBean
 import com.cy.obdproject.bean.RequestBean
 import com.cy.obdproject.constant.Constant
 import com.cy.obdproject.socket.WebSocketService
@@ -31,7 +32,7 @@ class ResponseListActivity : BaseActivity(), BaseActivity.ClickMethoListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_response_list)
         initView()
-        net_requestList()
+        net_login()
     }
 
     private fun initView() {
@@ -62,6 +63,10 @@ class ResponseListActivity : BaseActivity(), BaseActivity.ClickMethoListener {
             mAlertDialog = AlertDialog.Builder(this).setTitle("提示").setMessage("等待专家应答......").setCancelable(false).setPositiveButton("取消等待") { _, _ ->
                 stopService(mIntent1)
                 mAlertDialog!!.dismiss()
+                finish()
+                overridePendingTransition(0, 0)
+                startActivity(Intent(this@ResponseListActivity, ResponseListActivity::class.java))
+                overridePendingTransition(0, 0)
             }.show()
         } else {
             // 给专家端发送首页信息  用户连接
@@ -100,6 +105,22 @@ class ResponseListActivity : BaseActivity(), BaseActivity.ClickMethoListener {
         }
     }
 
+    private fun net_login() {
+        val map = hashMapOf<String, String>()
+        map["username"] = SPTools[this, Constant.USERNAME, ""].toString()
+        map["pwd"] = SPTools[this, Constant.PASSWORD, ""].toString()
+        if (SPTools[this, Constant.USERTYPE, Constant.userNormal] == Constant.userNormal) {
+            map["loginType"] = "s"
+        } else {
+            map["loginType"] = "z"
+        }
+        NetTools.net(map, Urls().auth_login, this, { response ->
+            val loginBean = Gson().fromJson(response.data, LoginBean::class.java)
+            SPTools.put(this@ResponseListActivity, Constant.TOKEN, "" + loginBean.token)
+            net_requestList()
+        }, "正在加载...", true, false)
+    }
+
     private fun net_requestList() {
         val map = hashMapOf<String, String>()
         map["requestUserType"] = "z"
@@ -117,7 +138,7 @@ class ResponseListActivity : BaseActivity(), BaseActivity.ClickMethoListener {
             } else {
                 toast(response.msg!!)
             }
-        }, "正在加载...", true, true)
+        }, "正在加载...", false, true)
     }
 
 }

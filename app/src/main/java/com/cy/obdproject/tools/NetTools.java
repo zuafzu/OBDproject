@@ -56,7 +56,7 @@ public class NetTools {
         net(json, url, context, myCallBack, msg, true, true);
     }
 
-    public static void net(String json, final String url, final Activity context, final MyCallBack myCallBack, final String msg, final boolean isShow, final boolean isDismiss) {
+    public static void net(final String json, final String url, final Activity context, final MyCallBack myCallBack, final String msg, final boolean isShow, final boolean isDismiss) {
         Log.e("zj", "net json = " + json);
         Log.e("zj", "net url = " + url);
         Log.e("zj", "net token = " + SPTools.INSTANCE.get(context, Constant.TOKEN, ""));
@@ -129,6 +129,8 @@ public class NetTools {
                         ((BaseActivity) context).dismissProgressDialog();
                     }
                 } else if ("1002".equals(baseBean.getCode())) {
+//                    Log.e("cyf6", "json : " + json);
+//                    Log.e("cyf6", "url : " + url);
                     // 登录信息失效
                     Toast.makeText(context, baseBean.getMsg(), Toast.LENGTH_SHORT).show();
                     SPTools.INSTANCE.put(context, Constant.ISLOGIN, "");

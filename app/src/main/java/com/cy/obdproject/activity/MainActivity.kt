@@ -9,6 +9,7 @@ import android.os.Handler
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
@@ -46,6 +47,8 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
     private var startWorker1: OBDStart1Worker? = null
     private var startWorker2: OBDStart2Worker? = null
 
+    private var isShowToast = false
+    private var mData = ""
     private var items = ""
     var homes: List<String>? = null
 
@@ -62,14 +65,12 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
         startWorker1 = OBDStart1Worker()
         startWorker2 = OBDStart2Worker()
         startWorker1!!.init(this@MainActivity, { data ->
-            changOBDState()
-            toast(data)
-            dismissProgressDialog()
+            isShowToast = true
+            setData1(data)
         })
         startWorker2!!.init(this@MainActivity, { data ->
-            changOBDState()
-            toast(data)
-            dismissProgressDialog()
+            isShowToast = true
+            setData1(data)
         })
         if (SPTools[this, Constant.USERTYPE, Constant.userProfessional] == Constant.userProfessional) {
 
@@ -90,7 +91,10 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
     override fun onResume() {
         super.onResume()
         initView()
-        changOBDState()
+        isShowToast = false
+        if (isUserConnected) {
+            setData1(mData)
+        }
         if (WebSocketService.getIntance() != null && WebSocketService.getIntance()!!.isConnected()) {
             tv_ycxz.text = "断开协助"
         }
@@ -99,11 +103,19 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
             iv_back.visibility = View.VISIBLE
             tv_connnect_obd.visibility = View.INVISIBLE
         } else {
-            tv_obd_state.text = "已连接"
             ibtn_setting.visibility = View.INVISIBLE
             iv_back.visibility = View.VISIBLE
             // ll_obd.visibility = View.INVISIBLE
             tv_connnect_obd.visibility = View.INVISIBLE
+        }
+        // 目前专家就是已连接，后期可优化
+        if(isProfessionalConnected){
+            mData = "连接成功"
+        }
+        if (mData == "连接成功") {
+            tv_obd_state.text = "已连接"
+        } else {
+            tv_obd_state.text = "未连接"
         }
         dismissProgressDialog()
     }
@@ -148,8 +160,8 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
         setData(Gson().toJson(bean))
     }
 
-    private fun changOBDState() {
-        if (SocketService.getIntance() != null && SocketService.getIntance()!!.isConnected() && SocketService.isConnected) {
+    private fun changOBDState(data: String?) {
+        if (data == "连接成功") {
             tv_obd_state.text = "已连接"
             tv_connnect_obd.text = "断开OBD"
         } else {
@@ -163,7 +175,7 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
             sendClick(this@MainActivity.localClassName, string)
             doMethod(string)
         } else {
-            if (isProfessionalConnected) {
+            if (isProfessionalConnected && mData == "连接成功") {
                 sendClick(this@MainActivity.localClassName, string)
                 doMethod(string)
             } else {
@@ -189,8 +201,22 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
             homes = items.split(",")
             recyclerview.layoutManager = GridLayoutManager(this, 2)
             recyclerview.adapter = HomeAdapter()
+            setData1(mData)
         }
         super.setData(data)
+    }
+
+    override fun setData1(data: String?) {
+        Log.e("cyf111", data)
+        runOnUiThread {
+            mData = data!!
+            changOBDState(data)
+            if (isShowToast) {
+                toast(data!!)
+            }
+            dismissProgressDialog()
+        }
+        super.setData1(data)
     }
 
     @SuppressLint("SetTextI18n")

@@ -10,18 +10,16 @@ import com.cy.obdproject.R
 import com.cy.obdproject.base.BaseActivity
 import com.cy.obdproject.constant.Constant
 import com.cy.obdproject.socket.SocketService
+import com.cy.obdproject.tools.SPTools
 import com.cy.obdproject.tools.StringTools
 import com.cy.obdproject.tools.WifiTools
-import com.cy.obdproject.worker.OBDStart1Worker
-import com.cy.obdproject.worker.OBDStart2Worker
 import kotlinx.android.synthetic.main.activity_connent_obd.*
 import org.jetbrains.anko.toast
 
 class ConnentOBDActivity : BaseActivity(), BaseActivity.ClickMethoListener {
 
     private var mIntent2: Intent? = null
-    private var startWorker1: OBDStart1Worker? = null
-    private var startWorker2: OBDStart2Worker? = null
+
     private var wifiTools: WifiTools? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,8 +34,6 @@ class ConnentOBDActivity : BaseActivity(), BaseActivity.ClickMethoListener {
         setClickMethod(btn_ok)
 
         mIntent2 = Intent(this, SocketService::class.java)
-        startWorker1 = OBDStart1Worker()
-        startWorker2 = OBDStart2Worker()
         wifiTools = WifiTools(this)
 
         stopService(mIntent2)
@@ -60,9 +56,16 @@ class ConnentOBDActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                     SocketService.getIntance()!!.isConnected() &&
                     SocketService.isConnected) {
                 btn_ok.text = "断开OBD"
-                et_input_ip.setText(Constant.mDstName)
             } else {
                 btn_ok.text = "下一步"
+            }
+            if (intent.hasExtra("isSave")) {
+                if (intent.getBooleanExtra("isSave", false)) {
+                    btn_ok.text = "保存"
+                }
+            }
+            if (SPTools[this@ConnentOBDActivity, Constant.IP, ""].toString() != "") {
+                et_input_ip.setText(SPTools[this@ConnentOBDActivity, Constant.IP, ""].toString())
             }
             dismissProgressDialog()
         }, 1000)
@@ -98,46 +101,47 @@ class ConnentOBDActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                 startActivity(intent)
             }
             "btn_ok" -> {
-                showProgressDialog()
-                if (SocketService.getIntance() != null && SocketService.getIntance()!!.isConnected()) {
-                    stopService(mIntent2)
-                    Handler().postDelayed({
-                        btn_ok.text = "下一步"
-                        dismissProgressDialog()
-                    }, 2000)
+                if (!wifiTools!!.isWifiApEnabled) {
+                    toast("请先开启热点")
+                    dismissProgressDialog()
+                    return
+                }
+                // 建立长连接
+                if (!StringTools.isIP(et_input_ip.text.toString())) {
+                    toast("IP地址格式不正确")
+                    dismissProgressDialog()
+                    return
+                }
+                if (btn_ok.text == "保存") {
+                    SPTools.put(this@ConnentOBDActivity, Constant.IP, et_input_ip.text.toString())
+                    toast("保存成功")
+                    finish()
                 } else {
-                    //
-                    if (!wifiTools!!.isWifiApEnabled) {
-                        toast("请先开启热点")
-                        dismissProgressDialog()
-                        return
-                    }
-                    // 建立长连接
-                    if (!StringTools.isIP(et_input_ip.text.toString())) {
-                        toast("IP地址格式不正确")
-                        dismissProgressDialog()
-                        return
-                    }
-                    stopService(mIntent2)
-                    Handler().postDelayed({
-                        Constant.mDstName = et_input_ip.text.toString()
-                        startService(mIntent2)
-                        startWorker1!!.init(this@ConnentOBDActivity, { data ->
-                            this.finish()
-                            toast(data)
-                            dismissProgressDialog()
-                        })
-                        startWorker2!!.init(this@ConnentOBDActivity, { data ->
-                            this.finish()
-                            toast(data)
-                            dismissProgressDialog()
-                        })
+                    showProgressDialog()
+                    if (SocketService.getIntance() != null && SocketService.getIntance()!!.isConnected()) {
+                        stopService(mIntent2)
                         Handler().postDelayed({
-                            this.finish()
-                            startActivity(Intent(this@ConnentOBDActivity, SelectCarTypeActivity::class.java))
+                            btn_ok.text = "下一步"
                             dismissProgressDialog()
                         }, 2000)
-                    }, 1000)
+                    } else {
+                        stopService(mIntent2)
+                        Handler().postDelayed({
+                            Constant.mDstName = et_input_ip.text.toString()
+                            startService(mIntent2)
+                            Handler().postDelayed({
+                                dismissProgressDialog()
+                                if (SocketService.getIntance() != null &&
+                                        SocketService.getIntance()!!.isConnected()) {
+                                    this.finish()
+                                    SPTools.put(this@ConnentOBDActivity, Constant.IP, et_input_ip.text.toString())
+                                    startActivity(Intent(this@ConnentOBDActivity, SelectCarTypeActivity::class.java))
+                                } else {
+                                    toast("连接失败，请重试")
+                                }
+                            }, 2000)
+                        }, 1000)
+                    }
                 }
             }
         }

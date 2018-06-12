@@ -82,7 +82,9 @@ class RequestListActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                 toast("再按一次退出程序")
                 mExitTime = System.currentTimeMillis()
             } else {
+                val ip = SPTools[this@RequestListActivity, Constant.IP, ""]
                 SPTools.clear(this@RequestListActivity)
+                SPTools.put(this@RequestListActivity, Constant.IP, ip!!)
                 finish()
             }
             return true

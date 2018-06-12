@@ -11,10 +11,11 @@ import com.cy.obdproject.bean.DynamicDataBean
 import com.cy.obdproject.constant.ECUConstant
 import kotlinx.android.synthetic.main.activity_dynamic_data.*
 import org.jetbrains.anko.toast
+import java.util.concurrent.CopyOnWriteArrayList
 
 class DynamicDataActivity : BaseActivity(), BaseActivity.ClickMethoListener, AdapterView.OnItemClickListener {
 
-    private var list: ArrayList<DynamicDataBean>? = null
+    private var list: CopyOnWriteArrayList<DynamicDataBean>? = null
     private var adapter: DynamicDataAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,7 +55,7 @@ class DynamicDataActivity : BaseActivity(), BaseActivity.ClickMethoListener, Ada
                 finish()
             }
             "btn_next" -> {
-                var listData = ArrayList<DynamicDataBean>()
+                var listData = CopyOnWriteArrayList<DynamicDataBean>()
                 if (list!!.size > 0) {
                     for (i in 0 until list!!.size) {
                         if (list!![i].isSelect == "1") {
