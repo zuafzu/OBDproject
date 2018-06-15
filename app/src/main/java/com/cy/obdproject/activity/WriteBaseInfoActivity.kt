@@ -120,46 +120,55 @@ class WriteBaseInfoActivity : BaseActivity(), BaseActivity.ClickMethoListener, A
         Handler().postDelayed({
             val position = data.split("-")[1].toInt()
             val length = input.length
-            if (list!![position].name.contains("模式配置")) {
-                if (length != 1) {
-                    input = ""
-                }
-            } else if (list!![position].name.contains("FAW车辆识别号码")) {
-                if (length != 17) {
-                    input = ""
-                }
-            } else if (list!![position].name.contains("维修店代码和/或诊断仪序列号")) {
-                if (length != 10) {
-                    input = ""
-                }
-            } else if (list!![position].name.contains("ECU安装日期")) {
-                if (length != 4) {
-                    input = ""
-                }
-            } else if (list!![position].name.contains("车辆规格编号")) {
-                if (length != 18) {
-                    input = ""
-                }
-            } else if (list!![position].name.contains("FAW生产线中的汽车制造日期")) {
-                if (length != 4) {
-                    input = ""
-                }
-            } else if (list!![position].name.contains("车辆运输模式")) {
-                if (length != 1) {
-                    input = ""
-                }
-            } else if (list!![position].name.contains("车辆售后服务模式")) {
-                if (length != 1) {
-                    input = ""
-                }
-            } else if (list!![position].name.contains("噪声Simu语音配置")) {
-                if (length != 1) {
-                    input = ""
-                }
-            } else if (list!![position].name.contains("车辆配置信息")) {
-                if (length != 4) {
-                    input = ""
-                }
+//            if (list!![position].name.contains("模式配置")) {
+//                if (length != 1) {
+//                    input = ""
+//                }
+//            } else if (list!![position].name.contains("FAW车辆识别号码")) {
+//                if (length != 17) {
+//                    input = ""
+//                }
+//            } else if (list!![position].name.contains("维修店代码和/或诊断仪序列号")) {
+//                if (length != 10) {
+//                    input = ""
+//                }
+//            } else if (list!![position].name.contains("ECU安装日期")) {
+//                if (length != 4) {
+//                    input = ""
+//                }
+//            } else if (list!![position].name.contains("车辆规格编号")) {
+//                if (length != 18) {
+//                    input = ""
+//                }
+//            } else if (list!![position].name.contains("FAW生产线中的汽车制造日期")) {
+//                if (length != 4) {
+//                    input = ""
+//                }
+//            } else if (list!![position].name.contains("车辆运输模式")) {
+//                if (length != 1) {
+//                    input = ""
+//                }
+//            } else if (list!![position].name.contains("车辆售后服务模式")) {
+//                if (length != 1) {
+//                    input = ""
+//                }
+//            } else if (list!![position].name.contains("噪声Simu语音配置")) {
+//                if (length != 1) {
+//                    input = ""
+//                }
+//            } else if (list!![position].name.contains("车辆配置信息")) {
+//                if (length != 4) {
+//                    input = ""
+//                }
+//            }
+            var max = 100
+            try {
+                max = Integer.valueOf(ECUConstant.getWriteBaseInfoData1()[position].byteLength)
+            } catch (e: Exception) {
+
+            }
+            if (length != max) {
+                input = ""
             }
             if (input == "") {
                 toast("录入数据长度错误！")
@@ -170,7 +179,7 @@ class WriteBaseInfoActivity : BaseActivity(), BaseActivity.ClickMethoListener, A
 
                 } else {
                     val socketBean = ECUConstant.getWriteBaseInfoData2()[position]
-                    socketBean.data = socketBean.data + ECUTools.putData(input)
+                    socketBean.value = ECUTools.putData(input)
                     writeBaseInfoWorker!!.start(socketBean)
                 }
             }
@@ -188,27 +197,35 @@ class WriteBaseInfoActivity : BaseActivity(), BaseActivity.ClickMethoListener, A
         sendClick(this@WriteBaseInfoActivity.localClassName, "" + position)
         view = LayoutInflater.from(this@WriteBaseInfoActivity).inflate(R.layout.alert_view, null)
         edit = view!!.findViewById(R.id.et) as EditText
-        if (list!![position].name.contains("模式配置")) {
-            edit!!.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(1)) //最大输入长度
-        } else if (list!![position].name.contains("FAW车辆识别号码")) {
-            edit!!.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(17)) //最大输入长度
-        } else if (list!![position].name.contains("维修店代码和/或诊断仪序列号")) {
-            edit!!.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(10)) //最大输入长度
-        } else if (list!![position].name.contains("ECU安装日期")) {
-            edit!!.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(4)) //最大输入长度
-        } else if (list!![position].name.contains("车辆规格编号")) {
-            edit!!.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(18)) //最大输入长度
-        } else if (list!![position].name.contains("FAW生产线中的汽车制造日期")) {
-            edit!!.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(4)) //最大输入长度
-        } else if (list!![position].name.contains("车辆运输模式")) {
-            edit!!.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(1)) //最大输入长度
-        } else if (list!![position].name.contains("车辆售后服务模式")) {
-            edit!!.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(1)) //最大输入长度
-        } else if (list!![position].name.contains("噪声Simu语音配置")) {
-            edit!!.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(1)) //最大输入长度
-        } else if (list!![position].name.contains("车辆配置信息")) {
-            edit!!.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(4)) //最大输入长度
+//        if (list!![position].name.contains("模式配置")) {
+//            edit!!.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(1)) //最大输入长度
+//        } else if (list!![position].name.contains("FAW车辆识别号码")) {
+//            edit!!.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(17)) //最大输入长度
+//        } else if (list!![position].name.contains("维修店代码和/或诊断仪序列号")) {
+//            edit!!.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(10)) //最大输入长度
+//        } else if (list!![position].name.contains("ECU安装日期")) {
+//            edit!!.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(4)) //最大输入长度
+//        } else if (list!![position].name.contains("车辆规格编号")) {
+//            edit!!.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(18)) //最大输入长度
+//        } else if (list!![position].name.contains("FAW生产线中的汽车制造日期")) {
+//            edit!!.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(4)) //最大输入长度
+//        } else if (list!![position].name.contains("车辆运输模式")) {
+//            edit!!.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(1)) //最大输入长度
+//        } else if (list!![position].name.contains("车辆售后服务模式")) {
+//            edit!!.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(1)) //最大输入长度
+//        } else if (list!![position].name.contains("噪声Simu语音配置")) {
+//            edit!!.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(1)) //最大输入长度
+//        } else if (list!![position].name.contains("车辆配置信息")) {
+//            edit!!.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(4)) //最大输入长度
+//        }
+        var max = 100
+        try {
+            max = Integer.valueOf(ECUConstant.getWriteBaseInfoData1()[position].byteLength)
+            edit!!.hint = "输入长度$max"
+        } catch (e: Exception) {
+            edit!!.hint = "输入长度未知"
         }
+        edit!!.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(max)) //最大输入长度
         edit!!.setText("")
         if (list!![position].value != null) {
             // edit!!.setText(list!![position].value.toString())

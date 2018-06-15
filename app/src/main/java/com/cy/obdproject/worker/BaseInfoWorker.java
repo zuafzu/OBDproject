@@ -6,7 +6,6 @@ import android.util.Log;
 
 import com.cy.obdproject.agreement.ECUagreement;
 import com.cy.obdproject.bean.BaseInfoBean;
-import com.cy.obdproject.bean.SocketBean;
 import com.cy.obdproject.callback.SocketCallBack;
 import com.cy.obdproject.socket.MySocketClient;
 import com.cy.obdproject.socket.SocketService;
@@ -20,7 +19,7 @@ import java.util.List;
 
 public class BaseInfoWorker {
 
-    private List<SocketBean> socketBeanList;
+    private List<BaseInfoBean> socketBeanList;
     private List<BaseInfoBean> baseInfoBeanList = new ArrayList<>();
 
     private List<String> myData = new ArrayList<>();
@@ -35,7 +34,7 @@ public class BaseInfoWorker {
     private Handler handler;
     private Runnable runnable;
 
-    public void init(Activity activity, List<SocketBean> socketBeanList, SocketCallBack socketCallBack) {
+    public void init(Activity activity, List<BaseInfoBean> socketBeanList, SocketCallBack socketCallBack) {
         this.activity = activity;
         this.socketBeanList = socketBeanList;
         this.socketCallBack = socketCallBack;
@@ -72,12 +71,15 @@ public class BaseInfoWorker {
         if (myData.size() > 0) {
             myData.remove(0);
         }
-        Log.e("cyf", "发送信息 : " + msg + "  ");
         if (SocketService.Companion.getIntance() != null &&
                 SocketService.Companion.getIntance().isConnected() &&
                 SocketService.Companion.isConnected()) {
+            Log.e("cyf", "发送信息 : " + msg + "  ");
             SocketService.Companion.getIntance().sendMsg(StringTools.hex2byte(msg), connectLinstener);
             startTime();
+        } else {
+            putData("OBD连接断开，请重新启动软件");
+            return true;
         }
         return sleep() || checkData();
     }
@@ -110,7 +112,7 @@ public class BaseInfoWorker {
         if (sysTime2 - sysTime1 <= timeOut) {
             String mmsg = "";
             for (int i = 0; i < myData.size(); i++) {
-                mmsg = ECUTools.getData(myData.get(i), socketBeanList.get(index).getType(), msg);
+                mmsg = ECUTools.getData(myData.get(i), socketBeanList.get(index).getParsingType(), msg);
                 if (mmsg.equals(ECUTools.ERR)) {
                     myData.remove(i);
                     i--;
@@ -151,14 +153,28 @@ public class BaseInfoWorker {
             @Override
             public void run() {
                 if (index < socketBeanList.size()) {
-                    msg = ECUagreement.a(socketBeanList.get(index).getData());
+                    msg = ECUagreement.a(socketBeanList.get(index).getId());
                     if (replay()) {
                         return;
                     }
-                    String mmsg = ECUTools.getData(myData.get(0), socketBeanList.get(index).getType(), msg);
+                    String mmsg = ECUTools.getData(myData.get(0), socketBeanList.get(index).getParsingType(), msg);
                     BaseInfoBean baseInfoBean = new BaseInfoBean();
                     baseInfoBean.setName(BaseInfoWorker.this.socketBeanList.get(index).getName());
-                    baseInfoBean.setValue(mmsg);
+                    String value = "无数据";
+                    try {
+                        if (!mmsg.isEmpty()) {
+                            value = mmsg;
+                            if (!BaseInfoWorker.this.socketBeanList.get(index).getEnumValue().isEmpty()) {
+                                long a = Long.valueOf(mmsg, 16);
+                                String[] strs = BaseInfoWorker.this.socketBeanList.get(index).getEnumValue().split("#");
+                                value = strs[(int) a].split("\\^")[1];
+                            }
+                        }
+                    } catch (Exception e) {
+                        // index = -1;
+                        Log.e("cyf99", "e : " + e.getMessage());
+                    }
+                    baseInfoBean.setValue("" + value);
                     baseInfoBeanList.add(baseInfoBean);
                     index++;
                     next();

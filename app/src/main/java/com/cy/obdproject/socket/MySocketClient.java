@@ -44,6 +44,7 @@ public class MySocketClient {
             mClient = new Socket();
             SocketAddress socAddress = new InetSocketAddress(mDstName, mDesPort);
             mClient.connect(socAddress, 3000);
+            // mClient.setKeepAlive(true);//开启保持活动状态的套接字
             boolean flag = mClient.isConnected();
             Log.e("cyf", "MySocketClient 是否连接上 ： " + flag);
         }
@@ -106,14 +107,18 @@ public class MySocketClient {
      *
      * @throws IOException
      */
-    public void disconnect() throws IOException {
-        if (null != mClient && mClient.isConnected()) {
-            mClient.shutdownInput();
-            mClient.shutdownOutput();
-            mClient.close();
-            mClient = null;
+    public void disconnect() {
+        try {
+            if (null != mClient && mClient.isConnected()) {
+                mClient.shutdownInput();
+                mClient.shutdownOutput();
+                mClient.close();
+                mClient = null;
+            }
+            Log.e("cyf", "是否断开了 ： " + (mClient == null));
+        } catch (Exception e) {
+
         }
-        Log.e("cyf", "是否断开了 ： " + (mClient == null));
     }
 
     public void setOnConnectLinstener(ConnectLinstener linstener) {

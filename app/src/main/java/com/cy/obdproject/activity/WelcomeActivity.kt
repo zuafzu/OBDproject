@@ -15,15 +15,9 @@ class WelcomeActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_welcome)
-        var file = File(Constant.xlsFilePath)
-        if (file.exists()) {
-            Handler().postDelayed({
-                startActivity(Intent(this@WelcomeActivity, LoginActivity::class.java))
-                overridePendingTransition(0, 0)
-                finish()
-                overridePendingTransition(0, 0)
-            }, 1000)
-        } else {
+        val file = File(Constant.xlsFilePath)
+        file.deleteOnExit()
+        Handler().postDelayed({
             FileUtils.getInstance(this).copyAssetsToSD(Constant.assXlsFilePath, Constant.xlsFilePathSub).setFileOperateCallback(object : FileUtils.FileOperateCallback {
                 override fun onSuccess() {
                     startActivity(Intent(this@WelcomeActivity, LoginActivity::class.java))
@@ -38,6 +32,6 @@ class WelcomeActivity : BaseActivity() {
                 }
 
             })
-        }
+        }, 1000)
     }
 }

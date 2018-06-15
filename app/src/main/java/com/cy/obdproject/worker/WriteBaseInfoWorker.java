@@ -5,7 +5,7 @@ import android.os.Handler;
 import android.util.Log;
 
 import com.cy.obdproject.agreement.ECUagreement;
-import com.cy.obdproject.bean.SocketBean;
+import com.cy.obdproject.bean.BaseInfoBean;
 import com.cy.obdproject.callback.SocketCallBack;
 import com.cy.obdproject.socket.MySocketClient;
 import com.cy.obdproject.socket.SocketService;
@@ -19,7 +19,7 @@ import java.util.List;
 
 public class WriteBaseInfoWorker {
 
-    private SocketBean socketBean;
+    private BaseInfoBean socketBean;
 
     private List<String> myData = new ArrayList<>();
     private final int timeOut = 3000;// 超时时间
@@ -52,7 +52,7 @@ public class WriteBaseInfoWorker {
         };
     }
 
-    public void start(SocketBean socketBean) {
+    public void start(BaseInfoBean socketBean) {
         this.socketBean = socketBean;
         if (SocketService.Companion.getIntance() != null &&
                 SocketService.Companion.getIntance().isConnected() &&
@@ -67,18 +67,21 @@ public class WriteBaseInfoWorker {
         if (myData.size() > 0) {
             myData.remove(0);
         }
-        Log.e("cyf", "发送信息 : " + msg + "  ");
         if (SocketService.Companion.getIntance() != null &&
                 SocketService.Companion.getIntance().isConnected() &&
                 SocketService.Companion.isConnected()) {
+            Log.e("cyf", "发送信息 : " + msg + "  ");
             SocketService.Companion.getIntance().sendMsg(StringTools.hex2byte(msg), connectLinstener);
             startTime();
+        } else {
+            putData("OBD连接断开，请重新启动软件");
+            return true;
         }
         return sleep() || checkData();
     }
 
-    private boolean sleep(){
-        while (myData.size()==0) {
+    private boolean sleep() {
+        while (myData.size() == 0) {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
@@ -117,7 +120,7 @@ public class WriteBaseInfoWorker {
                     break;
                 }
             }
-            if(myData.size() == 0){
+            if (myData.size() == 0) {
                 putData("返回数据异常");
                 return true;
             }
@@ -159,7 +162,7 @@ public class WriteBaseInfoWorker {
                 if (replay()) {
                     return;
                 }
-                msg = ECUagreement.a(socketBean.getData());
+                msg = ECUagreement.a(socketBean.getValue());
                 if (replay()) {
                     return;
                 }

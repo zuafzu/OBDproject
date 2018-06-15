@@ -72,12 +72,15 @@ public class WriteDataWorker {
         if (myData.size() > 0) {
             myData.remove(0);
         }
-        Log.e("cyf", "发送信息 : " + msg + "  ");
         if (SocketService.Companion.getIntance() != null &&
                 SocketService.Companion.getIntance().isConnected() &&
                 SocketService.Companion.isConnected()) {
+            Log.e("cyf", "发送信息 : " + msg + "  ");
             SocketService.Companion.getIntance().sendMsg(StringTools.hex2byte(msg), connectLinstener);
             startTime();
+        } else {
+            putData("OBD连接断开，请重新启动软件");
+            return true;
         }
         return sleep() || checkData();
     }
@@ -86,15 +89,18 @@ public class WriteDataWorker {
         if (myData.size() > 0) {
             myData.remove(0);
         }
-        Log.e("cyf", "发送信息 : " + msg + "  ");
         if (msg.length() > 8) {
             key = msg.substring(6, 8);
         }
         if (SocketService.Companion.getIntance() != null &&
                 SocketService.Companion.getIntance().isConnected() &&
                 SocketService.Companion.isConnected()) {
+            Log.e("cyf", "发送信息 : " + msg + "  ");
             SocketService.Companion.getIntance().sendMsg(StringTools.hex2byte(msg), connectLinstener);
             startTime();
+        } else {
+            putData("OBD连接断开，请重新启动软件");
+            return true;
         }
         return sleep() || checkData2();
     }
@@ -102,7 +108,7 @@ public class WriteDataWorker {
     private boolean sleep() {
         while (myData.size() == 0) {
             try {
-                Thread.sleep(100);
+                Thread.sleep(10);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

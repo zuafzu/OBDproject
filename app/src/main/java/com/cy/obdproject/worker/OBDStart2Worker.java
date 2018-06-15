@@ -61,14 +61,17 @@ public class OBDStart2Worker {
         if (myData.size() > 0) {
             myData.remove(0);
         }
-        Log.e("cyf", "发送信息 : " + msg + "  ");
         if (msg.length() > 8) {
             key = msg.substring(6, 8);
         }
         if (SocketService.Companion.getIntance() != null &&
                 SocketService.Companion.getIntance().isConnected()) {
+            Log.e("cyf", "发送信息 : " + msg + "  ");
             SocketService.Companion.getIntance().sendMsg(StringTools.hex2byte(msg), connectLinstener);
             startTime();
+        }else {
+            putData("OBD连接断开，请重新启动软件");
+            return true;
         }
         return sleep() || checkData();
     }
@@ -134,7 +137,7 @@ public class OBDStart2Worker {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                msg = OBDagreement.a("05", "0c");
+                msg = OBDagreement.a("05", "0d");
                 if (replay()) {
                     return;
                 }
