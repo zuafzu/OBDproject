@@ -24,7 +24,7 @@ public class WriteDataWorker {
     private ArrayList<WriteFileBean> writeFileBeans;
 
     private List<String> myData = new ArrayList<>();
-    private int timeOut = 3000;// 超时时间
+    private int timeOut = 6000;// 超时时间
     private Activity activity;
     private SocketCallBack socketCallBack;
     private String msg = "";
@@ -108,13 +108,15 @@ public class WriteDataWorker {
     private boolean sleep() {
         while (myData.size() == 0) {
             try {
-                Thread.sleep(10);
+                Thread.sleep(50);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
             sysTime2 = new Date().getTime();
             if (sysTime2 - sysTime1 > timeOut) {
-                putData("返回数据超时");
+                if (timeOut != 500) {
+                    putData("返回数据超时");
+                }
                 return true;
             }
         }
@@ -146,11 +148,15 @@ public class WriteDataWorker {
                 }
             }
             if (myData.size() == 0) {
-                putData("返回数据异常");
+                if (timeOut != 500) {
+                    putData("返回数据异常");
+                }
                 return true;
             }
         } else {
-            putData("返回数据超时");
+            if (timeOut != 500) {
+                putData("返回数据超时");
+            }
             return true;
         }
         return false;
@@ -172,21 +178,34 @@ public class WriteDataWorker {
                 }
             }
             if (myData.size() == 0) {
-                putData("返回数据异常");
+                if (timeOut != 500) {
+                    putData("返回数据异常");
+                }
                 return true;
             }
         } else {
-            putData("返回数据超时");
+            if (timeOut != 500) {
+                putData("返回数据超时");
+            }
             return true;
         }
         return false;
     }
 
-    private void putData(final String msg) {
+    private void putData(final String mmsg) {
+        if (mmsg.equals("返回数据异常") || mmsg.equals("返回数据超时")) {
+            // stop 3e
+            msg = OBDagreement.h();
+            if (SocketService.Companion.getIntance() != null &&
+                    SocketService.Companion.getIntance().isConnected() &&
+                    SocketService.Companion.isConnected()) {
+                SocketService.Companion.getIntance().sendMsg(StringTools.hex2byte(msg), connectLinstener);
+            }
+        }
         WriteDataWorker.this.activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                WriteDataWorker.this.socketCallBack.getData(msg);
+                WriteDataWorker.this.socketCallBack.getData(mmsg);
             }
         });
     }
@@ -197,12 +216,16 @@ public class WriteDataWorker {
             @Override
             public void run() {
                 // 更改canId和reCanId
+                timeOut = 500;
                 ECUagreement.canId = "000007DF";
                 ECUagreement.reCanId = "000007AA";
                 // 1、发送7DF  指令1003 长度2 不需要接收
                 msg = ECUagreement.a("1003");
                 Log.e("cyf", "发送信息 : " + msg + "  ");
-                SocketService.Companion.getIntance().sendMsg(StringTools.hex2byte(msg), connectLinstener);
+                // SocketService.Companion.getIntance().sendMsg(StringTools.hex2byte(msg), connectLinstener);
+                if (replay()) {
+
+                }
                 // 2、发送7DF  指令 长度2  只发送不需要接收
                 msg = ECUagreement.a("3E80");
                 Log.e("cyf", "发送信息 : " + msg + "  ");
@@ -210,23 +233,41 @@ public class WriteDataWorker {
                 // 3、发送7DF  指令8502 长度2  只发送不需要接收
                 msg = ECUagreement.a("8502");
                 Log.e("cyf", "发送信息 : " + msg + "  ");
-                SocketService.Companion.getIntance().sendMsg(StringTools.hex2byte(msg), connectLinstener);
+                // SocketService.Companion.getIntance().sendMsg(StringTools.hex2byte(msg), connectLinstener);
+                if (replay()) {
+
+                }
                 // 4、发送7DF  指令 长度3  只发送不需要接收
                 msg = ECUagreement.a("280303");
                 Log.e("cyf", "发送信息 : " + msg + "  ");
-                SocketService.Companion.getIntance().sendMsg(StringTools.hex2byte(msg), connectLinstener);
+                // SocketService.Companion.getIntance().sendMsg(StringTools.hex2byte(msg), connectLinstener);
+                if (replay()) {
+
+                }
                 // 4-2、start 3e
                 msg = OBDagreement.g();
                 if (replay2()) {
-                    return;
                 }
                 // 更改canId
+                timeOut = 6000;
                 ECUagreement.canId = "000007A2";
                 // 5、发送7A2 指令1002 长度2 返回 7AA 5002
                 msg = ECUagreement.a("1002");
                 if (replay()) {
                     return;
                 }
+
+                // 2、发送7DF  指令 长度2  只发送不需要接收
+                msg = ECUagreement.a("3E80");
+                Log.e("cyf", "发送信息 : " + msg + "  ");
+                SocketService.Companion.getIntance().sendMsg(StringTools.hex2byte(msg), connectLinstener);
+
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
                 //6、发送7A2 指令2703   长度2  返回  7AA 6703   四个字节seed（随机产生，给算法，经运算后下一步发送）
                 msg = ECUagreement.a("2703");
                 if (replay()) {
@@ -240,12 +281,14 @@ public class WriteDataWorker {
                     return;
                 }
                 //8、CANID 7A2   指令 2EF19831323334353637383900     长度 13    返回 7AA  6EF198
-                msg = ECUagreement.a("2EF19831323334353637383900");
+                // msg = ECUagreement.a("2EF19831323334353637383900");//hs5
+                msg = ECUagreement.a("2EF1980000000000000000");
                 if (replay()) {
                     return;
                 }
                 //9、CANID 7A2   指令2EF199   长度 7 返回 7AA  6EF199
-                msg = ECUagreement.a("2EF19920180521");
+                // msg = ECUagreement.a("2EF19920180521");//hs5
+                msg = ECUagreement.a("2EF199180521");
                 if (replay()) {
                     return;
                 }
@@ -262,14 +305,14 @@ public class WriteDataWorker {
                 int index = 0;
                 while (writeFileBeans.size() > index) {
                     putData("开始刷写第" + (index + 1) + "段");
-                    if (index != 0) {
-                        //10、CANID 7A2 指令 3101FF0044 00FE0000(addr) 0009F230(len)(这条指令是数据擦除) 返回7AA 7101FF
-                        msg = ECUagreement.a("3101FF0044" + writeFileBeans.get(index).getAddress() +
-                                String.format("%08x", Integer.valueOf(writeFileBeans.get(index).getLength())));
-                        if (replay()) {
-                            return;
-                        }
-                    }
+//                    if (index != 0) {
+//                        //10、CANID 7A2 指令 3101FF0044 00FE0000(addr) 0009F230(len)(这条指令是数据擦除) 返回7AA 7101FF
+//                        msg = ECUagreement.a("3101FF0044" + writeFileBeans.get(index).getAddress() +
+//                                String.format("%08x", Integer.valueOf(writeFileBeans.get(index).getLength())));
+//                        if (replay()) {
+//                            return;
+//                        }
+//                    }
                     //11、CANID 7A2   指令340044 00000000(EOl中的addr) 000003B2(eol中的len)   长度 11 返回 7AA  74...
                     msg = ECUagreement.a("340044" + writeFileBeans.get(index).getAddress() +
                             String.format("%08x", Integer.valueOf(writeFileBeans.get(index).getLength())));
@@ -283,7 +326,13 @@ public class WriteDataWorker {
                         total = total + 1;
                     }
                     while (total > index2) {
-                        String xx = String.format("%02x", index2 % 255 + 1);
+                        String xx = "";
+                        if (index2 > 254) {
+                            xx = String.format("%02x", (index2 + 1) % 256);
+                        } else {
+                            xx = String.format("%02x", index2 % 255 + 1);
+                        }
+
                         int byteLength = writeFileBeans.get(index).getData().length - (index2 * 1024);
                         if (byteLength < 1024) {
                             msg = ECUagreement.a("36" + xx + StringTools.byte2hex(ByteTools.subBytes(writeFileBeans.get(index).getData(), index2 * 1024, byteLength)));
@@ -321,44 +370,71 @@ public class WriteDataWorker {
                     } else if (crc.length() == 7) {
                         crc = "0" + crc;
                     }
-                    msg = ECUagreement.a("31010202" + crc);
+                    // msg = ECUagreement.a("31010202" + crc);//hs5
+                    msg = ECUagreement.a("3101ff01ff");
                     if (replay()) {
                         return;
                     }
                     // putData("第" + (index + 1) + "段刷写完成");
+
+                    if (index == 0) {
+                        //10、CANID 7A2 指令 3101FF0044 00FE0000(addr) 0009F230(len)(这条指令是数据擦除) 返回7AA 7101FF
+//                        msg = ECUagreement.a("3101FF0044" + writeFileBeans.get(index).getAddress() +
+//                                String.format("%08x", Integer.valueOf(writeFileBeans.get(index).getLength())));//hs5
+                        msg = ECUagreement.a("3101ff00ff");
+                        if (replay()) {
+                            return;
+                        }
+                    }
+
                     index++;
                 }
                 // 15、一致性校验
-                msg = ECUagreement.a("3101ff01");
-                if (replay()) {
-                    return;
-                }
+//                msg = ECUagreement.a("3101ff01");
+//                if (replay()) {
+//                    return;
+//                }
                 // 16、物理寻址11 01（等待4秒）
                 msg = ECUagreement.a("1101");
                 timeOut = 4000;
                 if (replay()) {
                     return;
                 }
-                timeOut = 3000;
+                timeOut = 500;
                 ECUagreement.canId = "000007DF";
                 // 17、发送7DF  指令1003 长度2 不需要接收
                 msg = ECUagreement.a("1003");
-                SocketService.Companion.getIntance().sendMsg(StringTools.hex2byte(msg), connectLinstener);
+                // SocketService.Companion.getIntance().sendMsg(StringTools.hex2byte(msg), connectLinstener);
+                if (replay()) {
+
+                }
                 // 18、发送7DF  指令280003 长度3  只发送不需要接收
                 msg = ECUagreement.a("280003");
-                SocketService.Companion.getIntance().sendMsg(StringTools.hex2byte(msg), connectLinstener);
+                // SocketService.Companion.getIntance().sendMsg(StringTools.hex2byte(msg), connectLinstener);
+                if (replay()) {
+
+                }
                 // 19、发送7DF  指令8501 长度2  只发送不需要接收
                 msg = ECUagreement.a("8501");
-                SocketService.Companion.getIntance().sendMsg(StringTools.hex2byte(msg), connectLinstener);
+                // SocketService.Companion.getIntance().sendMsg(StringTools.hex2byte(msg), connectLinstener);
+                if (replay()) {
+
+                }
                 // 19-2、stop 3e
+                timeOut = 6000;
                 msg = OBDagreement.h();
                 if (replay2()) {
                     return;
                 }
+                timeOut = 500;
                 // 20、发送7DF  指令1001 长度2  只发送不需要接收
                 msg = ECUagreement.a("1001");
-                SocketService.Companion.getIntance().sendMsg(StringTools.hex2byte(msg), connectLinstener);
+                // SocketService.Companion.getIntance().sendMsg(StringTools.hex2byte(msg), connectLinstener);
+                if (replay()) {
+
+                }
                 // 更改canId
+                timeOut = 6000;
                 ECUagreement.canId = "000007A2";
                 // 21、物理寻址 14 FF FF FF
                 msg = ECUagreement.a("14FFFFFF");

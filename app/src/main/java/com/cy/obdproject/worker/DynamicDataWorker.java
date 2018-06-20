@@ -157,8 +157,8 @@ public class DynamicDataWorker {
             return;
         }
         // 更改canId和reCanId
-        ECUagreement.canId = "000007E3";
-        ECUagreement.reCanId = "000007EB";
+        ECUagreement.canId = "000007A2";
+        ECUagreement.reCanId = "000007AA";
 
         new Thread(new Runnable() {
             @Override
@@ -179,12 +179,12 @@ public class DynamicDataWorker {
                                         int a;
                                         if (dynamicDataBeans.get(index).getOffset().contains("-")) {
                                             a = (int) (Long.valueOf(mmsg, 16)
-                                                    * Float.valueOf(dynamicDataBeans.get(index).getCoefficient())
-                                                    - Integer.valueOf(dynamicDataBeans.get(index).getOffset().replace("-", "")));
+                                                    * Double.valueOf(dynamicDataBeans.get(index).getCoefficient())
+                                                    - Double.valueOf(dynamicDataBeans.get(index).getOffset().replace("-", "")));
                                         } else {
                                             a = (int) (Long.valueOf(mmsg, 16)
-                                                    * Float.valueOf(dynamicDataBeans.get(index).getCoefficient())
-                                                    + Integer.valueOf(dynamicDataBeans.get(index).getOffset()));
+                                                    * Double.valueOf(dynamicDataBeans.get(index).getCoefficient())
+                                                    + Double.valueOf(dynamicDataBeans.get(index).getOffset()));
                                         }
                                         value = a + "";
                                         if (!dynamicDataBeans.get(index).getEnumValue().isEmpty()) {

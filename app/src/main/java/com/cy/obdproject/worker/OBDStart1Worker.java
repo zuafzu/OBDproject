@@ -70,7 +70,7 @@ public class OBDStart1Worker {
             Log.e("cyf", "发送信息 : " + msg + "  ");
             SocketService.Companion.getIntance().sendMsg(StringTools.hex2byte(msg), connectLinstener);
             startTime();
-        }else {
+        } else {
             putData("OBD连接断开，请重新启动软件");
             return true;
         }
@@ -138,6 +138,32 @@ public class OBDStart1Worker {
         new Thread(new Runnable() {
             @Override
             public void run() {
+//                msg = OBDagreement.a("05", "0d");
+//                if (replay()) {
+//                    return;
+//                }
+//                msg = OBDagreement.b("0007a120");
+//                if (replay()) {
+//                    return;
+//                }
+//                msg = OBDagreement.c("FC600000", "01000000");
+//                if (replay()) {
+//                    return;
+//                }
+//                msg = OBDagreement.d("000007E3", "000007EB");
+//                if (replay()) {
+//                    return;
+//                }
+//                msg = OBDagreement.e("00");
+//                if (replay()) {
+//                    return;
+//                }
+//                msg = OBDagreement.f("00");
+//                if (replay()) {
+//                    return;
+//                }
+//                SocketService.Companion.setConnected(true);
+//                putData("连接成功");
                 msg = OBDagreement.a("05", "0d");
                 if (replay()) {
                     return;
@@ -146,11 +172,11 @@ public class OBDStart1Worker {
                 if (replay()) {
                     return;
                 }
-                msg = OBDagreement.c("FC600000", "01000000");
+                msg = OBDagreement.c("F5400000", "00000000");
                 if (replay()) {
                     return;
                 }
-                msg = OBDagreement.d("000007E3", "000007EB");
+                msg = OBDagreement.d("000007A2", "000007AA");
                 if (replay()) {
                     return;
                 }

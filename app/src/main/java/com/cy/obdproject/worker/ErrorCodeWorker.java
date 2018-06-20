@@ -142,8 +142,8 @@ public class ErrorCodeWorker {
 
     private void next() {
         // 更改canId和reCanId
-        ECUagreement.canId = "000007E3";
-        ECUagreement.reCanId = "000007EB";
+        ECUagreement.canId = "000007A2";
+        ECUagreement.reCanId = "000007AA";
 
         new Thread(new Runnable() {
             @Override
@@ -169,10 +169,10 @@ public class ErrorCodeWorker {
                             starKey = "P";
                             break;
                         case "01":
-                            starKey = "B";
+                            starKey = "C";
                             break;
                         case "10":
-                            starKey = "C";
+                            starKey = "B";
                             break;
                         case "11":
                             starKey = "U";

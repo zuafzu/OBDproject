@@ -28,7 +28,7 @@ public class ECUTools {
      * @return
      */
     public static String getData(String data, int type, String myData) {
-        if (data.contains("7F2278")) {
+        if (data.toLowerCase().endsWith("78aa") && data.toLowerCase().contains("7f")) {
             return WAIT;
         }
         int a = myData.indexOf(ECUagreement.canId);
@@ -62,6 +62,7 @@ public class ECUTools {
                     return mData.toString();
                 }
             } catch (Exception e) {
+                // Log.e("cyf","ECUTools getData "+e.getMessage());
                 return "";
             }
         }

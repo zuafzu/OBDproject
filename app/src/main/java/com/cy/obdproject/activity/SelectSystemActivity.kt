@@ -32,7 +32,7 @@ class SelectSystemActivity : BaseActivity(), BaseActivity.ClickMethoListener, Ad
         setClickMethod(iv_back)
         list = ArrayList()
         if ("1" == SPTools[this@SelectSystemActivity, Constant.CARTYPE, ""]) {
-            list!!.add("整车控制系统")
+            list!!.add("电动助力转向系统")
 
         } else if ("2" == SPTools[this@SelectSystemActivity, Constant.CARTYPE, ""]) {
             list!!.add("电动助力转向系统")

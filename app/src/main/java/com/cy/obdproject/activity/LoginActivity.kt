@@ -22,6 +22,17 @@ class LoginActivity : BaseActivity(), BaseActivity.ClickMethoListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+//        var xx = ""
+//        for (i in 0 until 2000) {
+//            if (i > 254) {
+//                xx = String.format("%02x", i % 256)
+//            } else {
+//                xx = String.format("%02x", i % 255 + 1)
+//            }
+//            if(xx.startsWith("f")||xx.startsWith("0")){
+//                Log.e("cyfmm", xx)
+//            }
+//        }
         initView()
     }
 
@@ -105,11 +116,11 @@ class LoginActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                             startService(mIntent2)
                             Handler().postDelayed({
                                 dismissProgressDialog()
-                                if(SocketService.getIntance()!=null &&
-                                        SocketService.getIntance()!!.isConnected()){
+                                if (SocketService.getIntance() != null &&
+                                        SocketService.getIntance()!!.isConnected()) {
                                     this.finish()
                                     startActivity(Intent(this@LoginActivity, SelectCarTypeActivity::class.java))
-                                }else{
+                                } else {
                                     toast("请先确认连接设备")
                                     startActivity(Intent(this@LoginActivity, ConnentOBDActivity::class.java))
                                     finish()

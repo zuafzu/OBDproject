@@ -36,8 +36,8 @@ class SelectCarTypeActivity : BaseActivity(), BaseActivity.ClickMethoListener, A
         INSTANCE = this
 
         list = ArrayList()
-        list!!.add("红旗EV")
-        list!!.add("红旗HS5")
+        list!!.add("红旗EV诊断")
+        list!!.add("红旗EV刷写")
 
         if (adapter == null) {
             adapter = SelectAdapter(list!!, this)

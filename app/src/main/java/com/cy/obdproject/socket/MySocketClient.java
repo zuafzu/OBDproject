@@ -56,12 +56,18 @@ public class MySocketClient {
             //通过回调接口将获取到的数据推送出去
             if (mListener != null) {
                 String data = StringTools.byte2hex(buffer);
-                data = data.substring(0, StringTools.byte2hex(buffer).lastIndexOf("AA") + 2);
-                int length = Integer.parseInt(Integer.parseInt(data.substring(2, 4), 16) + ""
-                        + Integer.parseInt(data.substring(4, 6), 16));
-                data = data.substring(0, 6 + (length * 2) + 2);
-                Log.i("cyf", "收到信息 : " + data);
-                mListener.onReceiveData(data);
+                data = data.substring(0, len * 2);
+                Log.i("cy", len + " 收到原始信息 : " + data);
+                // 多包
+                while (!data.equals("")) {
+                    int length = Integer.parseInt(Integer.parseInt(data.substring(2, 4), 16) + ""
+                            + Integer.parseInt(data.substring(4, 6), 16));
+                    String mdata = data.substring(0, 6 + (length * 2) + 2);
+                    data = data.replace(mdata, "");
+                    // Log.i("cyf", len + " 收到信息11 : " + data);
+                    Log.i("cyf", len + " 收到信息 : " + mdata);
+                    mListener.onReceiveData(mdata);
+                }
             }
         }
     }
@@ -84,10 +90,14 @@ public class MySocketClient {
      *
      * @param data 需要发送的内容
      */
-    public void send(byte[] data) throws IOException {
-        if (mClient != null && mClient.isConnected()) {
-            OutputStream outputStream = mClient.getOutputStream();
-            outputStream.write(data);
+    public void send(byte[] data) {
+        try {
+            if (mClient != null && mClient.isConnected()) {
+                OutputStream outputStream = mClient.getOutputStream();
+                outputStream.write(data);
+            }
+        } catch (Exception e) {
+            Log.e("cyf", "obd连接异常，无法发送数据了");
         }
     }
 

@@ -3,9 +3,9 @@ package com.cy.obdproject.agreement;
 public class ECUagreement {
 
     public static String canLinkNum = "10"; // 1个字节
-    public static String canId = "000007E3"; // 4个字节（发送的CanId）
+    public static String canId = "000007A2"; // 4个字节（发送的CanId）
 
-    public static String reCanId = "000007EB"; // 4个字节（返回的CanId）
+    public static String reCanId = "000007AA"; // 4个字节（返回的CanId）
 
     /**
      * @param data

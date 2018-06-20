@@ -57,12 +57,12 @@ class WriteData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
         setClickMethod(iv_back)
         progressBar.progress = 0
         writeDataWorker = WriteDataWorker()
-        writeDataWorker!!.init(this, { data ->
+        writeDataWorker!!.init(this) { data ->
             if (mData != data) {
                 mData = data
                 setData(data)
             }
-        })
+        }
     }
 
     override fun doMethod(string: String) {
@@ -93,11 +93,13 @@ class WriteData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
             } else {
                 if (data == "下载刷写文件中") {
                     tv_msg.text = "下载刷写文件中"
-                } else if (data == "返回数据超时" || data == "OBD未连接") {
+                } else if (data == "返回数据超时" || data == "OBD未连接" || data == "返回数据异常") {
                     if (data == "返回数据超时") {
                         tv_msg.append("\n返回数据超时")
-                    } else {
+                    } else if (data == "OBD未连接") {
                         tv_msg.text = "OBD未连接"
+                    } else if (data == "返回数据异常") {
+                        tv_msg.append("\n返回数据异常")
                     }
                     btn_start.text = getString(R.string.write)
                     iv_back.isClickable = true

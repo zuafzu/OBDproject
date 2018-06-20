@@ -29,6 +29,15 @@ class ReadBaseInfoActivity : BaseActivity(), BaseActivity.ClickMethoListener {
 
     private fun initView() {
         list = ArrayList()
+
+        list!!.clear()
+        for (i in 0 until ECUConstant.getReadBaseInfoData().size) {
+            val bean = BaseInfoBean()
+            bean.name = ECUConstant.getReadBaseInfoData()[i].name
+            list!!.add(bean)
+        }
+        setData(Gson().toJson(list))
+
         readBaseInfoWorker = BaseInfoWorker()
         readBaseInfoWorker!!.init(this, ECUConstant.getReadBaseInfoData()) { data ->
             setData(data)

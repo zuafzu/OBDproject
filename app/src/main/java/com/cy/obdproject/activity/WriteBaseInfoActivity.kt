@@ -47,6 +47,15 @@ class WriteBaseInfoActivity : BaseActivity(), BaseActivity.ClickMethoListener, A
 
     private fun initView() {
         list = ArrayList()
+
+        list!!.clear()
+        for (i in 0 until ECUConstant.getWriteBaseInfoData1().size) {
+            val bean = BaseInfoBean()
+            bean.name = ECUConstant.getWriteBaseInfoData1()[i].name
+            list!!.add(bean)
+        }
+        setData(Gson().toJson(list))
+
         readBaseInfoWorker = BaseInfoWorker()
         readBaseInfoWorker!!.init(this, ECUConstant.getWriteBaseInfoData1()) { data ->
             setData(data)

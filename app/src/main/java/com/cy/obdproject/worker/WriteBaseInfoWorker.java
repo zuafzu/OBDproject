@@ -142,8 +142,8 @@ public class WriteBaseInfoWorker {
 
     private void next() {
         // 更改canId和reCanId
-        ECUagreement.canId = "000007E3";
-        ECUagreement.reCanId = "000007EB";
+        ECUagreement.canId = "000007A2";
+        ECUagreement.reCanId = "000007AA";
 
         new Thread(new Runnable() {
             @Override

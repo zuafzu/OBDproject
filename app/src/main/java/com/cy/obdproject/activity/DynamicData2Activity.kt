@@ -28,6 +28,8 @@ class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
     private var adapter: ControlDynamicDataAdapter? = null
     var pageIndex = 0
 
+    private var time = 500L
+
     private var pageCount = 0
 
     companion object {
@@ -123,7 +125,7 @@ class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
                             if (!isStart) {
                                 dynamicDataWorker!!.start(getPageList(listData!!, Constant.pageSize)[pageIndex])
                             }
-                        }, 3000)
+                        }, time)
                     }
                 }
                 dynamicDataWorker!!.start(getPageList(listData!!, Constant.pageSize)[pageIndex])
@@ -134,7 +136,7 @@ class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
     override fun doMethod(string: String?) {
         when (string) {
             "iv_back" -> {
-                var time = 3100L
+                var time = time+100L
                 if (isStart) {
                     time = 0L
                 }
@@ -148,7 +150,7 @@ class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
                 }, time)
             }
             "btn_lastPage" -> {
-                var time = 3100L
+                var time = time+100L
                 if (isStart) {
                     time = 0L
                 }
@@ -164,7 +166,7 @@ class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
                 }, time)
             }
             "btn_nextPage" -> {
-                var time = 3100L
+                var time = time+100L
                 if (isStart) {
                     time = 0L
                 }
@@ -186,7 +188,7 @@ class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
                     isStart = false
                     initData()
                 } else {
-                    var time = 3100L
+                    var time = time+100L
                     if (isStart) {
                         time = 0L
                     }

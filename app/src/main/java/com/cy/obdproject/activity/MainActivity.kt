@@ -193,7 +193,8 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
             homes = null
             homes = ArrayList()
             if ("1" == carType) {
-                items = "221,222,223,224,225"
+                // items = "221,222,223,224,225"
+                items = "221,222,223,224"
             } else if ("2" == carType) {
                 items = "226"
             }
