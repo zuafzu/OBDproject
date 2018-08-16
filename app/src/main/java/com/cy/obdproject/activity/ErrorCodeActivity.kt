@@ -2,6 +2,7 @@ package com.cy.obdproject.activity
 
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import com.cy.obdproject.R
 import com.cy.obdproject.adapter.ErrorCodeAdapter
 import com.cy.obdproject.base.BaseActivity
@@ -72,12 +73,17 @@ class ErrorCodeActivity : BaseActivity(), BaseActivity.ClickMethoListener, Error
                     adapter!!.notifyDataSetChanged()
                 }
                 adapter!!.setOnErrorCodeClick(this)
-
+                if (list!!.size == 0) {
+                    tv_msg.visibility = View.VISIBLE
+                } else {
+                    tv_msg.visibility = View.GONE
+                }
             } catch (e: Exception) {
-                Log.i("cyf", "e : ${e.message}")
+                // Log.i("cyf", "e : ${e.message}")
                 toast(data!!)
-                if("清空数据成功" == data){
+                if ("清空数据成功" == data) {
                     list!!.clear()
+                    tv_msg.visibility = View.VISIBLE
                     adapter!!.notifyDataSetChanged()
                 }
             }

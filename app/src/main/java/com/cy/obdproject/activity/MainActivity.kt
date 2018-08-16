@@ -64,14 +64,14 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
         // 启动OBD
         startWorker1 = OBDStart1Worker()
         startWorker2 = OBDStart2Worker()
-        startWorker1!!.init(this@MainActivity, { data ->
+        startWorker1!!.init(this@MainActivity) { data ->
             isShowToast = true
             setData1(data)
-        })
-        startWorker2!!.init(this@MainActivity, { data ->
+        }
+        startWorker2!!.init(this@MainActivity) { data ->
             isShowToast = true
             setData1(data)
-        })
+        }
         if (SPTools[this, Constant.USERTYPE, Constant.userProfessional] == Constant.userProfessional) {
 
         } else {
@@ -141,9 +141,9 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
         }
 
         stopWorker = OBDStopWorker()
-        stopWorker!!.init(this, {
+        stopWorker!!.init(this) {
 
-        })
+        }
         wifiTools = WifiTools(this)
         setClickMethod(tv_connnect_obd)
         setClickMethod(tv_ycxz)
@@ -270,7 +270,7 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
             "ll_main5" -> {//IO测试
                 startActivity(Intent(this@MainActivity, IOTestActivity::class.java))
             }
-            "ll_main6" -> {
+            "ll_main6" -> {//刷写文件
                 startActivity(Intent(this@MainActivity, WriteDataActivity::class.java))
             }
             "ibtn_setting" -> {

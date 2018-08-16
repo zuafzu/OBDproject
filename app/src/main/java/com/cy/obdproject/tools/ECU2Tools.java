@@ -4,15 +4,45 @@ public class ECU2Tools {
 
 
     public static byte[] _GetKey(byte[] seed) {
-        return _GetKey(0x4a68795b, seed, 4);
+        //return _GetKey(0xA8CB7ADC, seed, 4);
+        return _GetKeyAA(seed);
     }
 
-    public static byte[] _GetKey(int mask, byte[] seed, int seedLen) {
+    public static byte[] _GetKeyAA(byte[] seed) {
+        long wort = 0;
+        wort = (long) (seed[0] & 0xFF);
+        wort = wort << 8;
+        wort = wort | (long) (seed[1] & 0xFF);
+        wort = wort << 8;
+        wort = wort | (long) (seed[2] & 0xFF);
+        wort = wort << 8;
+        wort = wort | (long) (seed[3] & 0xFF);
+        for (int i = 0; i < 35; i++) {
+            if ((wort & 0x0000000080000000L) > 0) {
+                wort = wort << 1;
+                wort = wort ^ 0x00000000A8CB7ADCL;
+            } else {
+                wort = wort << 1;
+            }
+        }
+        byte[] key = new byte[4];
+        key[0] = (byte) (wort >> 24);
+        key[1] = (byte) (wort >> 16);
+        key[2] = (byte) (wort >> 8);
+        key[3] = (byte) (wort >> 0);
+        return key;
+    }
+
+    public static byte[] _GetKey(int mask, byte[] _seed, int seedLen) {
+        int[] seed = new int[_seed.length];
+        for (int i = 0; i < _seed.length; i++) {
+            seed[i] = (int) ((_seed[i]) & 0xff);
+        }
 
         int retLen = 0;
         byte[] bytes = new byte[4];
         byte[] key = new byte[4];
-        int wort;
+        long wort;
         if (seed[1] == 0 && seed[2] == 0)
             return null;
         else {

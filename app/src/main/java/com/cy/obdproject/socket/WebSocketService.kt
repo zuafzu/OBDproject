@@ -389,8 +389,20 @@ class WebSocketService : Service() {
 
     fun sendMsg(msg: String) {
         Log.i("cyf", "WebSocketServie 发送 : $msg")
-        if (msgClient != null && msgClient!!.readyState == WebSocket.READYSTATE.OPEN) {
-            msgClient!!.sendMsg(msg)
+        try {
+            if (msgClient != null && msgClient!!.readyState == WebSocket.READYSTATE.OPEN) {
+                msgClient!!.sendMsg(msg)
+            } else {
+                val i = (application as MyApp).activityList.size - 1
+                if (i >= 0) {
+                    ((application as MyApp).activityList[i] as BaseActivity).runOnUiThread {
+                        Toast.makeText(((application as MyApp).activityList[i] as BaseActivity),
+                                "远程连接断开", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        } catch (e: Exception) {
+
         }
     }
 

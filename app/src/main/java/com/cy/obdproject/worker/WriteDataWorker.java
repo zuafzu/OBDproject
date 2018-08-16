@@ -257,6 +257,7 @@ public class WriteDataWorker {
                     return;
                 }
 
+                ECUagreement.canId = "000007DF";
                 // 2、发送7DF  指令 长度2  只发送不需要接收
                 msg = ECUagreement.a("3E80");
                 Log.e("cyf", "发送信息 : " + msg + "  ");
@@ -268,6 +269,7 @@ public class WriteDataWorker {
                     e.printStackTrace();
                 }
 
+                ECUagreement.canId = "000007A2";
                 //6、发送7A2 指令2703   长度2  返回  7AA 6703   四个字节seed（随机产生，给算法，经运算后下一步发送）
                 msg = ECUagreement.a("2703");
                 if (replay()) {
@@ -400,6 +402,13 @@ public class WriteDataWorker {
                 if (replay()) {
                     return;
                 }
+
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
                 timeOut = 500;
                 ECUagreement.canId = "000007DF";
                 // 17、发送7DF  指令1003 长度2 不需要接收

@@ -75,6 +75,13 @@
 
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/tv_msg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="无故障" />
+
     <include
         android:id="@+id/float_window"
         layout="@layout/float_window"

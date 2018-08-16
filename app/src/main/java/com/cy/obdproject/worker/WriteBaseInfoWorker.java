@@ -162,7 +162,7 @@ public class WriteBaseInfoWorker {
                 if (replay()) {
                     return;
                 }
-                msg = ECUagreement.a(socketBean.getValue());
+                msg = ECUagreement.a(socketBean.getId() + socketBean.getValue());
                 if (replay()) {
                     return;
                 }

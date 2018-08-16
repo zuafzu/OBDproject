@@ -170,9 +170,23 @@ public class BaseActivity extends AppCompatActivity {
     public void setClickMethod(View view) {
         view.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(final View view) {
+                // 避免连续多次点击
+                view.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                    }
+                });
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        setClickMethod(view);
+                    }
+                }, 1000);
+
+                // 如果长连接开启，并且我是专家端
                 if (clickMethoListener != null) {
-                    // 如果长连接开启，并且我是专家端
                     sendClick(BaseActivity.this.getLocalClassName(), view.getTag().toString());
                     clickMethoListener.doMethod(view.getTag().toString());
                 }

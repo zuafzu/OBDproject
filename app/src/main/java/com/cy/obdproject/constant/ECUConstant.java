@@ -199,6 +199,7 @@ public class ECUConstant {
                         DynamicDataBean dynamicDataBean = new DynamicDataBean();
                         dynamicDataBean.setId("22" + (sheet.getCell(0, j)).getContents().replace(" ", ""));
                         dynamicDataBean.setName((sheet.getCell(1, j)).getContents());
+                        dynamicDataBean.setByteLength(sheet.getCell(4, j).getContents().replace(" ", ""));
                         dynamicDataBean.setCoefficient((sheet.getCell(7, j)).getContents().replace(" ", ""));
                         dynamicDataBean.setOffset((sheet.getCell(8, j)).getContents().replace(" ", ""));
                         dynamicDataBean.setParsingType((sheet.getCell(9, j)).getContents().replace(" ", ""));

@@ -172,7 +172,11 @@ class WriteBaseInfoActivity : BaseActivity(), BaseActivity.ClickMethoListener, A
 //            }
             var max = 100
             try {
-                max = Integer.valueOf(ECUConstant.getWriteBaseInfoData1()[position].byteLength)
+                max = if (ECUConstant.getWriteBaseInfoData1()[position].parsingType == "2") {
+                    Integer.valueOf(ECUConstant.getWriteBaseInfoData1()[position].byteLength)
+                } else {
+                    Integer.valueOf(ECUConstant.getWriteBaseInfoData1()[position].byteLength) * 2
+                }
             } catch (e: Exception) {
 
             }
@@ -188,7 +192,11 @@ class WriteBaseInfoActivity : BaseActivity(), BaseActivity.ClickMethoListener, A
 
                 } else {
                     val socketBean = ECUConstant.getWriteBaseInfoData2()[position]
-                    socketBean.value = ECUTools.putData(input)
+                    if (ECUConstant.getWriteBaseInfoData1()[position].parsingType == "2") {
+                        socketBean.value = ECUTools.putData(input)
+                    } else {
+                        socketBean.value = input
+                    }
                     writeBaseInfoWorker!!.start(socketBean)
                 }
             }
@@ -229,7 +237,11 @@ class WriteBaseInfoActivity : BaseActivity(), BaseActivity.ClickMethoListener, A
 //        }
         var max = 100
         try {
-            max = Integer.valueOf(ECUConstant.getWriteBaseInfoData1()[position].byteLength)
+            max = if (ECUConstant.getWriteBaseInfoData1()[position].parsingType == "2") {
+                Integer.valueOf(ECUConstant.getWriteBaseInfoData1()[position].byteLength)
+            } else {
+                Integer.valueOf(ECUConstant.getWriteBaseInfoData1()[position].byteLength) * 2
+            }
             edit!!.hint = "输入长度$max"
         } catch (e: Exception) {
             edit!!.hint = "输入长度未知"
@@ -244,11 +256,11 @@ class WriteBaseInfoActivity : BaseActivity(), BaseActivity.ClickMethoListener, A
                 .setTitle(list!![position].name)
                 .setView(view)
                 .setCancelable(false)
-                .setPositiveButton("确定", { _, _ ->
+                .setPositiveButton("确定") { _, _ ->
                     val input = edit!!.text.toString()
                     sendClick(this@WriteBaseInfoActivity.localClassName, "$input-$position")
                     putData("$input-$position")
-                })
+                }
                 .setNegativeButton("取消") { _, _ ->
                     sendClick(this@WriteBaseInfoActivity.localClassName, "")
                     dismiss()
@@ -258,7 +270,7 @@ class WriteBaseInfoActivity : BaseActivity(), BaseActivity.ClickMethoListener, A
 
             } else {
                 val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS)
+                imm.hideSoftInputFromWindow(window.decorView.windowToken, 0)
             }
         }
         dialog!!.show()

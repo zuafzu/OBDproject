@@ -1,5 +1,6 @@
 package com.cy.obdproject.activity
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
@@ -36,6 +37,7 @@ class LoginActivity : BaseActivity(), BaseActivity.ClickMethoListener {
         initView()
     }
 
+    @SuppressLint("SetTextI18n")
     private fun initView() {
         if (WebSocketService.getIntance() != null) {
             WebSocketService.getIntance()!!.close()
@@ -43,7 +45,10 @@ class LoginActivity : BaseActivity(), BaseActivity.ClickMethoListener {
         setClickMethod(btn_login)
         setClickMethod(tv_setting)
         // 判断是否自动登录
-//        if (SPTools[this@LoginActivity, Constant.ISLOGIN, ""] != "") {
+        if (SPTools[this@LoginActivity, Constant.USERNAME, ""] != "") {
+            // 自动输入用户名和密码
+            et_name.setText("" + SPTools[this@LoginActivity, Constant.USERNAME, ""])
+            et_pw.setText("" + SPTools[this@LoginActivity, Constant.PASSWORD, ""])
 //            if (SPTools[this@LoginActivity, Constant.USERTYPE, 0] == Constant.userNormal) {
 //                for (i in 0 until (application as MyApp).activityList.size) {
 //                    (application as MyApp).activityList[i].finish()
@@ -56,7 +61,7 @@ class LoginActivity : BaseActivity(), BaseActivity.ClickMethoListener {
 //                val mIntent1 = Intent(this@LoginActivity, WebSocketService::class.java)
 //                startService(mIntent1)
 //            }
-//        }
+        }
     }
 
     override fun doMethod(string: String?) {

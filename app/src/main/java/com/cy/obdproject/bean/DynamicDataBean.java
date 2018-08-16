@@ -6,6 +6,7 @@ public class DynamicDataBean implements Serializable {
 
     private String id;
     private String name;
+    private String  byteLength;//字节长度
     private String parsingType;//解析类型
     private String coefficient;//系数
     private String offset;//偏移
@@ -19,9 +20,10 @@ public class DynamicDataBean implements Serializable {
         super();
     }
 
-    public DynamicDataBean(String id, String name, String parsingType, String coefficient, String offset, String enumValue, String unit, String value, String isSelect) {
+    public DynamicDataBean(String id, String name, String byteLength, String parsingType, String coefficient, String offset, String enumValue, String unit, String value, String isSelect) {
         this.id = id;
         this.name = name;
+        this.byteLength = byteLength;
         this.parsingType = parsingType;
         this.coefficient = coefficient;
         this.offset = offset;
@@ -45,6 +47,14 @@ public class DynamicDataBean implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getByteLength() {
+        return byteLength;
+    }
+
+    public void setByteLength(String byteLength) {
+        this.byteLength = byteLength;
     }
 
     public String getParsingType() {
@@ -108,6 +118,7 @@ public class DynamicDataBean implements Serializable {
         return "DynamicDataBean{" +
                 "id='" + id + '\'' +
                 ", name='" + name + '\'' +
+                ", byteLength='" + byteLength + '\'' +
                 ", parsingType='" + parsingType + '\'' +
                 ", coefficient='" + coefficient + '\'' +
                 ", offset='" + offset + '\'' +

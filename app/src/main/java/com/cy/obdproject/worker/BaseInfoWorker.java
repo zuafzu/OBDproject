@@ -167,7 +167,11 @@ public class BaseInfoWorker {
                             if (!BaseInfoWorker.this.socketBeanList.get(index).getEnumValue().isEmpty()) {
                                 long a = Long.valueOf(mmsg, 16);
                                 String[] strs = BaseInfoWorker.this.socketBeanList.get(index).getEnumValue().split("#");
-                                value = strs[(int) a].split("\\^")[1];
+                                for (int i = 0; i < strs.length; i++) {
+                                    if (strs[i].startsWith("" + a)) {
+                                        value = strs[i].split("\\^")[1];
+                                    }
+                                }
                             }
                         }
                     } catch (Exception e) {

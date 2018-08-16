@@ -175,6 +175,7 @@ public class DynamicDataWorker {
                                 try {
                                     // String mmsg = ECUTools.getData(myData.get(0), dynamicDataBeans.get(index).getParsingType(), msg);
                                     String mmsg = ECUTools.getData(myData.get(0), 1, msg);
+                                    mmsg = mmsg.substring(0, Integer.valueOf(dynamicDataBeans.get(index).getByteLength()) * 2);
                                     if (!mmsg.isEmpty()) {
                                         int a;
                                         if (dynamicDataBeans.get(index).getOffset().contains("-")) {
@@ -189,7 +190,11 @@ public class DynamicDataWorker {
                                         value = a + "";
                                         if (!dynamicDataBeans.get(index).getEnumValue().isEmpty()) {
                                             String[] strs = dynamicDataBeans.get(index).getEnumValue().split("#");
-                                            value = strs[a].split("\\^")[1];
+                                            for (int j = 0; j < strs.length; j++) {
+                                                if (strs[j].startsWith("" + a)) {
+                                                    value = strs[j].split("\\^")[1];
+                                                }
+                                            }
                                         }
                                     }
                                     if (dynamicDataBeans.size() > index) {
