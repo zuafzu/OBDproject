@@ -16,4 +16,9 @@ public class Urls {
     public final String checkOBD = base_url + "/checkOBD";// 验证OBD
     public final String upLog = base_url + "/upLog";// Log上传
 
+    public final String setFileDownOK = base_url + "/setFileDownOK"; // 生产文件下载成功
+    public final String getControlFile = base_url + "/getControlFile"; // 最新流程文件
+    public final String getModuleFile = base_url + "/getModuleFile"; // 最新模块文件
+    public final String getAppFile = base_url + "/getAppFile"; // 最新应用文件
+
 }

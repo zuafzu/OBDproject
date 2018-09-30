@@ -23,17 +23,6 @@ class LoginActivity : BaseActivity(), BaseActivity.ClickMethoListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
-//        var xx = ""
-//        for (i in 0 until 2000) {
-//            if (i > 254) {
-//                xx = String.format("%02x", i % 256)
-//            } else {
-//                xx = String.format("%02x", i % 255 + 1)
-//            }
-//            if(xx.startsWith("f")||xx.startsWith("0")){
-//                Log.e("cyfmm", xx)
-//            }
-//        }
         initView()
     }
 
@@ -49,18 +38,6 @@ class LoginActivity : BaseActivity(), BaseActivity.ClickMethoListener {
             // 自动输入用户名和密码
             et_name.setText("" + SPTools[this@LoginActivity, Constant.USERNAME, ""])
             et_pw.setText("" + SPTools[this@LoginActivity, Constant.PASSWORD, ""])
-//            if (SPTools[this@LoginActivity, Constant.USERTYPE, 0] == Constant.userNormal) {
-//                for (i in 0 until (application as MyApp).activityList.size) {
-//                    (application as MyApp).activityList[i].finish()
-//                }
-//                // startActivity(Intent(this@LoginActivity, MainActivity::class.java))
-//                // startActivity(Intent(this@LoginActivity, SelectCarTypeActivity::class.java))
-//                startActivity(Intent(this@LoginActivity, ConnentOBDActivity::class.java))
-//            } else {
-//                showProgressDialog()
-//                val mIntent1 = Intent(this@LoginActivity, WebSocketService::class.java)
-//                startService(mIntent1)
-//            }
         }
     }
 
@@ -95,14 +72,16 @@ class LoginActivity : BaseActivity(), BaseActivity.ClickMethoListener {
         map["loginType"] = ""
         NetTools.net(map, Urls().auth_login, this, { response ->
             Log.e("zj", "auth_login = " + response!!.data)
-            var loginBean = Gson().fromJson(response.data, LoginBean::class.java)
+            val loginBean = Gson().fromJson(response.data, LoginBean::class.java)
+            WebSocketService.spaceTime = loginBean.heartBeat!!.toLong() * 1000
+            WebSocketService.outTime = 2 * ((loginBean.threshold!!.toLong() - loginBean.heartBeat!!.toLong()) * 1000)// 超时时间乘以2，增大容错空间
 
             SPTools.put(this@LoginActivity, Constant.USERNAME, "" + et_name.text.toString())
             SPTools.put(this@LoginActivity, Constant.TOKEN, "" + loginBean.token)
             SPTools.put(this@LoginActivity, Constant.USERID, "" + loginBean.userId)
             SPTools.put(this@LoginActivity, Constant.PASSWORD, "" + et_pw.text.toString())
 
-            var list = ArrayList<String>()
+            val list = ArrayList<String>()
             list.addAll(loginBean.userType.toLowerCase().replace("s", "受控端").replace("z", "专家端").split(","))
 
             if (list.size == 1) {
@@ -118,6 +97,7 @@ class LoginActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                         stopService(mIntent2)
                         Handler().postDelayed({
                             Constant.mDstName = SPTools[this@LoginActivity, Constant.IP, ""].toString()
+                            myApp.publicUnit.setScriptManagerParam(true, true, Constant.mDstName, Constant.mDstPort)
                             startService(mIntent2)
                             Handler().postDelayed({
                                 dismissProgressDialog()

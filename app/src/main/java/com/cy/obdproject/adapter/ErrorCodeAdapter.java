@@ -55,7 +55,7 @@ public class ErrorCodeAdapter extends BaseAdapter {
         holder.tv_code.setText(items.get(position).getCode());
         holder.tv_msg.setText(items.get(position).getMsg());
 
-        holder.tv_freeze.setVisibility(View.GONE);
+        // holder.tv_freeze.setVisibility(View.GONE);
         holder.tv_freeze.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

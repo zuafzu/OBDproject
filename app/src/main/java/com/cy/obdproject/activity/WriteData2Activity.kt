@@ -3,35 +3,47 @@ package com.cy.obdproject.activity
 import android.annotation.SuppressLint
 import android.os.AsyncTask
 import android.os.Bundle
-import android.os.Environment
+import android.os.Handler
+import android.os.Message
+import android.text.Html
 import android.text.method.ScrollingMovementMethod
 import android.util.Log
+import android.view.View
+import android.widget.ScrollView
 import com.cy.obdproject.R
 import com.cy.obdproject.base.BaseActivity
 import com.cy.obdproject.bean.WriteFileBean
 import com.cy.obdproject.constant.Constant
 import com.cy.obdproject.socket.SocketService
-import com.cy.obdproject.tools.ByteTools
 import com.cy.obdproject.tools.FileUtil
+import com.cy.obdproject.tools.LogTools
+import com.cy.obdproject.tools.NetTools
 import com.cy.obdproject.tools.SPTools
-import com.cy.obdproject.tools.StringTools
-import com.cy.obdproject.worker.WriteDataWorker
+import com.cy.obdproject.url.Urls
 import com.zhy.http.okhttp.OkHttpUtils
 import com.zhy.http.okhttp.callback.FileCallBack
 import kotlinx.android.synthetic.main.activity_write_data2.*
 import okhttp3.Call
 import okhttp3.Request
 import org.jetbrains.anko.toast
+import org.json.JSONArray
+import java.io.ByteArrayOutputStream
 import java.io.File
+import java.net.URL
+import java.text.SimpleDateFormat
+import java.util.*
 
 class WriteData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
 
+    private var code = ""
     private var url = ""
     private var name = ""
-    private var writeDataWorker: WriteDataWorker? = null
+    private var isLocal = ""
     private var list = ArrayList<WriteFileBean>()
-    private var mData = ""
     private var mFile: File? = null
+    private var handler: Handler? = null
+    private var jsonArray = JSONArray()
+    var isStart = false// 是否开始刷写
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,35 +58,43 @@ class WriteData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
     }
 
     private fun initView() {
-        if (intent.hasExtra("url")) {
-            url = intent.getStringExtra("url")
-        }
-        if (intent.hasExtra("name")) {
-            name = intent.getStringExtra("name")
-        }
+        code = intent.getStringExtra("code")
+        url = intent.getStringExtra("url")
+        name = intent.getStringExtra("name")
+        isLocal = intent.getStringExtra("isLocal")
+        jsonArray = JSONArray()
         tv_msg.movementMethod = ScrollingMovementMethod.getInstance()
         setClickMethod(btn_start)
         setClickMethod(iv_back)
+        progressBar.visibility = View.GONE
         progressBar.progress = 0
-        writeDataWorker = WriteDataWorker()
-        writeDataWorker!!.init(this) { data ->
-            if (mData != data) {
-                mData = data
-                setData(data)
-            }
-        }
     }
 
     override fun doMethod(string: String) {
         when (string) {
             "btn_start" -> {
+                isStart = true
+                progressBar.progress = 0
+                progressBar.visibility = View.VISIBLE
                 btn_start.text = "刷写中......"
                 iv_back.isClickable = false
                 btn_start.isClickable = false
                 btn_start.setBackgroundResource(R.drawable.shape_btn_gary)
                 list.clear()
+                jsonArray = JSONArray()
                 if (SPTools[this, Constant.USERTYPE, Constant.userNormal] == Constant.userNormal) {
-                    download()
+                    if (url.toLowerCase().startsWith("http")) {
+                        if (isLocal == "1") {
+                            // 下载到本地
+                            download()
+                        } else {
+                            // 读网络流
+                            download2()
+                        }
+                    } else {
+                        // 本地已经有文件了
+                        unloadFileInfo()
+                    }
                 }
             }
             "iv_back" -> {
@@ -86,52 +106,67 @@ class WriteData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
     @SuppressLint("SetTextI18n")
     override fun setData(data: String?) {
         Log.e("cyf88", "data = $data")
+        var isD = true
         runOnUiThread {
-            if (data!!.contains("-")) {
-                val str = data!!.replace("-", "")
-                progressBar.progress = str.toInt()
-            } else {
-                if (data == "下载刷写文件中") {
-                    tv_msg.text = "下载刷写文件中"
-                } else if (data == "返回数据超时" || data == "OBD未连接" || data == "返回数据异常") {
-                    if (data == "返回数据超时") {
-                        tv_msg.append("\n返回数据超时")
-                    } else if (data == "OBD未连接") {
-                        tv_msg.text = "OBD未连接"
-                    } else if (data == "返回数据异常") {
-                        tv_msg.append("\n返回数据异常")
+            when {
+                data!!.startsWith("-") -> {
+                    val str = data!!.replace("-", "")
+                    if ((str.toInt() - progressBar.progress) < 5 && (str.toInt() - progressBar.progress) >= 0) {
+                        isD = false
+                    } else {
+                        progressBar.visibility = View.VISIBLE
+                        progressBar.progress = str.toInt()
                     }
-                    btn_start.text = getString(R.string.write)
-                    iv_back.isClickable = true
-                    btn_start.isClickable = true
-                    btn_start.setBackgroundResource(R.drawable.shape_btn_colorprimary)
-                } else {
-                    tv_msg.append("\n" + data)
-                    if (data == "刷写完成") {
-                        toast("刷写完成")
-                        btn_start.text = getString(R.string.write)
+                }
+                data!!.startsWith("toast") -> {
+                    toast(data!!.replace("toast", ""))
+                }
+                else -> {
+                    if (data == "刷写结束") {
+                        progressBar.visibility = View.GONE
+                        toast("刷写结束")
+                        isStart = false
                         iv_back.isClickable = true
+                        btn_start.text = getString(R.string.write)
                         btn_start.isClickable = true
                         btn_start.setBackgroundResource(R.drawable.shape_btn_colorprimary)
                         // 删除文件
-                        if (mFile != null) {
-                            mFile!!.deleteOnExit()
+//                        if (mFile != null) {
+//                            mFile!!.deleteOnExit()
+//                        }
+                    } else {
+                        var mData = ""
+                        val mJsonArray = JSONArray(data)
+                        for (i in 0 until mJsonArray.length()) {
+                            mData = mData + mJsonArray.get(i) + "<br/>"
                         }
+                        tv_msg.text = Html.fromHtml(mData)
+                    }
+                    // 设置默认滚动到底部
+                    scrollView.post {
+                        // TODO Auto-generated method stub
+                        scrollView.fullScroll(ScrollView.FOCUS_DOWN)
                     }
                 }
             }
         }
-        super.setData(data)
+        if (isD) {
+            super.setData(data)
+        }
     }
 
     private fun download() {
-        OkHttpUtils.get().url(url).addHeader("Accept-Encoding", "identity").build().execute(object : FileCallBack(Environment.getExternalStorageDirectory().absolutePath, name) {
+        OkHttpUtils.get().url(url).addHeader("Accept-Encoding", "identity").build().execute(object : FileCallBack(com.qiming.eol_public.InitClass.pathShuaxie, name) {
 
             var mProgress = 0F
 
             override fun onBefore(request: Request?, id: Int) {
                 super.onBefore(request, id)
-                setData("下载刷写文件")
+                val currentTime = Date()
+                val formatter = SimpleDateFormat("HH:mm:ss")
+                val dateString = formatter.format(currentTime)
+                jsonArray.put("$dateString        生产文件开始下载")
+                setData(jsonArray.toString())
             }
 
             override fun inProgress(progress: Float, total: Long, id: Int) {
@@ -150,17 +185,35 @@ class WriteData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
             }
 
             override fun onError(call: Call, e: Exception, id: Int) {
-                setData("下载刷写文件失败")
+                val currentTime = Date()
+                val formatter = SimpleDateFormat("HH:mm:ss")
+                val dateString = formatter.format(currentTime)
+                jsonArray.put("<font color='#FF0000'>$dateString        生产文件下载失败，请重试</font>")
+                setData(jsonArray.toString())
             }
 
             override fun onResponse(response: File, id: Int) {
                 if (mProgress == 1f) {
-                    setData("下载刷写文件完成\n读取刷写文件")
+                    mFile = response
+                    val buffer = FileUtil.readFile(mFile)
+                    myApp.publicUnit.setAllBytesData(buffer)
+
+                    val currentTime = Date()
+                    val formatter = SimpleDateFormat("HH:mm:ss")
+                    val dateString = formatter.format(currentTime)
+                    jsonArray.put("$dateString        生产文件下载完成")
+                    unloadFileInfo()
+                    setData(jsonArray.toString())
+
                     if (SocketService.getIntance() != null && SocketService.getIntance()!!.isConnected()) {
-                        readData(response)
+                        initScript()
                     } else {
                         if (isUserConnected) {
-                            setData("OBD未连接")
+                            val currentTime = Date()
+                            val formatter = SimpleDateFormat("HH:mm:ss")
+                            val dateString = formatter.format(currentTime)
+                            jsonArray.put("<font color='#FF0000'>$dateString        OBD未连接</font>")
+                            setData(jsonArray.toString())
                         }
                     }
                 }
@@ -169,58 +222,161 @@ class WriteData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
     }
 
     @SuppressLint("StaticFieldLeak")
-    fun readData(response: File) {
-        object : AsyncTask<File, Void, String>() {
+    private fun download2() {
+        object : AsyncTask<String, Void, ByteArray>() {
 
-            var num = 0
+            override fun onPreExecute() {
+                super.onPreExecute()
+                val currentTime = Date()
+                val formatter = SimpleDateFormat("HH:mm:ss")
+                val dateString = formatter.format(currentTime)
+                jsonArray.put("$dateString        生产文件开始读取")
+                setData(jsonArray.toString())
+            }
 
-            override fun doInBackground(vararg p0: File?): String {
-                mFile = p0[0]
-
-                val buffer = FileUtil.readFile(p0[0])
-                val ba0 = ByteArray(1)
-                ba0[0] = buffer[6]
-                val piece = StringTools.byte2hex(ba0)
-                num = piece.toInt()
-                var a = 0
-                for (i in 0 until num) {
-                    val ba1 = ByteArray(4)
-                    ba1[0] = buffer[i * 8 + 10 + a]
-                    ba1[1] = buffer[i * 8 + 9 + a]
-                    ba1[2] = buffer[i * 8 + 8 + a]
-                    ba1[3] = buffer[i * 8 + 7 + a]
-                    val ba2 = ByteArray(4)
-                    ba2[0] = buffer[i * 8 + 14 + a]
-                    ba2[1] = buffer[i * 8 + 13 + a]
-                    ba2[2] = buffer[i * 8 + 12 + a]
-                    ba2[3] = buffer[i * 8 + 11 + a]
-                    val str = StringTools.byte2hex(ba1)
-                    val str2 = StringTools.byte2hex(ba2)
-                    val bean = WriteFileBean()
-                    bean.address = str
-                    bean.endAddress = str2
-                    val b = (str2.toInt(16) - str.toInt(16) + 1)
-                    bean.length = "" + b
-                    bean.data = ByteTools.subBytes(buffer, i * 8 + 14 + a + 1, b)
-                    val aa = ShortArray(bean.data.size)
-                    for (j in 0 until bean.data.size) {
-                        aa[j] = ByteTools.toShort(bean.data[j])
+            override fun doInBackground(vararg strings: String): ByteArray? {
+                SPTools.put(this@WriteData2Activity, "ControlFile", "")
+                val mUrl = URL(strings[0])
+                val connection = mUrl.openConnection()
+                //获取内容长度
+                val contentLength = connection.contentLength
+                val scriptInputStream = connection.getInputStream()
+                var totalReaded = 0L
+                val baos = ByteArrayOutputStream()
+                val buffer = ByteArray(1024)
+                var len = 0
+                do {
+                    len = scriptInputStream!!.read(buffer)
+                    if (len == -1) {
+                        break
                     }
-                    bean.data2 = aa
-                    list.add(bean)
-                    a += b
-                    Log.i("cyf88", bean.toString())
-                }
-                return ""
+                    baos.write(buffer, 0, len)
+                    totalReaded += len
+                    val progress = totalReaded * 100 / contentLength
+                    setData("-" + progress.toInt())
+                } while (true)
+                scriptInputStream!!.close()
+                val result = baos.toByteArray()
+                baos.close()
+                return result
             }
 
-            override fun onPostExecute(result: String?) {
+            override fun onPostExecute(result: ByteArray?) {
                 super.onPostExecute(result)
-                setData("刷写文件中（共" + num + "段）")
-                writeDataWorker!!.start(list)
+                myApp.publicUnit.setAllBytesData(result)
+
+                val currentTime = Date()
+                val formatter = SimpleDateFormat("HH:mm:ss")
+                val dateString = formatter.format(currentTime)
+                jsonArray.put("$dateString        生产文件读取完成")
+                unloadFileInfo()
+                setData(jsonArray.toString())
+
+                if (SocketService.getIntance() != null && SocketService.getIntance()!!.isConnected()) {
+                    initScript()
+                } else {
+                    if (isUserConnected) {
+                        val currentTime = Date()
+                        val formatter = SimpleDateFormat("HH:mm:ss")
+                        val dateString = formatter.format(currentTime)
+                        jsonArray.put("<font color='#FF0000'>$dateString        OBD未连接</font>")
+                        setData(jsonArray.toString())
+                    }
+                }
+
             }
 
-        }.execute(response)
+        }.execute(url)
+    }
+
+    // 下载文件成功调用通知接口(判断本地文件是否可以刷写)
+    private fun unloadFileInfo() {
+        val map = HashMap<String, String>()
+        map["file"] = name
+        if (url.toLowerCase().startsWith("http")) {
+            map["isLocal"] = "0"//使用的网络下载文件
+        } else {
+            map["isLocal"] = "1"//使用的本地文件
+        }
+        NetTools.net(map, Urls().setFileDownOK, this, {
+            if (it.code == "0") {
+                if (!url.toLowerCase().startsWith("http")) {
+                    val buffer = FileUtil.readFile(File(url))
+                    myApp.publicUnit.setAllBytesData(buffer)
+
+                    if (SocketService.getIntance() != null && SocketService.getIntance()!!.isConnected()) {
+                        initScript()
+                    } else {
+                        if (isUserConnected) {
+                            val currentTime = Date()
+                            val formatter = SimpleDateFormat("HH:mm:ss")
+                            val dateString = formatter.format(currentTime)
+                            jsonArray.put("<font color='#FF0000'>$dateString        OBD未连接</font>")
+                            setData(jsonArray.toString())
+                        }
+                    }
+                }
+            } else {
+                File(url).deleteOnExit()
+                setData("toast" + it.msg)
+                setData("刷写结束")
+            }
+        }, "", false, false)
+    }
+
+    @SuppressLint("HandlerLeak")
+    private fun initScript() {
+        handler = object : Handler() {
+            override fun handleMessage(msg: Message) {
+                super.handleMessage(msg)
+                myApp.publicUnit.setBreak(true)
+                setData("toast" + msg.obj.toString())
+            }
+        }
+        try {
+            myApp.publicUnit.setMessageHandler(@SuppressLint("HandlerLeak")
+            object : Handler() {
+                override fun handleMessage(msg: Message) {
+                    when (msg.what) {
+                        -1// 清空显示文本
+                        -> setData("")
+                        0// 显示文本
+                        -> {
+                            val currentTime = Date()
+                            val formatter = SimpleDateFormat("HH:mm:ss")
+                            val dateString = formatter.format(currentTime)
+                            if (msg.arg1 == 1) {
+                                jsonArray.put("<font color='#FF0000'>" + dateString + "        " + msg.obj.toString() + "</font>")
+                            } else {
+                                jsonArray.put(dateString + "        " + msg.obj.toString())
+                            }
+                            setData(jsonArray.toString())
+                        }
+                        1// 显示进度条
+                        -> {
+                            Log.e("cyf", "进度条：" + msg.obj as Int)
+                            setData("-" + msg.obj as Int)
+                        }
+                    }
+                    super.handleMessage(msg)
+                }
+            })
+            myApp.publicUnit.SetEvent(handler, code)
+            Thread {
+                while (true) {
+                    val isRun = myApp.publicUnit.GetScriptIsRun(code)
+                    if (!isRun) {
+                        runOnUiThread {
+                            // 恢复按钮可以点击
+                            setData("刷写结束")
+                        }
+                        break
+                    }
+                }
+            }.start()
+        } catch (e: Exception) {
+            LogTools.errLog(e)
+        }
     }
 
 }

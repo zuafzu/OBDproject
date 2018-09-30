@@ -91,9 +91,9 @@ public class FileUtils {
             }
             isSuccess = true;
         } catch (Exception e) {
-            e.printStackTrace();
             errorStr = e.getMessage();
             isSuccess = false;
+            LogTools.errLog(e);
         }
     }
 

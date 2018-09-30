@@ -152,6 +152,7 @@ object SPTools {
                 val clz = SharedPreferences.Editor::class.java
                 return clz.getMethod("apply")
             } catch (e: NoSuchMethodException) {
+                LogTools.errLog(e)
             }
 
             return null
@@ -169,8 +170,11 @@ object SPTools {
                     return
                 }
             } catch (e: IllegalArgumentException) {
+                LogTools.errLog(e)
             } catch (e: IllegalAccessException) {
+                LogTools.errLog(e)
             } catch (e: InvocationTargetException) {
+                LogTools.errLog(e)
             }
 
             editor.commit()

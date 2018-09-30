@@ -2,15 +2,22 @@ package com.cy.obdproject.base;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.WindowManager;
 
 import com.cy.obdproject.R;
+import com.cy.obdproject.activity.LoginActivity;
+import com.cy.obdproject.activity.MainActivity;
+import com.cy.obdproject.activity.SelectCarTypeActivity;
+import com.cy.obdproject.activity.WriteData2Activity;
 import com.cy.obdproject.app.MyApp;
 import com.cy.obdproject.bean.BaseBean;
 import com.cy.obdproject.bean.WebSocketBean;
@@ -28,14 +35,22 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
 public class BaseActivity extends AppCompatActivity {
 
     private ClickMethoListener clickMethoListener;
     private ProgressDialog progressDialog;
+    private AlertDialog mDialog;
     public MyApp myApp;
     public boolean isUserConnected = false;// 是否用户远程协助中
     public boolean isProfessionalConnected = false;// 是否专家远程协助中
+
+    public boolean isshowDissWait = true;
+
+    public long delayMillis = 10 * 1000;// 专家端请求数据超时连接
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -52,6 +67,8 @@ public class BaseActivity extends AppCompatActivity {
         if (this instanceof ClickMethoListener) {
             clickMethoListener = (ClickMethoListener) this;
         }
+        // 开始屏蔽电话
+        myApp.stopCallPhone();
     }
 
     @Override
@@ -78,27 +95,96 @@ public class BaseActivity extends AppCompatActivity {
                 findViewById(R.id.float_window).setVisibility(View.GONE);
             }
         }
-        // 专家端进入界面延迟3秒再操作，防止操作过快丢数据
-        if (isProfessionalConnected) {
+    }
+
+    public void showDissWait() {
+        if (isshowDissWait) {
             showProgressDialog();
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     dismissProgressDialog();
                 }
-            }, 3000);
+            }, delayMillis);
         }
     }
 
     public void showProgressDialog() {
+        if (progressDialog == null) {
+            progressDialog = new ProgressDialog(this);
+            progressDialog.setTitle("");//2.设置标题
+            progressDialog.setMessage("正在加载中，请稍等......");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+        } else if (!progressDialog.isShowing()) {
+            progressDialog.show();
+        }
+    }
+
+    public void dismissProgressDialog() {
         if (progressDialog != null && progressDialog.isShowing()) {
             progressDialog.dismiss();
         }
-        progressDialog = new ProgressDialog(this);
-        progressDialog.setTitle("");//2.设置标题
-        progressDialog.setMessage("正在加载中，请稍等......");
-        progressDialog.setCancelable(false);
-        progressDialog.show();
+    }
+
+    public void showWebSocketStopDialog(String msg) {
+        if (mDialog != null && mDialog.isShowing()) {
+            mDialog.setMessage(msg);
+        } else {
+            mDialog = new AlertDialog.Builder(this).
+                    setTitle("提示").
+                    setMessage(msg).
+                    setCancelable(false).
+                    setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            mDialog.dismiss();
+                            if (Constant.userProfessional ==
+                                    (int) SPTools.INSTANCE.get(BaseActivity.this, Constant.USERTYPE, Constant.userProfessional)) {
+                                // 专家
+                                if (Objects.requireNonNull(WebSocketService.Companion.getIntance()).isConnected()) {
+                                    // 返回专家主界面（用户列表界面）
+                                    for (int j = 0; j < myApp.getActivityList().size(); j++) {
+                                        if (!myApp.getActivityList().get(j).getLocalClassName().contains("RequestListActivity")) {
+                                            myApp.getActivityList().get(j).finish();
+                                        }
+                                    }
+                                } else {
+                                    // 返回登录页面
+                                    for (int j = 0; j < myApp.getActivityList().size(); j++) {
+                                        myApp.getActivityList().get(j).finish();
+                                    }
+                                    Intent mIntent = new Intent(BaseActivity.this, LoginActivity.class);
+                                    mIntent.addFlags(FLAG_ACTIVITY_NEW_TASK);
+                                    startActivity(mIntent);
+                                }
+                            } else {
+                                // 用户
+                                if (BaseActivity.this.getLocalClassName().contains("WriteData2Activity") &&
+                                        ((WriteData2Activity) BaseActivity.this).isStart()) {
+                                    // 不处理（刷写过程中）
+                                } else {
+                                    // 返回用户主界面
+                                    if (WebSocketService.Companion.getState() == 2) {
+                                        for (int j = 0; j < myApp.getActivityList().size(); j++) {
+                                            myApp.getActivityList().get(j).finish();
+                                        }
+                                        Intent mIntent1 = new Intent(BaseActivity.this, SelectCarTypeActivity.class);
+                                        mIntent1.addFlags(FLAG_ACTIVITY_NEW_TASK);
+                                        startActivity(mIntent1);
+                                        Intent mIntent = new Intent(BaseActivity.this, MainActivity.class);
+                                        mIntent.addFlags(FLAG_ACTIVITY_NEW_TASK);
+                                        startActivity(mIntent);
+                                        if (WebSocketService.Companion.getIntance() != null) {
+                                            WebSocketService.Companion.getIntance().close();
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }).
+                    show();
+        }
     }
 
     public void setData(String data) {
@@ -158,12 +244,6 @@ public class BaseActivity extends AppCompatActivity {
                     }
                 }
             }.execute(str);
-        }
-    }
-
-    public void dismissProgressDialog() {
-        if (progressDialog != null && progressDialog.isShowing()) {
-            progressDialog.dismiss();
         }
     }
 
@@ -251,6 +331,17 @@ public class BaseActivity extends AppCompatActivity {
             progressDialog.dismiss();
         }
         myApp.getActivityList().remove(this);
+        if (myApp.getActivityList().size() == 0) {
+            try {
+                myApp.publicUnit.stopRun();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            // 停止屏蔽电话
+            if (myApp.getIntentOne() != null) {
+                stopService(myApp.getIntentOne());
+            }
+        }
         super.onDestroy();
     }
 

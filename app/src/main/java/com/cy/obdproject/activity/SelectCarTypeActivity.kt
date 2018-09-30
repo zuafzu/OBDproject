@@ -10,11 +10,17 @@ import com.cy.obdproject.R
 import com.cy.obdproject.adapter.SelectAdapter
 import com.cy.obdproject.base.BaseActivity
 import com.cy.obdproject.constant.Constant
+import com.cy.obdproject.socket.WebSocketService
+import com.cy.obdproject.tools.LogTools
 import com.cy.obdproject.tools.SPTools
 import kotlinx.android.synthetic.main.activity_select_car_type.*
 import org.jetbrains.anko.toast
+import org.json.JSONObject
+
 
 class SelectCarTypeActivity : BaseActivity(), BaseActivity.ClickMethoListener, AdapterView.OnItemClickListener {
+
+    private var jsonObject: JSONObject? = null
 
     private var mExitTime: Long = 0
 
@@ -32,38 +38,45 @@ class SelectCarTypeActivity : BaseActivity(), BaseActivity.ClickMethoListener, A
     }
 
     private fun initView() {
-        setClickMethod(iv_back)
-        INSTANCE = this
+        try {
+            setClickMethod(iv_back)
+            INSTANCE = this
 
-        list = ArrayList()
-        list!!.add("红旗EV诊断")
-        list!!.add("红旗EV刷写")
+            list = ArrayList()
 
-        if (adapter == null) {
-            adapter = SelectAdapter(list!!, this)
-            listView!!.adapter = adapter
-        } else {
-            adapter!!.notifyDataSetChanged()
-        }
+            val mJsonString = myApp.publicUnit.GetUI()
+            jsonObject = JSONObject(mJsonString)
 
-        listView.onItemClickListener = this
-        if (SPTools[this, Constant.USERTYPE, Constant.userNormal] == Constant.userNormal) {
-            iv_back.visibility = View.INVISIBLE
-        } else {
-            iv_back.visibility = View.INVISIBLE
+            val it = jsonObject!!.keys()
+            while (it.hasNext()) {
+                val key = it.next().toString()
+                list!!.add(key)
+            }
+
+            if (adapter == null) {
+                adapter = SelectAdapter(list!!, this)
+                listView!!.adapter = adapter
+            } else {
+                adapter!!.notifyDataSetChanged()
+            }
+
+            listView.onItemClickListener = this
+            if (SPTools[this, Constant.USERTYPE, Constant.userNormal] == Constant.userNormal) {
+                iv_back.visibility = View.INVISIBLE
+            } else {
+                iv_back.visibility = View.INVISIBLE
+            }
+        } catch (e: Exception) {
+            LogTools.errLog(e)
         }
     }
 
     override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
         sendClick(this@SelectCarTypeActivity.localClassName, "" + p2)
-        if (p2 == 0) {
-            SPTools.put(this@SelectCarTypeActivity, Constant.CARTYPE, "1")
-        } else if (p2 == 1) {
-            SPTools.put(this@SelectCarTypeActivity, Constant.CARTYPE, "2")
-        }
         SPTools.put(this@SelectCarTypeActivity, Constant.CARNAME, list!![p2])
-
-        startActivity(Intent(this@SelectCarTypeActivity, SelectSystemActivity::class.java))
+        val mIntent = Intent(this@SelectCarTypeActivity, SelectSystemActivity::class.java)
+        mIntent.putExtra("CARTYPE", jsonObject!!.optJSONArray(list!![p2]).toString())
+        startActivity(mIntent)
     }
 
     override fun doMethod(string: String?) {
@@ -86,9 +99,20 @@ class SelectCarTypeActivity : BaseActivity(), BaseActivity.ClickMethoListener, A
                     toast("再按一次退出程序")
                     mExitTime = System.currentTimeMillis()
                 } else {
+                    if( WebSocketService.getIntance()!=null){
+                        WebSocketService.getIntance()!!.stopSelf()
+                    }
                     val ip = SPTools[this@SelectCarTypeActivity, Constant.IP, ""]
+                    val ModuleFile = SPTools[this, "ModuleFile", ""] as String
+                    val ControlFile = SPTools[this, "ControlFile", ""] as String
+                    val USERNAME = SPTools[this, Constant.USERNAME, ""] as String
+                    val PASSWORD = SPTools[this, Constant.PASSWORD, ""] as String
                     SPTools.clear(this@SelectCarTypeActivity)
                     SPTools.put(this@SelectCarTypeActivity, Constant.IP, ip!!)
+                    SPTools.put(this@SelectCarTypeActivity, "ModuleFile", ModuleFile)
+                    SPTools.put(this@SelectCarTypeActivity, "ControlFile", ControlFile)
+                    SPTools.put(this@SelectCarTypeActivity, Constant.USERNAME, USERNAME)
+                    SPTools.put(this@SelectCarTypeActivity, Constant.PASSWORD, PASSWORD)
                     finish()
                 }
             }

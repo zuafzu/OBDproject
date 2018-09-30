@@ -6,7 +6,6 @@ import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
-import android.support.v7.app.AlertDialog
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
@@ -18,7 +17,6 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.cy.obdproject.R
-import com.cy.obdproject.app.MyApp
 import com.cy.obdproject.base.BaseActivity
 import com.cy.obdproject.bean.ErrorCodeBean
 import com.cy.obdproject.bean.WebSocketBean
@@ -26,33 +24,28 @@ import com.cy.obdproject.constant.Constant
 import com.cy.obdproject.socket.SocketService
 import com.cy.obdproject.socket.WebSocketService
 import com.cy.obdproject.tools.FastBlurUtil
+import com.cy.obdproject.tools.LogTools
 import com.cy.obdproject.tools.SPTools
 import com.cy.obdproject.tools.WifiTools
-import com.cy.obdproject.worker.OBDStart1Worker
-import com.cy.obdproject.worker.OBDStart2Worker
-import com.cy.obdproject.worker.OBDStopWorker
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.dip
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.toast
+import org.json.JSONArray
+import org.json.JSONObject
 
 
 class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
 
-    private var stopWorker: OBDStopWorker? = null
     private var wifiTools: WifiTools? = null
-
-    private var startWorker1: OBDStart1Worker? = null
-    private var startWorker2: OBDStart2Worker? = null
+    private var modeMap = HashMap<String, String>()
 
     private var isShowToast = false
     private var mData = ""
     private var items = ""
     var homes: List<String>? = null
-
-    private var isStopSocketService = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,27 +54,14 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
     }
 
     private fun initOBDStart() {
-        // 启动OBD
-        startWorker1 = OBDStart1Worker()
-        startWorker2 = OBDStart2Worker()
-        startWorker1!!.init(this@MainActivity) { data ->
-            isShowToast = true
-            setData1(data)
-        }
-        startWorker2!!.init(this@MainActivity) { data ->
-            isShowToast = true
-            setData1(data)
-        }
         if (SPTools[this, Constant.USERTYPE, Constant.userProfessional] == Constant.userProfessional) {
 
         } else {
             if (SocketService.getIntance() != null && SocketService.getIntance()!!.isConnected()) {
                 showProgressDialog()
-                if ("1" == SPTools[this@MainActivity, Constant.CARTYPE, ""]) {
-                    startWorker1!!.start()
-                } else {
-                    startWorker2!!.start()
-                }
+                SocketService.isConnected = true
+                isShowToast = false
+                setData1("连接成功")
             } else {
                 toast("OBD未连接")
             }
@@ -99,7 +79,7 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
             tv_ycxz.text = "断开协助"
         }
         if (SPTools[this, Constant.USERTYPE, Constant.userNormal] == Constant.userNormal) {
-            ibtn_setting.visibility = View.INVISIBLE
+            ibtn_setting.visibility = View.VISIBLE
             iv_back.visibility = View.VISIBLE
             tv_connnect_obd.visibility = View.INVISIBLE
         } else {
@@ -109,7 +89,7 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
             tv_connnect_obd.visibility = View.INVISIBLE
         }
         // 目前专家就是已连接，后期可优化
-        if(isProfessionalConnected){
+        if (isProfessionalConnected) {
             mData = "连接成功"
         }
         if (mData == "连接成功") {
@@ -140,10 +120,6 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
             }
         }
 
-        stopWorker = OBDStopWorker()
-        stopWorker!!.init(this) {
-
-        }
         wifiTools = WifiTools(this)
         setClickMethod(tv_connnect_obd)
         setClickMethod(tv_ycxz)
@@ -155,7 +131,7 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
         tv_username.text = SPTools[this@MainActivity, Constant.USERNAME, ""].toString()
 
         val bean = ErrorCodeBean()
-        bean.code = SPTools[this, Constant.CARTYPE, "1"].toString()//车型
+        // bean.code = SPTools[this, Constant.CARTYPE, "1"].toString()//车型
         bean.msg = SPTools[this, Constant.CARNAME, ""].toString()// 车名
         setData(Gson().toJson(bean))
     }
@@ -185,24 +161,88 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
     }
 
     override fun setData(data: String?) {
-        runOnUiThread {
-            var bean: ErrorCodeBean = Gson().fromJson(data, object : TypeToken<ErrorCodeBean>() {}.type)
-            var carName = bean.msg
-            var carType = bean.code
-            tv_carName.text = carName
-            homes = null
-            homes = ArrayList()
-            if ("1" == carType) {
-                // items = "221,222,223,224,225"
-                items = "221,222,223,224"
-            } else if ("2" == carType) {
-                items = "226"
-            }
+        try {
+            runOnUiThread {
+                var bean: ErrorCodeBean = Gson().fromJson(data, object : TypeToken<ErrorCodeBean>() {}.type)
+                var carName = bean.msg
+                // var carType = bean.code
+                tv_carName.text = carName
+                homes = null
+                homes = ArrayList()
+                items = ""
+                modeMap.clear()
 
-            homes = items.split(",")
-            recyclerview.layoutManager = GridLayoutManager(this, 2)
-            recyclerview.adapter = HomeAdapter()
-            setData1(mData)
+                val mJsonString = myApp.publicUnit.GetUI();
+                val jsonObject = JSONObject(mJsonString)
+
+                val jsonArray1 = jsonObject.getJSONArray(carName.split(" - ")[0])
+                for (i in 0 until jsonArray1.length()) {
+                    val jsonObject1 = jsonArray1.optJSONObject(i)
+                    val it = jsonObject1!!.keys()
+                    while (it.hasNext()) {
+                        val key = it.next().toString()
+                        if (key == carName.split(" - ")[1]) {
+                            val jsonArray = JSONArray(jsonObject1.getJSONArray(key).toString())
+                            for (j in 0 until jsonArray.length()) {
+                                val mJsonObject = jsonArray.optJSONObject(j)
+                                val name = mJsonObject.optString("name")
+                                val code = mJsonObject.optString("init_code")
+                                when (name) {
+                                    "基本信息" -> {
+                                        val refresh_code = mJsonObject.optString("refresh_code")
+                                        if (code != "" && refresh_code != "") {
+                                            items += "221,"
+                                            modeMap["221"] = "$code,$refresh_code"
+                                        }
+                                    }
+                                    "参数修改" -> {
+                                        val refresh_code = mJsonObject.optString("refresh_code")
+                                        if (code != "" && refresh_code != "") {
+                                            items += "222,"
+                                            modeMap["222"] = "$code,$refresh_code"
+                                        }
+                                    }
+                                    "故障信息" -> {
+                                        val refresh_code = mJsonObject.optString("refresh_code")
+                                        val read_freeze_code = mJsonObject.optString("read_freeze_code")
+                                        val clear_dtc_code = mJsonObject.optString("clear_dtc_code")
+                                        if (code != "" && refresh_code != "" && read_freeze_code != "" && clear_dtc_code != "") {
+                                            items += "223,"
+                                            modeMap["223"] = "$code,$refresh_code,$read_freeze_code,$clear_dtc_code"
+                                        }
+                                    }
+                                    "动态数据" -> {
+                                        val start_read_code = mJsonObject.optString("start_read_code")
+                                        val stop_read_code = mJsonObject.optString("stop_read_code")
+                                        if (code != "" && start_read_code != "" && stop_read_code != "") {
+                                            items += "224,"
+                                            modeMap["224"] = "$code,$start_read_code,$stop_read_code"
+                                        }
+                                    }
+                                    "刷写" -> {
+                                        val flush_code = mJsonObject.optString("flush_code")
+                                        if (flush_code != "") {
+                                            items += "226,"
+                                            modeMap["226"] = flush_code
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                if (items.isNotEmpty()) {
+                    items = items.substring(0, items.length - 1)
+                    homes = items.split(",")
+                } else {
+                    homes = ArrayList()
+                }
+                recyclerview.layoutManager = GridLayoutManager(this, 2) as RecyclerView.LayoutManager?
+                recyclerview.adapter = HomeAdapter()
+                setData1(mData)
+            }
+        } catch (e: Exception) {
+            LogTools.errLog(e)
         }
         super.setData(data)
     }
@@ -256,53 +296,43 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                 }
             }
             "ll_main1" -> {//读基本信息
-                startActivity(Intent(this@MainActivity, ReadBaseInfoActivity::class.java))
+                val mIntent = Intent(this@MainActivity, ReadBaseInfoActivity::class.java)
+                mIntent.putExtra("code", modeMap["221"])
+                startActivity(mIntent)
             }
             "ll_main2" -> {//写基本信息
-                startActivity(Intent(this@MainActivity, WriteBaseInfoActivity::class.java))
+                val mIntent = Intent(this@MainActivity, WriteBaseInfoActivity::class.java)
+                mIntent.putExtra("code", modeMap["222"])
+                startActivity(mIntent)
             }
             "ll_main3" -> {//故障代码
-                startActivity(Intent(this@MainActivity, ErrorCodeActivity::class.java))
+                val mIntent = Intent(this@MainActivity, ErrorCodeActivity::class.java)
+                mIntent.putExtra("code", modeMap["223"])
+                startActivity(mIntent)
             }
             "ll_main4" -> {//动态数据
-                startActivity(Intent(this@MainActivity, DynamicDataActivity::class.java))
+                val mIntent = Intent(this@MainActivity, DynamicDataActivity::class.java)
+                mIntent.putExtra("code", modeMap["224"])
+                startActivity(mIntent)
             }
             "ll_main5" -> {//IO测试
-                startActivity(Intent(this@MainActivity, IOTestActivity::class.java))
+                val mIntent = Intent(this@MainActivity, IOTestActivity::class.java)
+                mIntent.putExtra("code", modeMap["225"])
+                startActivity(mIntent)
             }
             "ll_main6" -> {//刷写文件
-                startActivity(Intent(this@MainActivity, WriteDataActivity::class.java))
+                val mIntent = Intent(this@MainActivity, WriteDataActivity::class.java)
+                mIntent.putExtra("code", modeMap["226"])
+                startActivity(mIntent)
             }
             "ibtn_setting" -> {
-                AlertDialog.Builder(this).setTitle("提示").setMessage("确认退出当前账号？").setPositiveButton("确认") { _, _ ->
-                    SPTools.clear(this@MainActivity)
-                    isStopSocketService = true
-                    for (i in 0 until (application as MyApp).activityList.size) {
-                        (application as MyApp).activityList[i].finish()
-                    }
-                    startActivity(Intent(this@MainActivity, LoginActivity::class.java))
-                }.setNegativeButton("取消") { _, _ -> }.show()
+                val mIntent = Intent(this@MainActivity, SettingActivity::class.java)
+                startActivity(mIntent)
             }
             "iv_back" -> {
-                if (SPTools[this, Constant.USERTYPE, Constant.userProfessional] == Constant.userProfessional) {
-                    startActivity(Intent(this@MainActivity, SelectCarTypeActivity::class.java))
-                } else {
-                    isStopSocketService = true
-                    finish()
-                }
+                startActivity(Intent(this@MainActivity, SelectCarTypeActivity::class.java))
             }
         }
-    }
-
-    override fun onDestroy() {
-        // obd关闭
-        if (isStopSocketService) {
-            if (SocketService.getIntance() != null && SocketService.getIntance()!!.isConnected() && SocketService.isConnected) {
-                stopWorker!!.start()
-            }
-            SocketService.isConnected = false
-        }
-        super.onDestroy()
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
@@ -310,7 +340,6 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
             if (SPTools[this, Constant.USERTYPE, Constant.userProfessional] == Constant.userProfessional) {
 
             } else {
-                isStopSocketService = true
                 finish()
             }
             return true

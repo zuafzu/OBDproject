@@ -1,0 +1,153 @@
+package com.cy.obdproject.activity
+
+import android.annotation.SuppressLint
+import android.os.Bundle
+import android.os.Handler
+import android.os.Message
+import android.util.Log
+import com.cy.obdproject.R
+import com.cy.obdproject.adapter.ErrorCode2Adapter
+import com.cy.obdproject.base.BaseActivity
+import com.cy.obdproject.bean.BaseInfoBean
+import com.cy.obdproject.tools.LogTools
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import kotlinx.android.synthetic.main.activity_read_base_info.*
+import org.jetbrains.anko.toast
+import org.json.JSONObject
+import java.util.*
+
+class ErrorCode2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
+
+    private var code = ""
+    private var data = ""
+
+    private var list: ArrayList<BaseInfoBean>? = null
+    private var baseInfoAdapter: ErrorCode2Adapter? = null
+
+    private var handler: Handler? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_error_code2)
+        initView()
+        initData(code.split(",")[2])
+    }
+
+    private fun initView() {
+        code = intent.getStringExtra("code")
+        data = intent.getStringExtra("data")
+        list = ArrayList()
+        setClickMethod(iv_back)
+        setClickMethod(tv_refresh)
+    }
+
+    private fun initData(mCode: String) {
+        if (isProfessionalConnected) {// 专家连接
+            showDissWait()
+            doMethod("tv_refresh")
+        } else {
+            showProgressDialog()
+            handler = @SuppressLint("HandlerLeak")
+            object : Handler() {
+                override fun handleMessage(msg: Message) {
+                    super.handleMessage(msg)
+                    myApp.publicUnit.setBreak(true)
+                    setData("toast" + msg.obj.toString())
+                }
+            }
+            try {
+                myApp.publicUnit.SetReadFreezeItems(@SuppressLint("HandlerLeak")
+                object : Handler() {
+                    override fun handleMessage(msg: Message) {
+                        when (msg.what) {
+                            3 -> {
+                                val data = msg.obj.toString()
+                                setData(data)
+                            }
+                        }
+                        super.handleMessage(msg)
+                    }
+                }, data)
+                myApp.publicUnit.SetEvent(handler, mCode)
+                Thread {
+                    while (true) {
+                        val isRun = myApp.publicUnit.GetScriptIsRun(mCode)
+                        if (!isRun) {
+                            runOnUiThread {
+                                // 完成
+                                dismissProgressDialog()
+                            }
+                            break
+                        }
+                    }
+                }.start()
+            } catch (e: Exception) {
+                LogTools.errLog(e)
+            }
+        }
+    }
+
+    override fun setData(data: String) {
+        runOnUiThread {
+            Log.i("cyf", "data : $data")
+            if(data.startsWith("toast")){
+                toast(data!!.replace("toast", ""))
+                dismissProgressDialog()
+            }else{
+                try {
+                    val mlist = Gson().fromJson<List<BaseInfoBean>>(data, object : TypeToken<ArrayList<BaseInfoBean>>() {}.type) as ArrayList<BaseInfoBean>?
+                    list!!.clear()
+                    list!!.addAll(mlist!!)
+                    if (baseInfoAdapter == null) {
+                        baseInfoAdapter = ErrorCode2Adapter(list!!, this@ErrorCode2Activity, 1)
+                        listView!!.adapter = baseInfoAdapter
+                    } else {
+                        baseInfoAdapter!!.notifyDataSetChanged()
+                    }
+                    dismissProgressDialog()
+                } catch (e: Exception) {
+                    Log.i("cyf", "e : ${e.message}")
+                    try {
+                        val jo = JSONObject(data)
+                        val ja = jo.optJSONArray("List")
+                        list!!.clear()
+                        for (i in 0 until ja.length()) {
+                            val jo1 = ja.optJSONObject(i)
+                            val Name = jo1.optString("Name")
+                            if (jo1.has("Value")) {
+                                list!!.add(BaseInfoBean("", Name, "", "", "", jo1.optString("Value")))
+                            } else {
+                                list!!.add(BaseInfoBean("", Name, "", "", "", ""))
+                            }
+                        }
+                        if (baseInfoAdapter == null) {
+                            baseInfoAdapter = ErrorCode2Adapter(list!!, this@ErrorCode2Activity, 1)
+                            listView!!.adapter = baseInfoAdapter
+                        } else {
+                            baseInfoAdapter!!.notifyDataSetChanged()
+                        }
+                        dismissProgressDialog()
+                    } catch (e: Exception) {
+                        LogTools.errLog(e)
+                    }
+                }
+            }
+            super.setData(data)
+        }
+    }
+
+    override fun doMethod(string: String?) {
+        when (string) {
+            "iv_back" -> {
+                finish()
+            }
+            "tv_refresh" -> {
+                if (!isProfessionalConnected) {// 专家连接
+                    initData(code.split(",")[2])
+                }
+            }
+        }
+    }
+
+}

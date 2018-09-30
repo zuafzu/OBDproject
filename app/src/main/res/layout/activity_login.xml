@@ -101,6 +101,16 @@
             android:text="启动中..."
             android:visibility="invisible" />
 
+        <ProgressBar
+            android:visibility="invisible"
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:max="100" />
+
     </LinearLayout>
 
 </RelativeLayout>

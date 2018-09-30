@@ -43,6 +43,7 @@ public class WifiTools {
             //返回热点打开状态
             return (Boolean) method.invoke(wifiManager, apConfig, enabled);
         } catch (Exception e) {
+            LogTools.errLog(e);
             return false;
         }
     }
@@ -73,7 +74,7 @@ public class WifiTools {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LogTools.errLog(e);
         }
         return connectedIP;
     }
@@ -93,8 +94,7 @@ public class WifiTools {
             }
             return WIFI_AP_STATE.class.getEnumConstants()[tmp];
         } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LogTools.errLog(e);
             return WIFI_AP_STATE.WIFI_AP_STATE_FAILED;
         }
     }

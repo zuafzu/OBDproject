@@ -1,10 +1,15 @@
 package com.cy.obdproject.tools;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.cy.obdproject.R;
 import com.cy.obdproject.activity.LoginActivity;
 import com.cy.obdproject.app.MyApp;
 import com.cy.obdproject.base.BaseActivity;
@@ -94,34 +99,56 @@ public class NetTools {
             public void onError(Call call, Exception e, int id) {
                 // 无数据布局隐藏(后期可做网络错误显示)
 //                ((BaseActivity) context).setListToastView(0, "", 0, false);
-                if (e.getClass().getSimpleName().equals("ConnectException")) {
-                    // 无法连接网络
-                    Toast.makeText(context, "无法连接服务器", Toast.LENGTH_SHORT).show();
-                } else if (e.getClass().getSimpleName().equals("SocketTimeoutException")) {
-                    // 网络连接超时
-                    Toast.makeText(context, "服务器连接超时", Toast.LENGTH_SHORT).show();
+                if (context.getLocalClassName().contains("LoginActivity")) {
+                    // 登录界面
+                    Toast.makeText(context, "连接服务器失败，请重试", Toast.LENGTH_SHORT).show();
+                    Log.e("cyf", "http Exception ：" + e.toString());
+                    ((BaseActivity) context).dismissProgressDialog();
+                } else if (context.getLocalClassName().contains("WriteDataActivity")) {
+                    // 下载刷写文件界面
+                    TextView textView = context.findViewById(R.id.tv_notice);
+                    if (textView != null) {
+                        textView.setVisibility(View.VISIBLE);
+                        textView.setText("获取生产文件失败，请重试");
+                    }
+                    if (context.findViewById(R.id.listView) != null) {
+                        context.findViewById(R.id.listView).setVisibility(View.GONE);
+                    }
+                } else if (context.getLocalClassName().contains("ResponseListActivity")) {
+                    // 专家列表界面
+                    TextView textView = context.findViewById(R.id.tv_notice);
+                    if (textView != null) {
+                        textView.setVisibility(View.VISIBLE);
+                        textView.setText("获取可协助的专家列表失败，请重试");
+                    }
+                    if (context.findViewById(R.id.listView) != null) {
+                        context.findViewById(R.id.listView).setVisibility(View.GONE);
+                    }
+                } else if (context.getLocalClassName().contains("WelcomeActivity")) {
+                    AlertDialog dialog = new AlertDialog.Builder(context)
+                            .setTitle("提示")
+                            .setMessage("初始化异常")
+                            .setCancelable(false)
+                            .setPositiveButton("退出", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    context.finish();
+                                    dialog.dismiss();
+                                }
+                            }).create();
+                    dialog.show();
+                    Log.e("cyf", "http Exception ：" + e.toString());
                 } else {
-                    // 其它异常
-                    Log.e("Exception gson：", e.toString());
+                    // Toast.makeText(context, "连接服务器失败，请重试", Toast.LENGTH_SHORT).show();
+                    Log.e("cyf", "http Exception ：" + e.toString());
                 }
                 ((BaseActivity) context).dismissProgressDialog();
             }
 
             @Override
             public void onResponse(BaseBean baseBean, int id) {
-                // 无数据布局隐藏
-//                ((BaseActivity) context).setListToastView(0, "", 0, false);
                 Log.e("zj", "bean = " + baseBean.toString());
                 if ("0".equals(baseBean.getCode())) {
-
-//                    Log.e("zj", "url = " + url);
-//                    Log.e("zj", "baseBean = " + baseBean.toString());
-
-//                    if (null == baseBean.getData() || "".equals(baseBean.getData())) {
-//                        Toast.makeText(context, "返回data为null", Toast.LENGTH_SHORT).show();
-//                        return;
-//                    }
-
                     if (myCallBack != null) {
                         myCallBack.getData(baseBean);
                     }
@@ -129,8 +156,6 @@ public class NetTools {
                         ((BaseActivity) context).dismissProgressDialog();
                     }
                 } else if ("1002".equals(baseBean.getCode())) {
-//                    Log.e("cyf6", "json : " + json);
-//                    Log.e("cyf6", "url : " + url);
                     // 登录信息失效
                     Toast.makeText(context, baseBean.getMsg(), Toast.LENGTH_SHORT).show();
                     SPTools.INSTANCE.put(context, Constant.ISLOGIN, "");
@@ -139,8 +164,23 @@ public class NetTools {
                     }
                     context.startActivity(new Intent(context, LoginActivity.class));
                 } else {
-                    Toast.makeText(context, baseBean.getMsg(), Toast.LENGTH_SHORT).show();
-                    ((BaseActivity) context).dismissProgressDialog();
+                    if (context.getLocalClassName().contains("WelcomeActivity")) {
+                        AlertDialog dialog = new AlertDialog.Builder(context)
+                                .setTitle("提示")
+                                .setMessage(baseBean.getMsg())
+                                .setCancelable(false)
+                                .setPositiveButton("退出", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        context.finish();
+                                        dialog.dismiss();
+                                    }
+                                }).create();
+                        dialog.show();
+                    } else {
+                        Toast.makeText(context, baseBean.getMsg(), Toast.LENGTH_SHORT).show();
+                        ((BaseActivity) context).dismissProgressDialog();
+                    }
                 }
             }
 
@@ -151,86 +191,6 @@ public class NetTools {
 
         });
     }
-
-    /**
-     * 上传文件
-     */
-//    public static void netFile(Map<String, File> map, final Activity context, final MyCallBack myCallBack) {
-//        Log.e("zj", "netFile = file_upload_url = " + Urls.file_upload_url);
-////        PostFormBuilder builder = OkHttpUtils.post().url("http://192.168.13.9:8180/files/upload_file");
-//        PostFormBuilder builder = OkHttpUtils.post().url(Urls.file_upload_url);
-//        boolean isImgs = true;
-//        for (int i = 0; i < map.size(); i++) {
-//            if (!FileTools.isImgFile(map.get("file" + i).getName())) {
-//                isImgs = false;
-//            }
-//            builder.addFile("file" + i, map.get("file" + i).getName(), map.get("file" + i));
-//            Log.e("zj", "file = " + map.get("file" + i));
-//        }
-//        builder.addHeader("ticket", SecretKey.getKey(context));
-//
-//        builder.addParams("work", "" + SPTools.INSTANCE.get(context, Constant.WORK, ""));//
-//        builder.addParams("transaction", "1");
-//        builder.addParams("org", SPTools.INSTANCE.get(context, Constant.SCHOOLID, "").toString());
-//        if (isImgs) {
-//            builder.addParams("thumbnail", "1");
-//        } else {
-//            builder.addParams("thumbnail", "0");
-//        }
-//
-//        RequestCall call = builder.build();
-//        call.execute(new Callback<BaseBean>() {
-//            @Override
-//            public void onBefore(Request request, int id) {
-//                if (context != null) {
-//                    ((BaseActivity) context).showProgressDialog("正在上传...");
-//                }
-//            }
-//
-//            @Override
-//            public BaseBean parseNetworkResponse(Response response, int id) throws Exception {
-//                String json = response.body().string();
-//                Log.e("cyf7", "response : " + json);
-//                JSONObject jsonObject = new JSONObject(json);
-//                BaseBean bean = new BaseBean();
-//                bean.setCode(jsonObject.optString("code"));
-//                bean.setMsg(jsonObject.optString("msg"));
-//                // bean.setData(jsonObject.optString("data"));
-//                bean.setData(jsonObject.optString("data")
-//                        .replace("originalName", "originalFileName")
-//                        .replace("filePath", "accessPath")
-//                        .replace("fileSize", "size")
-//                        .replace("thumbPath", "thumbnailPath"));
-//                return bean;
-//            }
-//
-//            @Override
-//            public void onError(Call call, Exception e, int id) {
-//                if (e.getClass().getSimpleName().equals("ConnectException")) {
-//                    // 无法连接网络
-//                    Toast.makeText(context, "无法连接服务器", Toast.LENGTH_SHORT).show();
-//                } else if (e.getClass().getSimpleName().equals("SocketTimeoutException")) {
-//                    // 网络连接超时
-//                    Toast.makeText(context, "服务器连接超时", Toast.LENGTH_SHORT).show();
-//                } else {
-//                    // 其它异常
-//                    Log.e("Exception gson：", e.toString());
-//                }
-//                ((BaseActivity) context).dismissProgressDialog();
-//            }
-//
-//            @Override
-//            public void onResponse(BaseBean baseBean, int id) {
-//                if ("0".equals(baseBean.getCode())) {
-//                    myCallBack.getData(baseBean);
-//                } else {
-//                    ((BaseActivity) context).dismissProgressDialog();
-//                    Toast.makeText(context, baseBean.getMsg(), Toast.LENGTH_SHORT).show();
-//                }
-//            }
-//
-//        });
-//    }
 
     public interface MyCallBack {
         void getData(BaseBean response);

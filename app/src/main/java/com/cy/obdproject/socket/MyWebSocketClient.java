@@ -44,9 +44,14 @@ public class MyWebSocketClient extends WebSocketClient {
 
     @Override
     public void onClose(int code, String reason, boolean remote) {
-        Log.e("CyfMsgClient", "onClose " + reason);
+        Log.e("CyfMsgClient", "onClose " + reason + "   " + code);
         // The codecodes are documented in class org.java_websocket.framing.CloseFrame
         System.out.println("cyf Connection closed by " + (remote ? "remote peer" : "us"));
+    }
+
+    public void close(String string) {
+        Log.e("cyf", "WebSocketClient close 被调用  " + string);
+        super.close();
     }
 
     @Override

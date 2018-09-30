@@ -1,1 +1,1 @@
-include ':app'
+include ':app', ':eol_extendfuction', ':eol_message', ':eol_producefileparser', ':eol_protocolapplayer', ':eol_safeaccess', ':eol_scriptrunner', ':eol_public'

@@ -191,7 +191,7 @@ public class ErrorCodeWorker {
                         }
                     }
                     if (flag) {
-                        errorCodeBeanList.add(new ErrorCodeBean(code, "无效故障代码"));
+                        // errorCodeBeanList.add(new ErrorCodeBean(code, "无效故障代码"));
                     }
                 }
                 putData(new Gson().toJson(errorCodeBeanList));

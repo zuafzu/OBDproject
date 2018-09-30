@@ -7,6 +7,7 @@ import android.util.Log
 import com.cy.obdproject.app.MyApp
 import com.cy.obdproject.base.BaseActivity
 import com.cy.obdproject.constant.Constant
+import com.cy.obdproject.tools.LogTools
 
 class SocketService : Service() {
 
@@ -67,6 +68,7 @@ class SocketService : Service() {
                         }
                         Log.e("cyf", "SocketService 连接失败 " + e.message)
                     }
+                    LogTools.errLog(e)
                 }
             }.start()
         }

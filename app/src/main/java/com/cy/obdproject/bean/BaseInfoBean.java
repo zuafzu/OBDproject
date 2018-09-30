@@ -6,7 +6,7 @@ public class BaseInfoBean {
     private String name;
     private String parsingType;//解析类型
     private String enumValue;//枚举值（用^分隔）
-    private String  byteLength;//字节长度
+    private String byteLength;//字节长度
 
     private String value;
 

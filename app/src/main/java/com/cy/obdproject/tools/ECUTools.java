@@ -62,6 +62,7 @@ public class ECUTools {
                     return mData.toString();
                 }
             } catch (Exception e) {
+                LogTools.errLog(e);
                 // Log.e("cyf","ECUTools getData "+e.getMessage());
                 return "";
             }
@@ -112,6 +113,7 @@ public class ECUTools {
                     return mData.toString();
                 }
             } catch (Exception e) {
+                LogTools.errLog(e);
                 return "";
             }
         }

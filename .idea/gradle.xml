@@ -3,13 +3,19 @@
   <component name="GradleSettings">
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
-        <option name="distributionType" value="LOCAL" />
+        <option name="distributionType" value="DEFAULT_WRAPPED" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="gradleHome" value="$APPLICATION_HOME_DIR$/gradle/gradle-4.4" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/eol_extendfuction" />
+            <option value="$PROJECT_DIR$/eol_message" />
+            <option value="$PROJECT_DIR$/eol_producefileparser" />
+            <option value="$PROJECT_DIR$/eol_protocolapplayer" />
+            <option value="$PROJECT_DIR$/eol_public" />
+            <option value="$PROJECT_DIR$/eol_safeaccess" />
+            <option value="$PROJECT_DIR$/eol_scriptrunner" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

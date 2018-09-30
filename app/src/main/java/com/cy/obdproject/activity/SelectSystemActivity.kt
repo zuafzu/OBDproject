@@ -11,8 +11,12 @@ import com.cy.obdproject.base.BaseActivity
 import com.cy.obdproject.constant.Constant
 import com.cy.obdproject.tools.SPTools
 import kotlinx.android.synthetic.main.activity_select_system.*
+import org.json.JSONArray
 
 class SelectSystemActivity : BaseActivity(), BaseActivity.ClickMethoListener, AdapterView.OnItemClickListener {
+
+    private var CARTYPE = ""
+    private var listString = ArrayList<String>()
 
     private var list: ArrayList<String>? = null
     private var adapter: SelectAdapter? = null
@@ -29,13 +33,19 @@ class SelectSystemActivity : BaseActivity(), BaseActivity.ClickMethoListener, Ad
 
     private fun initView() {
         INSTANCE = this
+        CARTYPE = intent.getStringExtra("CARTYPE")
         setClickMethod(iv_back)
         list = ArrayList()
-        if ("1" == SPTools[this@SelectSystemActivity, Constant.CARTYPE, ""]) {
-            list!!.add("电动助力转向系统")
-
-        } else if ("2" == SPTools[this@SelectSystemActivity, Constant.CARTYPE, ""]) {
-            list!!.add("电动助力转向系统")
+        listString.clear()
+        val jsonArray = JSONArray(CARTYPE)
+        for (i in 0 until jsonArray.length()) {
+            val jsonObject = jsonArray.optJSONObject(i)
+            val it = jsonObject!!.keys()
+            while (it.hasNext()) {
+                val key = it.next().toString()
+                list!!.add(key)
+                listString.add(jsonObject.getJSONArray(key).toString())
+            }
         }
 
         if (adapter == null) {
@@ -51,7 +61,9 @@ class SelectSystemActivity : BaseActivity(), BaseActivity.ClickMethoListener, Ad
         sendClick(this@SelectSystemActivity.localClassName, "" + p2)
         val name = SPTools[this@SelectSystemActivity, Constant.CARNAME, ""].toString()
         SPTools.put(this@SelectSystemActivity, Constant.CARNAME, name + " - " + list!![p2])
-        startActivity(Intent(this@SelectSystemActivity, MainActivity::class.java))
+        val mIntent = Intent(this@SelectSystemActivity, MainActivity::class.java)
+        mIntent.putExtra("CARSYSTEM", listString[p2])
+        startActivity(mIntent)
         finish()
     }
 

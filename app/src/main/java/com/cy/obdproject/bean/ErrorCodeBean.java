@@ -3,13 +3,15 @@ package com.cy.obdproject.bean;
 public class ErrorCodeBean {
     private String code;
     private String msg;
+    private String data;
 
     public ErrorCodeBean() {
     }
 
-    public ErrorCodeBean(String code, String msg) {
+    public ErrorCodeBean(String code, String msg, String data) {
         this.code = code;
         this.msg = msg;
+        this.data = data;
     }
 
     public String getCode() {
@@ -28,11 +30,20 @@ public class ErrorCodeBean {
         this.msg = msg;
     }
 
+    public String getData() {
+        return data;
+    }
+
+    public void setData(String data) {
+        this.data = data;
+    }
+
     @Override
     public String toString() {
         return "ErrorCodeBean{" +
                 "code='" + code + '\'' +
                 ", msg='" + msg + '\'' +
+                ", data='" + data + '\'' +
                 '}';
     }
 }

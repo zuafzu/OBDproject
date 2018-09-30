@@ -10,7 +10,6 @@ import com.cy.obdproject.bean.DynamicDataBean;
 import com.cy.obdproject.callback.SocketCallBack;
 import com.cy.obdproject.socket.MySocketClient;
 import com.cy.obdproject.socket.SocketService;
-import com.cy.obdproject.tools.ECUTools;
 import com.cy.obdproject.tools.StringTools;
 import com.google.gson.Gson;
 
@@ -119,17 +118,17 @@ public class DynamicDataWorker {
             String mmsg = "";
             for (int i = 0; i < myData.size(); i++) {
                 if (myData.size() > i && dynamicDataBeans.size() > index) {
-                    mmsg = ECUTools.getData(myData.get(i), dynamicDataBeans.get(index).getParsingType(), msg);
-                    if (mmsg.equals(ECUTools.ERR)) {
-                        myData.remove(i);
-                        i--;
-                    } else if (mmsg.equals(ECUTools.WAIT)) {
-                        myData.remove(i);
-                        startTime();
-                        return sleep() || checkData();
-                    } else {
-                        break;
-                    }
+//                    mmsg = ECUTools.getData(myData.get(i), dynamicDataBeans.get(index).getParsingType(), msg);
+//                    if (mmsg.equals(ECUTools.ERR)) {
+//                        myData.remove(i);
+//                        i--;
+//                    } else if (mmsg.equals(ECUTools.WAIT)) {
+//                        myData.remove(i);
+//                        startTime();
+//                        return sleep() || checkData();
+//                    } else {
+//                        break;
+//                    }
                 }
             }
             if (myData.size() == 0) {
@@ -166,46 +165,46 @@ public class DynamicDataWorker {
                 if (index < dynamicDataBeans.size()) {
                     if (dynamicDataBeans.get(index).getIsSelect().equals("1")) {
                         for (int i = 0; i < dynamicDataBeans2.size(); i++) {
-                            if (dynamicDataBeans.get(index).getId().equals(dynamicDataBeans2.get(i).getId())) {
-                                msg = ECUagreement.a(dynamicDataBeans.get(index).getId());
-                                if (replay()) {
-                                    return;
-                                }
-                                String value = "无数据";
-                                try {
-                                    // String mmsg = ECUTools.getData(myData.get(0), dynamicDataBeans.get(index).getParsingType(), msg);
-                                    String mmsg = ECUTools.getData(myData.get(0), 1, msg);
-                                    mmsg = mmsg.substring(0, Integer.valueOf(dynamicDataBeans.get(index).getByteLength()) * 2);
-                                    if (!mmsg.isEmpty()) {
-                                        int a;
-                                        if (dynamicDataBeans.get(index).getOffset().contains("-")) {
-                                            a = (int) (Long.valueOf(mmsg, 16)
-                                                    * Double.valueOf(dynamicDataBeans.get(index).getCoefficient())
-                                                    - Double.valueOf(dynamicDataBeans.get(index).getOffset().replace("-", "")));
-                                        } else {
-                                            a = (int) (Long.valueOf(mmsg, 16)
-                                                    * Double.valueOf(dynamicDataBeans.get(index).getCoefficient())
-                                                    + Double.valueOf(dynamicDataBeans.get(index).getOffset()));
-                                        }
-                                        value = a + "";
-                                        if (!dynamicDataBeans.get(index).getEnumValue().isEmpty()) {
-                                            String[] strs = dynamicDataBeans.get(index).getEnumValue().split("#");
-                                            for (int j = 0; j < strs.length; j++) {
-                                                if (strs[j].startsWith("" + a)) {
-                                                    value = strs[j].split("\\^")[1];
-                                                }
-                                            }
-                                        }
-                                    }
-                                    if (dynamicDataBeans.size() > index) {
-                                        dynamicDataBeans.get(index).setValue(value + " " + dynamicDataBeans.get(index).getUnit());
-                                    }
-                                } catch (Exception e) {
-                                    index = -1;
-                                    Log.e("cyf99", "e : " + e.getMessage());
-                                }
-                                break;
-                            }
+//                            if (dynamicDataBeans.get(index).getId().equals(dynamicDataBeans2.get(i).getId())) {
+//                                msg = ECUagreement.a(dynamicDataBeans.get(index).getId());
+//                                if (replay()) {
+//                                    return;
+//                                }
+//                                String value = "无数据";
+//                                try {
+//                                    // String mmsg = ECUTools.getData(myData.get(0), dynamicDataBeans.get(index).getParsingType(), msg);
+//                                    String mmsg = ECUTools.getData(myData.get(0), 1, msg);
+//                                    mmsg = mmsg.substring(0, Integer.valueOf(dynamicDataBeans.get(index).getByteLength()) * 2);
+//                                    if (!mmsg.isEmpty()) {
+//                                        int a;
+//                                        if (dynamicDataBeans.get(index).getOffset().contains("-")) {
+//                                            a = (int) (Long.valueOf(mmsg, 16)
+//                                                    * Double.valueOf(dynamicDataBeans.get(index).getCoefficient())
+//                                                    - Double.valueOf(dynamicDataBeans.get(index).getOffset().replace("-", "")));
+//                                        } else {
+//                                            a = (int) (Long.valueOf(mmsg, 16)
+//                                                    * Double.valueOf(dynamicDataBeans.get(index).getCoefficient())
+//                                                    + Double.valueOf(dynamicDataBeans.get(index).getOffset()));
+//                                        }
+//                                        value = a + "";
+//                                        if (!dynamicDataBeans.get(index).getEnumValue().isEmpty()) {
+//                                            String[] strs = dynamicDataBeans.get(index).getEnumValue().split("#");
+//                                            for (int j = 0; j < strs.length; j++) {
+//                                                if (strs[j].startsWith("" + a)) {
+//                                                    value = strs[j].split("\\^")[1];
+//                                                }
+//                                            }
+//                                        }
+//                                    }
+//                                    if (dynamicDataBeans.size() > index) {
+//                                        dynamicDataBeans.get(index).setValue(value + " " + dynamicDataBeans.get(index).getUnit());
+//                                    }
+//                                } catch (Exception e) {
+//                                    index = -1;
+//                                    Log.e("cyf99", "e : " + e.getMessage());
+//                                }
+//                                break;
+//                            }
                         }
                     }
                     index++;

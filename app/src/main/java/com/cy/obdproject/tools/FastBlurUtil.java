@@ -66,7 +66,7 @@ public class FastBlurUtil {
             Bitmap blurBitmap = doBlur(scaledBitmap, blurRadius, true);
             return blurBitmap;
         } catch (IOException e) {
-            e.printStackTrace();
+            LogTools.errLog(e);
             return null;
         }
     }

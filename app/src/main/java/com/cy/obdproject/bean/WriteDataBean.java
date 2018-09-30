@@ -1,18 +1,15 @@
 package com.cy.obdproject.bean;
 
 public class WriteDataBean {
+
     private String fileId;
     private String fileName;
     private String filePath;
+    private String isLocal;
+    private String localHas;
 
     public WriteDataBean() {
         super();
-    }
-
-    public WriteDataBean(String fileId, String fileName, String filePath) {
-        this.fileId = fileId;
-        this.fileName = fileName;
-        this.filePath = filePath;
     }
 
     public String getFileId() {
@@ -39,12 +36,30 @@ public class WriteDataBean {
         this.filePath = filePath;
     }
 
+    public String getIsLocal() {
+        return isLocal;
+    }
+
+    public void setIsLocal(String isLocal) {
+        this.isLocal = isLocal;
+    }
+
+    public String getLocalHas() {
+        return localHas;
+    }
+
+    public void setLocalHas(String localHas) {
+        this.localHas = localHas;
+    }
+
     @Override
     public String toString() {
         return "WriteDataBean{" +
                 "fileId='" + fileId + '\'' +
                 ", fileName='" + fileName + '\'' +
                 ", filePath='" + filePath + '\'' +
+                ", isLocal='" + isLocal + '\'' +
+                ", localHas='" + localHas + '\'' +
                 '}';
     }
 }

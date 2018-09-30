@@ -76,6 +76,7 @@ public class StringTools {
                         }
                     }
                 } catch (Exception e) {
+                    LogTools.errLog(e);
                     return false;
                 }
                 return true;

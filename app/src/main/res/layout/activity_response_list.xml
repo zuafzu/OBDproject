@@ -45,19 +45,32 @@
                 android:tag="tv_refresh"
                 android:text="@string/refresh"
                 android:textColor="@android:color/white"
-                android:visibility="invisible" />
+                android:visibility="visible" />
 
         </LinearLayout>
 
-        <ListView
-            android:id="@+id/listView"
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"
-            android:divider="@android:color/transparent"
-            android:dividerHeight="0dp"
-            android:listSelector="@android:color/transparent"
-            android:tag="listView" />
+            android:layout_weight="1">
+
+            <TextView
+                android:id="@+id/tv_notice"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="暂无可协助的专家"/>
+
+            <ListView
+                android:id="@+id/listView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:divider="@android:color/transparent"
+                android:dividerHeight="0dp"
+                android:listSelector="@android:color/transparent"
+                android:tag="listView" />
+
+        </RelativeLayout>
     </LinearLayout>
 
     <include

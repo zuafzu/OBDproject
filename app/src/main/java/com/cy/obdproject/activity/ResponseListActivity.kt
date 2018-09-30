@@ -2,7 +2,10 @@ package com.cy.obdproject.activity
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
 import android.support.v7.app.AlertDialog
+import android.view.View
+import android.widget.TextView
 import com.cy.obdproject.R
 import com.cy.obdproject.adapter.SelectRequestAdapter
 import com.cy.obdproject.base.BaseActivity
@@ -27,6 +30,8 @@ class ResponseListActivity : BaseActivity(), BaseActivity.ClickMethoListener {
     private var mIntent1: Intent? = null
     private var requestList: ArrayList<RequestBean>? = null
     private var adapter: SelectRequestAdapter? = null
+    private val waitTimeMax = 15
+    private var waitTime = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,7 +41,10 @@ class ResponseListActivity : BaseActivity(), BaseActivity.ClickMethoListener {
     }
 
     private fun initView() {
+        findViewById<TextView>(R.id.tv_notice).visibility = View.VISIBLE
+        findViewById<TextView>(R.id.tv_notice).text = "暂无可协助的专家"
         setClickMethod(iv_back)
+        setClickMethod(tv_refresh)
         mIntent1 = Intent(this, WebSocketService::class.java)
         requestList = ArrayList()
         listView!!.setOnItemClickListener { _, _, position, _ ->
@@ -51,52 +59,28 @@ class ResponseListActivity : BaseActivity(), BaseActivity.ClickMethoListener {
             "iv_back" -> {
                 finish()
             }
+            "tv_refresh" -> {
+                if (!isProfessionalConnected) {
+                    net_login()
+                } else {
+                    showDissWait()
+                }
+            }
         }
     }
 
     fun showWaitDialog(isShow: Boolean) {
         dismissProgressDialog()
         if (isShow) {
+            waitTime = waitTimeMax
             if (mAlertDialog != null && mAlertDialog!!.isShowing) {
                 mAlertDialog!!.dismiss()
             }
-            mAlertDialog = AlertDialog.Builder(this).setTitle("提示").setMessage("等待专家应答......").setCancelable(false).setPositiveButton("取消等待") { _, _ ->
-                stopService(mIntent1)
-                mAlertDialog!!.dismiss()
-                finish()
-                overridePendingTransition(0, 0)
-                startActivity(Intent(this@ResponseListActivity, ResponseListActivity::class.java))
-                overridePendingTransition(0, 0)
+            mAlertDialog = AlertDialog.Builder(this).setTitle("提示").setMessage("等待专家应答(${waitTime}s)......").setCancelable(false).setPositiveButton("取消等待") { _, _ ->
+                closeWait()
             }.show()
+            setWaitMessage()
         } else {
-            // 给专家端发送首页信息  用户连接
-//            var data = ""
-//            var bean: ErrorCodeBean = ErrorCodeBean()
-//            bean.code = SPTools.get(this, Constant.CARTYPE, "1").toString()//车型
-//            bean.msg = SPTools.get(this, Constant.CARNAME, "").toString()// 车名
-//            data = Gson().toJson(bean)
-//            val str = "{\"activity\":\"" + "MainActivity" + "\",\"method\":\"" + "setData" + "\",\"data\":\"" + data.replace("\"", "\\\"") + "\"}"
-//            val map = HashMap<String, String>()
-//            map["data"] = str
-//            NetTools.net(map, Urls().updateMsg, this, { response ->
-//                if (response != null && "0" == response.code) {
-//                    try {
-//                        val jsonObject = JSONObject(response.data)
-//                        val webSocketBean = WebSocketBean()
-//                        webSocketBean.s = "" + SPTools[this@ResponseListActivity, Constant.USERID, ""]!!
-//                        // ---------------------------- cyf 需要修改-----------------------------
-//                        webSocketBean.r = "" + SPTools[this@ResponseListActivity, Constant.ZFORUID, ""]!!
-//                        webSocketBean.c = "D"
-//                        webSocketBean.d = jsonObject.optString("id")
-//                        webSocketBean.e = ""
-//                        WebSocketService.getIntance()!!.sendMsg(Gson().toJson(webSocketBean))
-//                    } catch (e: JSONException) {
-//                        e.printStackTrace()
-//                    }
-//
-//                }
-//            }, "正在加载...", false, false)
-
             // 返回主页面
             if (mAlertDialog != null && mAlertDialog!!.isShowing) {
                 mAlertDialog!!.dismiss()
@@ -105,7 +89,32 @@ class ResponseListActivity : BaseActivity(), BaseActivity.ClickMethoListener {
         }
     }
 
-    private fun net_login() {
+    private fun setWaitMessage() {
+        Handler().postDelayed({
+            if (mAlertDialog != null && mAlertDialog!!.isShowing) {
+                if (waitTime == 0) {
+                    waitTime = waitTimeMax
+                    closeWait()
+                } else {
+                    mAlertDialog!!.setMessage("等待专家应答(${--waitTime}s)......")
+                    setWaitMessage()
+                }
+            }
+        }, 1000)
+    }
+
+    private fun closeWait() {
+        if (mAlertDialog != null && mAlertDialog!!.isShowing) {
+            stopService(mIntent1)
+            mAlertDialog!!.dismiss()
+            finish()
+            overridePendingTransition(0, 0)
+            startActivity(Intent(this@ResponseListActivity, ResponseListActivity::class.java))
+            overridePendingTransition(0, 0)
+        }
+    }
+
+    fun net_login() {
         val map = hashMapOf<String, String>()
         map["username"] = SPTools[this, Constant.USERNAME, ""].toString()
         map["pwd"] = SPTools[this, Constant.PASSWORD, ""].toString()
@@ -129,6 +138,13 @@ class ResponseListActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                 val beans = Gson().fromJson<List<RequestBean>>(response.data, object : TypeToken<ArrayList<RequestBean>>() {}.type) as ArrayList<RequestBean>?
                 requestList!!.clear()
                 requestList!!.addAll(beans!!)
+                if (requestList!!.size > 0) {
+                    findViewById<TextView>(R.id.tv_notice).visibility = View.GONE
+                } else {
+                    findViewById<TextView>(R.id.tv_notice).visibility = View.VISIBLE
+                    findViewById<TextView>(R.id.tv_notice).text = "暂无可协助的专家"
+                }
+                listView.visibility = View.VISIBLE
                 if (adapter == null) {
                     adapter = SelectRequestAdapter(requestList!!, this)
                     listView!!.adapter = adapter

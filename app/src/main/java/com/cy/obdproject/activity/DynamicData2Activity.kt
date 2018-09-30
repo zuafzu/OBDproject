@@ -1,8 +1,10 @@
 package com.cy.obdproject.activity
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.os.Handler
+import android.os.Message
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -13,17 +15,18 @@ import com.cy.obdproject.R
 import com.cy.obdproject.base.BaseActivity
 import com.cy.obdproject.bean.DynamicDataBean
 import com.cy.obdproject.constant.Constant
-import com.cy.obdproject.socket.SocketService
-import com.cy.obdproject.worker.DynamicDataWorker
+import com.cy.obdproject.tools.LogTools
 import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.activity_dynamic_data2.*
 import org.jetbrains.anko.toast
+import org.json.JSONArray
 import java.util.concurrent.CopyOnWriteArrayList
 
 class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
 
-    private var dynamicDataWorker: DynamicDataWorker? = null
+    private var code = ""
+
+    // private var dynamicDataWorker: DynamicDataWorker? = null
     private var listData = CopyOnWriteArrayList<DynamicDataBean>()
     private var adapter: ControlDynamicDataAdapter? = null
     var pageIndex = 0
@@ -31,6 +34,9 @@ class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
     private var time = 500L
 
     private var pageCount = 0
+
+    private var handler1: Handler? = null
+    private var handler2: Handler? = null
 
     companion object {
         var isStart: Boolean = true
@@ -48,6 +54,7 @@ class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
     }
 
     private fun initView() {
+        code = intent.getStringExtra("code")
 
         setClickMethod(iv_back)
         setClickMethod(btn_lastPage)
@@ -85,7 +92,7 @@ class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
                 Log.e("zj", "count = " + adapter!!.count)
             }
         } else {
-            toast("shujuqueshi")
+            toast("数据缺失")
         }
     }
 
@@ -94,18 +101,27 @@ class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
             Log.i("cyf", "data : $data")
             dismissProgressDialog()
             try {
-                val mlist = Gson().fromJson<List<DynamicDataBean>>(data, object : TypeToken<ArrayList<DynamicDataBean>>() {}.type) as ArrayList<DynamicDataBean>?
-                listData!!.clear()
-                listData!!.addAll(mlist!!)
-                if (adapter == null) {
-                    adapter = ControlDynamicDataAdapter(listData!!, this)
-                    listView!!.adapter = adapter
+                if (data!!.startsWith("toast")) {
+                    toast(data!!.replace("toast", ""))
                 } else {
-                    adapter!!.notifyDataSetChanged()
+                    val jo = JSONArray(data)
+                    //val mlist = Gson().fromJson<List<DynamicDataBean>>(data, object : TypeToken<ArrayList<DynamicDataBean>>() {}.type) as ArrayList<DynamicDataBean>?
+                    for (i in 0 until jo!!.length()) {
+                        for (j in 0 until listData!!.size) {
+                            if (listData[j].name == jo.optJSONObject(i).optString("Name")) {
+                                listData[j].value = jo.optJSONObject(i).optString("Value")
+                            }
+                        }
+                    }
+                    if (adapter == null) {
+                        adapter = ControlDynamicDataAdapter(listData!!, this)
+                        listView!!.adapter = adapter
+                    } else {
+                        adapter!!.notifyDataSetChanged()
+                    }
                 }
             } catch (e: Exception) {
-                Log.i("cyf", "e : ${e.message}")
-                toast(data!!)
+                LogTools.errLog(e)
             }
             super.setData(data)
         }
@@ -115,33 +131,59 @@ class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
         if (isProfessionalConnected) {// 专家连接
 
         } else {
-            showProgressDialog()
-            if (SocketService.getIntance() != null && SocketService.getIntance()!!.isConnected()) {
-                dynamicDataWorker = DynamicDataWorker()
-                dynamicDataWorker!!.init(this, listData) { data ->
-                    setData(data)
-                    if (!isStart) {
-                        Handler().postDelayed({
-                            if (!isStart) {
-                                dynamicDataWorker!!.start(getPageList(listData!!, Constant.pageSize)[pageIndex])
-                            }
-                        }, time)
-                    }
-                }
-                dynamicDataWorker!!.start(getPageList(listData!!, Constant.pageSize)[pageIndex])
-            }
+            start()
         }
     }
+
+    private fun start() {
+        handler1 = @SuppressLint("HandlerLeak")
+        object : Handler() {
+            override fun handleMessage(msg: Message) {
+                super.handleMessage(msg)
+                myApp.publicUnit.setBreak(true)
+                setData("toast" + msg.obj.toString())
+            }
+        }
+        myApp.publicUnit.InitDynamicData(@SuppressLint("HandlerLeak")
+        object : Handler() {
+            override fun handleMessage(msg: Message) {
+                when (msg.what) {
+                    4 -> {
+                        val data = msg.obj.toString()
+                        setData(data)
+                    }
+                }
+                super.handleMessage(msg)
+            }
+        }, Gson().toJson(getPageList(listData!!, Constant.pageSize)[pageIndex]))
+        myApp.publicUnit.SetEvent(handler1, code.split(",")[1])
+    }
+
+    private fun stop() {
+        handler2 = @SuppressLint("HandlerLeak")
+        object : Handler() {
+            override fun handleMessage(msg: Message) {
+                super.handleMessage(msg)
+                myApp.publicUnit.setBreak(true)
+                setData("toast" + msg.obj.toString())
+            }
+        }
+        myApp.publicUnit.SetEvent(handler2, code.split(",")[2])
+    }
+
 
     override fun doMethod(string: String?) {
         when (string) {
             "iv_back" -> {
-                var time = time+100L
+                var time = time + 100L
                 if (isStart) {
                     time = 0L
+                } else {
+                    toast("停止读取动态数据")
                 }
                 isStart = true
-                dynamicDataWorker = null
+                stop()
+                // dynamicDataWorker = null
                 showProgressDialog()
                 Handler().postDelayed({
                     btn_start.text = "开始"
@@ -150,12 +192,15 @@ class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
                 }, time)
             }
             "btn_lastPage" -> {
-                var time = time+100L
+                var time = time + 100L
                 if (isStart) {
                     time = 0L
+                } else {
+                    toast("停止读取动态数据")
                 }
                 isStart = true
-                dynamicDataWorker = null
+                stop()
+                // dynamicDataWorker = null
                 showProgressDialog()
                 Handler().postDelayed({
                     if (pageCount > 1 && Constant.pageSize > 0) {
@@ -166,12 +211,15 @@ class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
                 }, time)
             }
             "btn_nextPage" -> {
-                var time = time+100L
+                var time = time + 100L
                 if (isStart) {
                     time = 0L
+                } else {
+                    toast("停止读取动态数据")
                 }
                 isStart = true
-                dynamicDataWorker = null
+                stop()
+                // dynamicDataWorker = null
                 showProgressDialog()
                 Handler().postDelayed({
                     if (pageCount > 1) {
@@ -184,16 +232,20 @@ class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
             "btn_start" -> {
                 Log.e("zj", "当前页 List = " + getPageList(listData!!, Constant.pageSize)[pageIndex])
                 if (isStart) {
+                    toast("开始读取动态数据")
                     btn_start.text = "停止"
                     isStart = false
                     initData()
                 } else {
-                    var time = time+100L
+                    var time = time + 100L
                     if (isStart) {
                         time = 0L
+                    } else {
+                        toast("停止读取动态数据")
                     }
                     isStart = true
-                    dynamicDataWorker = null
+                    stop()
+                    // dynamicDataWorker = null
                     showProgressDialog()
                     Handler().postDelayed({
                         dismissProgressDialog()
@@ -205,8 +257,16 @@ class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
     }
 
     override fun onBackPressed() {
-        btn_start.text = "开始"
-        isStart = true
+        if (!isUserConnected && !isProfessionalConnected) {
+            btn_start.text = "开始"
+            if (isStart) {
+                time = 0L
+            } else {
+                toast("停止读取动态数据")
+            }
+            isStart = true
+            stop()
+        }
         super.onBackPressed()
     }
 
@@ -259,11 +319,7 @@ class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
             // 值的总个数-前几页的个数就是这一页要显示的个数，如果比默认的值小，说明这是最后一页，只需显示这么多就可以了
             return if (items!!.size - ori < Constant.pageSize) {
                 items!!.size - ori
-
-//                Log.e("zj","getCount 111= "+(items!!.size - ori))
             } else {
-//                Log.e("zj","getCount 222 = "+Constant.pageSize)
-
                 Constant.pageSize
             }// 如果比默认的值还要大，说明一页显示不完，还要用换一页显示，这一页用默认的值显示满就可以了。
         }
@@ -292,12 +348,6 @@ class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
             }
             holder.tv_name!!.text = items.get(position + pageIndex * Constant.pageSize).name
             holder.tv_value!!.text = items.get(position + pageIndex * Constant.pageSize).value
-
-            //        if (position != (getCount() - 1)) {
-            //            holder.view_line.setVisibility(View.VISIBLE);
-            //        } else {
-            //            holder.view_line.setVisibility(View.GONE);
-            //        }
             return convertView
         }
 

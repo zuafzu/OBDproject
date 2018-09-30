@@ -2,12 +2,10 @@ package com.cy.obdproject.activity
 
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.app.AlertDialog
 import android.view.KeyEvent
 import android.view.View
 import com.cy.obdproject.R
 import com.cy.obdproject.adapter.SelectRequestAdapter
-import com.cy.obdproject.app.MyApp
 import com.cy.obdproject.base.BaseActivity
 import com.cy.obdproject.bean.RequestBean
 import com.cy.obdproject.bean.WebSocketBean
@@ -55,7 +53,7 @@ class RequestListActivity : BaseActivity(), BaseActivity.ClickMethoListener {
             webSocketBean.d = "z"
             WebSocketService.getIntance()!!.sendMsg(Gson().toJson(webSocketBean))
         }
-        iv_quit.visibility = View.INVISIBLE
+        iv_quit.visibility = View.VISIBLE
     }
 
     override fun doMethod(string: String?) {
@@ -64,13 +62,8 @@ class RequestListActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                 finish()
             }
             "iv_quit" -> {
-                AlertDialog.Builder(this).setTitle("提示").setMessage("确认退出当前账号？").setPositiveButton("确认") { _, _ ->
-                    SPTools.clear(this@RequestListActivity)
-                    for (i in 0 until (application as MyApp).activityList.size) {
-                        (application as MyApp).activityList[i].finish()
-                    }
-                    startActivity(Intent(this@RequestListActivity, LoginActivity::class.java))
-                }.setNegativeButton("取消") { _, _ -> }.show()
+                val mIntent = Intent(this@RequestListActivity, SettingActivity::class.java)
+                startActivity(mIntent)
             }
 
         }
@@ -82,9 +75,20 @@ class RequestListActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                 toast("再按一次退出程序")
                 mExitTime = System.currentTimeMillis()
             } else {
+                if( WebSocketService.getIntance()!=null){
+                    WebSocketService.getIntance()!!.stopSelf()
+                }
                 val ip = SPTools[this@RequestListActivity, Constant.IP, ""]
+                val ModuleFile = SPTools[this, "ModuleFile", ""] as String
+                val ControlFile = SPTools[this, "ControlFile", ""] as String
+                val USERNAME = SPTools[this, Constant.USERNAME, ""] as String
+                val PASSWORD = SPTools[this, Constant.PASSWORD, ""] as String
                 SPTools.clear(this@RequestListActivity)
                 SPTools.put(this@RequestListActivity, Constant.IP, ip!!)
+                SPTools.put(this@RequestListActivity, "ModuleFile", ModuleFile)
+                SPTools.put(this@RequestListActivity, "ControlFile", ControlFile)
+                SPTools.put(this@RequestListActivity, Constant.USERNAME, USERNAME)
+                SPTools.put(this@RequestListActivity, Constant.PASSWORD, PASSWORD)
                 finish()
             }
             return true

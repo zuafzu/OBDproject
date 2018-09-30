@@ -1,5 +1,6 @@
 package com.cy.obdproject.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,6 +38,7 @@ public class WriteDataAdapter extends BaseAdapter {
         return position;
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         Holder holder = null;
@@ -50,13 +52,31 @@ public class WriteDataAdapter extends BaseAdapter {
         } else {
             holder = (Holder) convertView.getTag();
         }
-        holder.tv_name.setText(items.get(position).getFileName());
-        holder.tv_value.setVisibility(View.GONE);
-//        if (position != (getCount() - 1)) {
-//            holder.view_line.setVisibility(View.VISIBLE);
-//        } else {
-//            holder.view_line.setVisibility(View.GONE);
-//        }
+        holder.tv_value.setVisibility(View.VISIBLE);
+        String[] str = items.get(position).getFileName().split("\\.");
+        String name2 = str[str.length - 1];
+        if (items.get(position).getFileName().contains("_")) {
+            String name1 = items.get(position).getFileName().split("_")[0];
+            holder.tv_value.setText(name2.toUpperCase() + "  " + name1);
+            if ("1".equals(items.get(position).getLocalHas())) {
+                holder.tv_name.setText(items.get(position).getFileName().
+                        replace(name1 + "_", "").
+                        replace("." + name2, "") + "(本地)");
+            } else {
+                holder.tv_name.setText(items.get(position).getFileName().
+                        replace(name1 + "_", "").
+                        replace("." + name2, ""));
+            }
+        } else {
+            holder.tv_value.setText(name2.toUpperCase());
+            if ("1".equals(items.get(position).getLocalHas())) {
+                holder.tv_name.setText(items.get(position).getFileName().
+                        replace("." + name2, "") + "(本地)");
+            } else {
+                holder.tv_name.setText(items.get(position).getFileName().
+                        replace("." + name2, ""));
+            }
+        }
         return convertView;
     }
 

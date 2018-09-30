@@ -1,6 +1,10 @@
 package com.cy.obdproject.activity
 
+import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Message
 import android.util.Log
 import android.view.View
 import com.cy.obdproject.R
@@ -8,34 +12,82 @@ import com.cy.obdproject.adapter.ErrorCodeAdapter
 import com.cy.obdproject.base.BaseActivity
 import com.cy.obdproject.bean.ErrorCodeBean
 import com.cy.obdproject.socket.SocketService
-import com.cy.obdproject.worker.ErrorCodeClearWorker
-import com.cy.obdproject.worker.ErrorCodeWorker
+import com.cy.obdproject.tools.LogTools
 import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.activity_error_code.*
 import org.jetbrains.anko.toast
+import org.json.JSONArray
+import java.util.*
+
 
 class ErrorCodeActivity : BaseActivity(), BaseActivity.ClickMethoListener, ErrorCodeAdapter.OnErrorCodeClick {
 
+    private var code = ""
+
     private var list: ArrayList<ErrorCodeBean>? = null
     private var adapter: ErrorCodeAdapter? = null
-    private var errorCodeWorker: ErrorCodeWorker? = null
-    private var errorCodeClearWorker: ErrorCodeClearWorker? = null
+    // private var errorCodeWorker: ErrorCodeWorker? = null
+    // private var errorCodeClearWorker: ErrorCodeClearWorker? = null
+
+    private var handler: Handler? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_error_code)
         initView()
-        initData()
+        initData(code.split(",")[0])
     }
 
-    private fun initData() {
+    private fun initData(mCode: String) {
         if (isProfessionalConnected) {// 专家连接
+            showDissWait()
             doMethod("tv_refresh")
         } else {
             showProgressDialog()
             if (SocketService.getIntance() != null && SocketService.getIntance()!!.isConnected()) {
-                errorCodeWorker!!.start()
+                handler = @SuppressLint("HandlerLeak")
+                object : Handler() {
+                    override fun handleMessage(msg: Message) {
+                        super.handleMessage(msg)
+                        myApp.publicUnit.setBreak(true)
+                        setData("toast" + msg.obj.toString())
+                    }
+                }
+                try {
+                    myApp.publicUnit.setMessageHandler(@SuppressLint("HandlerLeak")
+                    object : Handler() {
+                        override fun handleMessage(msg: Message) {
+                            when (msg.what) {
+                                0 -> {
+                                    val data = msg.obj.toString()
+                                    // toast(data)
+                                    setData("toast2$data")
+                                }
+                                2 -> {
+                                    val data = msg.obj.toString()
+                                    setData(data)
+                                }
+                            }
+                            super.handleMessage(msg)
+                        }
+                    })
+                    myApp.publicUnit.SetEvent(handler, mCode)
+
+                    Thread {
+                        while (true) {
+                            val isRun = myApp.publicUnit.GetScriptIsRun(mCode)
+                            if (!isRun) {
+                                runOnUiThread {
+                                    // 完成
+                                    dismissProgressDialog()
+                                }
+                                break
+                            }
+                        }
+                    }.start()
+                } catch (e: Exception) {
+                    LogTools.errLog(e)
+                }
             } else {
                 list!!.clear()
                 setData(Gson().toJson(list))
@@ -44,14 +96,7 @@ class ErrorCodeActivity : BaseActivity(), BaseActivity.ClickMethoListener, Error
     }
 
     private fun initView() {
-        errorCodeWorker = ErrorCodeWorker()
-        errorCodeWorker!!.init(this) { data ->
-            setData(data)
-        }
-        errorCodeClearWorker = ErrorCodeClearWorker()
-        errorCodeClearWorker!!.init(this) { data ->
-            setData(data)
-        }
+        code = intent.getStringExtra("code")
         setClickMethod(iv_back)
         setClickMethod(tv_refresh)
         setClickMethod(btn_clean)
@@ -61,30 +106,44 @@ class ErrorCodeActivity : BaseActivity(), BaseActivity.ClickMethoListener, Error
     override fun setData(data: String?) {
         runOnUiThread {
             Log.i("cyf", "data : $data")
-            dismissProgressDialog()
-            try {
-                val mlist = Gson().fromJson<List<ErrorCodeBean>>(data, object : TypeToken<ArrayList<ErrorCodeBean>>() {}.type) as ArrayList<ErrorCodeBean>?
-                list!!.clear()
-                list!!.addAll(mlist!!)
-                if (adapter == null) {
-                    adapter = ErrorCodeAdapter(list!!, this)
-                    listView!!.adapter = adapter
-                } else {
-                    adapter!!.notifyDataSetChanged()
-                }
-                adapter!!.setOnErrorCodeClick(this)
-                if (list!!.size == 0) {
-                    tv_msg.visibility = View.VISIBLE
-                } else {
-                    tv_msg.visibility = View.GONE
-                }
-            } catch (e: Exception) {
+            if (data!!.startsWith("toast")) {
                 // Log.i("cyf", "e : ${e.message}")
-                toast(data!!)
+                toast(data!!.replace("toast2", "").replace("toast", ""))
                 if ("清空数据成功" == data) {
                     list!!.clear()
                     tv_msg.visibility = View.VISIBLE
                     adapter!!.notifyDataSetChanged()
+                }
+            } else {
+                if (!data!!.startsWith("toast2")) {
+                    dismissProgressDialog()
+                }
+                try {
+                    list!!.clear()
+                    val jsonArray = JSONArray(data)
+                    for (i in 0 until jsonArray.length()) {
+                        val iterator = jsonArray.getJSONObject(i).keys()
+                        while (iterator.hasNext()) {
+                            val key = iterator.next() + ""
+                            if (key != "data") {
+                                list!!.add(ErrorCodeBean(key, jsonArray.getJSONObject(i).optString(key), jsonArray.getJSONObject(i).optString("data")))
+                            }
+                        }
+                    }
+                    if (adapter == null) {
+                        adapter = ErrorCodeAdapter(list!!, this)
+                        listView!!.adapter = adapter
+                    } else {
+                        adapter!!.notifyDataSetChanged()
+                    }
+                    adapter!!.setOnErrorCodeClick(this)
+                    if (list!!.size == 0) {
+                        tv_msg.visibility = View.VISIBLE
+                    } else {
+                        tv_msg.visibility = View.GONE
+                    }
+                } catch (e: Exception) {
+                    LogTools.errLog(e)
                 }
             }
             super.setData(data)
@@ -93,7 +152,11 @@ class ErrorCodeActivity : BaseActivity(), BaseActivity.ClickMethoListener, Error
 
     override fun setOnErrorCodeClick(id: String?, position: Int) {
         sendClick(this@ErrorCodeActivity.localClassName, "" + position)
-        toast("" + position)
+        val mIntent = Intent(this, ErrorCode2Activity::class.java)
+        mIntent.putExtra("data", list!![position].data)
+        mIntent.putExtra("code", code)
+        startActivity(mIntent)
+        // toast("" + position)
     }
 
     override fun doMethod(string: String?) {
@@ -103,12 +166,57 @@ class ErrorCodeActivity : BaseActivity(), BaseActivity.ClickMethoListener, Error
             }
             "tv_refresh" -> {
                 if (!isProfessionalConnected) {// 专家连接
-                    initData()
+                    initData(code.split(",")[1])
+                } else {
+                    showDissWait()
                 }
             }
             "btn_clean" -> {
+                showProgressDialog()
                 if (!isProfessionalConnected) {// 专家连接
-                    errorCodeClearWorker!!.start()
+                    handler = @SuppressLint("HandlerLeak")
+                    object : Handler() {
+                        override fun handleMessage(msg: Message) {
+                            super.handleMessage(msg)
+                            myApp.publicUnit.setBreak(true)
+                            setData("toast" + msg.obj.toString())
+                        }
+                    }
+                    try {
+                        myApp.publicUnit.setMessageHandler(@SuppressLint("HandlerLeak")
+                        object : Handler() {
+                            override fun handleMessage(msg: Message) {
+                                when (msg.what) {
+                                    0 -> {
+                                        val data = msg.obj.toString()
+                                        // toast(data)
+                                        setData("toast2$data")
+                                    }
+                                    2 -> {
+                                        val data = msg.obj.toString()
+                                        setData(data)
+                                    }
+                                }
+                                super.handleMessage(msg)
+                            }
+                        })
+                        myApp.publicUnit.SetEvent(handler, code.split(",")[3])
+
+                        Thread {
+                            while (true) {
+                                val isRun = myApp.publicUnit.GetScriptIsRun(code.split(",")[3])
+                                if (!isRun) {
+                                    runOnUiThread {
+                                        // 完成
+                                        dismissProgressDialog()
+                                    }
+                                    break
+                                }
+                            }
+                        }.start()
+                    } catch (e: Exception) {
+                        LogTools.errLog(e)
+                    }
                 }
             }
             else -> {

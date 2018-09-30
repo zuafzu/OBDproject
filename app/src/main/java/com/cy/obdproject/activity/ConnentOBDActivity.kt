@@ -87,9 +87,6 @@ class ConnentOBDActivity : BaseActivity(), BaseActivity.ClickMethoListener {
 
                 } else {
                     tv_wifiState.text = "热点是否开启：未开启"
-//                    ll_ip.visibility = View.GONE
-//                    ll_input_ip.visibility = View.GONE
-//                    ll_ok.visibility = View.GONE
                 }
             }
             "btn_seeIp" -> {
@@ -114,6 +111,7 @@ class ConnentOBDActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                 }
                 if (btn_ok.text == "保存") {
                     SPTools.put(this@ConnentOBDActivity, Constant.IP, et_input_ip.text.toString())
+                    myApp.publicUnit.setScriptManagerParam(true, true, et_input_ip.text.toString(), Constant.mDstPort)
                     toast("保存成功")
                     finish()
                 } else {
@@ -135,6 +133,7 @@ class ConnentOBDActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                                         SocketService.getIntance()!!.isConnected()) {
                                     this.finish()
                                     SPTools.put(this@ConnentOBDActivity, Constant.IP, et_input_ip.text.toString())
+                                    myApp.publicUnit.setScriptManagerParam(true, true, et_input_ip.text.toString(), Constant.mDstPort)
                                     startActivity(Intent(this@ConnentOBDActivity, SelectCarTypeActivity::class.java))
                                 } else {
                                     toast("连接失败，请重试")

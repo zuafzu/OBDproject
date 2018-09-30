@@ -1,67 +1,86 @@
 package com.cy.obdproject.activity
 
+import android.annotation.SuppressLint
 import android.os.Bundle
+import android.os.Handler
+import android.os.Message
 import android.util.Log
 import com.cy.obdproject.R
 import com.cy.obdproject.adapter.BaseInfoAdapter
 import com.cy.obdproject.base.BaseActivity
 import com.cy.obdproject.bean.BaseInfoBean
-import com.cy.obdproject.constant.ECUConstant
-import com.cy.obdproject.socket.SocketService
-import com.cy.obdproject.worker.BaseInfoWorker
+import com.cy.obdproject.tools.LogTools
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.activity_read_base_info.*
 import org.jetbrains.anko.toast
+import org.json.JSONObject
 
 class ReadBaseInfoActivity : BaseActivity(), BaseActivity.ClickMethoListener {
 
-    private var readBaseInfoWorker: BaseInfoWorker? = null
+    private var code = ""
+
     private var list: ArrayList<BaseInfoBean>? = null
     private var baseInfoAdapter: BaseInfoAdapter? = null
+
+    private var handler: Handler? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_read_base_info)
         initView()
-        initData()
+        initData(code.split(",")[0])
     }
 
     private fun initView() {
+        code = intent.getStringExtra("code")
         list = ArrayList()
-
-        list!!.clear()
-        for (i in 0 until ECUConstant.getReadBaseInfoData().size) {
-            val bean = BaseInfoBean()
-            bean.name = ECUConstant.getReadBaseInfoData()[i].name
-            list!!.add(bean)
-        }
-        setData(Gson().toJson(list))
-
-        readBaseInfoWorker = BaseInfoWorker()
-        readBaseInfoWorker!!.init(this, ECUConstant.getReadBaseInfoData()) { data ->
-            setData(data)
-        }
         setClickMethod(iv_back)
         setClickMethod(tv_refresh)
     }
 
-    private fun initData() {
-
+    private fun initData(mCode: String) {
         if (isProfessionalConnected) {// 专家连接
+            showDissWait()
             doMethod("tv_refresh")
         } else {
             showProgressDialog()
-            if (SocketService.getIntance() != null && SocketService.getIntance()!!.isConnected()) {
-                readBaseInfoWorker!!.start()
-            } else {
-                list!!.clear()
-                for (i in 0 until ECUConstant.getReadBaseInfoData().size) {
-                    val bean = BaseInfoBean()
-                    bean.name = ECUConstant.getReadBaseInfoData()[i].name
-                    list!!.add(bean)
+            handler = @SuppressLint("HandlerLeak")
+            object : Handler() {
+                override fun handleMessage(msg: Message) {
+                    super.handleMessage(msg)
+                    myApp.publicUnit.setBreak(true)
+                    setData("toast" + msg.obj.toString())
                 }
-                setData(Gson().toJson(list))
+            }
+            try {
+                myApp.publicUnit.setMessageHandler(@SuppressLint("HandlerLeak")
+                object : Handler() {
+                    override fun handleMessage(msg: Message) {
+                        when (msg.what) {
+                            3 -> {
+                                val data = msg.obj.toString()
+                                setData(data)
+                            }
+                        }
+                        super.handleMessage(msg)
+                    }
+                })
+                myApp.publicUnit.SetEvent(handler, mCode)
+                Thread {
+                    while (true) {
+                        val isRun = myApp.publicUnit.GetScriptIsRun(mCode)
+                        if (!isRun) {
+                            runOnUiThread {
+                                // 完成
+                                dismissProgressDialog()
+                            }
+                            break
+                        }
+                    }
+                }.start()
+            } catch (e: Exception) {
+                LogTools.errLog(e)
             }
         }
     }
@@ -69,20 +88,49 @@ class ReadBaseInfoActivity : BaseActivity(), BaseActivity.ClickMethoListener {
     override fun setData(data: String) {
         runOnUiThread {
             Log.i("cyf", "data : $data")
-            dismissProgressDialog()
-            try {
-                val mlist = Gson().fromJson<List<BaseInfoBean>>(data, object : TypeToken<ArrayList<BaseInfoBean>>() {}.type) as ArrayList<BaseInfoBean>?
-                list!!.clear()
-                list!!.addAll(mlist!!)
-                if (baseInfoAdapter == null) {
-                    baseInfoAdapter = BaseInfoAdapter(list!!, this@ReadBaseInfoActivity, 1)
-                    listView!!.adapter = baseInfoAdapter
-                } else {
-                    baseInfoAdapter!!.notifyDataSetChanged()
+            if(data.startsWith("toast")){
+                toast(data!!.replace("toast", ""))
+                dismissProgressDialog()
+            }else{
+                try {
+                    val mlist = Gson().fromJson<List<BaseInfoBean>>(data, object : TypeToken<ArrayList<BaseInfoBean>>() {}.type) as ArrayList<BaseInfoBean>?
+                    list!!.clear()
+                    list!!.addAll(mlist!!)
+                    if (baseInfoAdapter == null) {
+                        baseInfoAdapter = BaseInfoAdapter(list!!, this@ReadBaseInfoActivity, 1)
+                        listView!!.adapter = baseInfoAdapter
+                    } else {
+                        baseInfoAdapter!!.notifyDataSetChanged()
+                    }
+                    dismissProgressDialog()
+                } catch (e: Exception) {
+                    Log.i("cyf", "e : ${e.message}")
+                    try {
+                        val jo = JSONObject(data)
+                        val ja = jo.optJSONArray("List")
+                        list!!.clear()
+                        for (i in 0 until ja.length()) {
+                            val jo1 = ja.optJSONObject(i)
+                            val Name = jo1.optString("Name")
+                            if (jo1.has("Value")) {
+                                list!!.add(BaseInfoBean("", Name, "", "", "", jo1.optString("Value")))
+                            } else {
+                                list!!.add(BaseInfoBean("", Name, "", "", "", ""))
+                            }
+                        }
+                        if (baseInfoAdapter == null) {
+                            baseInfoAdapter = BaseInfoAdapter(list!!, this@ReadBaseInfoActivity, 1)
+                            listView!!.adapter = baseInfoAdapter
+                        } else {
+                            baseInfoAdapter!!.notifyDataSetChanged()
+                        }
+                        if (list!!.size == 0 || list!![0].value != "") {
+                            dismissProgressDialog()
+                        }
+                    } catch (e: Exception) {
+                        LogTools.errLog(e)
+                    }
                 }
-            } catch (e: Exception) {
-                Log.i("cyf", "e : ${e.message}")
-                toast(data!!)
             }
             super.setData(data)
         }
@@ -95,7 +143,9 @@ class ReadBaseInfoActivity : BaseActivity(), BaseActivity.ClickMethoListener {
             }
             "tv_refresh" -> {
                 if (!isProfessionalConnected) {// 专家连接
-                    initData()
+                    initData(code.split(",")[1])
+                } else {
+                    showDissWait()
                 }
             }
         }

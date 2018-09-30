@@ -4,12 +4,8 @@ import com.cy.obdproject.bean.BaseInfoBean;
 import com.cy.obdproject.bean.DynamicDataBean;
 import com.cy.obdproject.bean.ErrorCodeBean;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import jxl.Sheet;
-import jxl.Workbook;
 
 public class ECUConstant {
 
@@ -50,26 +46,27 @@ public class ECUConstant {
 //        socketBeanList.add(new SocketBean("a2l文件ID：", 1, "22F1AA"));
 //        socketBeanList.add(new SocketBean("噪声Simu语音配置：", 1, "22F1AB"));
 //        return socketBeanList;
-        ArrayList<BaseInfoBean> socketBeanList = new ArrayList<>();
-        try {
-            Workbook book = Workbook.getWorkbook(new File(Constant.xlsFilePath));
-            // 获得第一个工作表对象
-            Sheet sheet = book.getSheet(5);
-            for (int j = 0; j < sheet.getRows(); j++) {
-                if (j != 0) {
-                    if (!(sheet.getCell(0, j)).getContents().isEmpty() && !(sheet.getCell(1, j)).getContents().isEmpty()) {
-                        BaseInfoBean baseInfoBean = new BaseInfoBean();
-                        baseInfoBean.setId("22" + sheet.getCell(0, j).getContents().replace(" ", ""));
-                        baseInfoBean.setName(sheet.getCell(1, j).getContents());
-                        baseInfoBean.setParsingType(sheet.getCell(9, j).getContents());
-                        baseInfoBean.setEnumValue(sheet.getCell(10, j).getContents());
-                        socketBeanList.add(baseInfoBean);
-                    }
-                }
-            }
-        } catch (Exception e) {
 
-        }
+        ArrayList<BaseInfoBean> socketBeanList = new ArrayList<>();
+//        try {
+//            Workbook book = Workbook.getWorkbook(new File(Constant.xlsFilePath));
+//            // 获得第一个工作表对象
+//            Sheet sheet = book.getSheet(5);
+//            for (int j = 0; j < sheet.getRows(); j++) {
+//                if (j != 0) {
+//                    if (!(sheet.getCell(0, j)).getContents().isEmpty() && !(sheet.getCell(1, j)).getContents().isEmpty()) {
+//                        BaseInfoBean baseInfoBean = new BaseInfoBean();
+//                        baseInfoBean.setId("22" + sheet.getCell(0, j).getContents().replace(" ", ""));
+//                        baseInfoBean.setName(sheet.getCell(1, j).getContents());
+//                        baseInfoBean.setParsingType(sheet.getCell(9, j).getContents());
+//                        baseInfoBean.setEnumValue(sheet.getCell(10, j).getContents());
+//                        socketBeanList.add(baseInfoBean);
+//                    }
+//                }
+//            }
+//        } catch (Exception e) {
+//
+//        }
         return socketBeanList;
     }
 
@@ -91,27 +88,28 @@ public class ECUConstant {
 //        socketBeanList.add(new SocketBean("噪声Simu语音配置：", 1, "22F1AB"));
 //        socketBeanList.add(new SocketBean("车辆配置信息：", 1, "22F1A1"));
 //        return socketBeanList;
-        ArrayList<BaseInfoBean> socketBeanList = new ArrayList<>();
-        try {
-            Workbook book = Workbook.getWorkbook(new File(Constant.xlsFilePath));
-            // 获得第一个工作表对象
-            Sheet sheet = book.getSheet(7);
-            for (int j = 0; j < sheet.getRows(); j++) {
-                if (j != 0) {
-                    if (!(sheet.getCell(0, j)).getContents().isEmpty() && !(sheet.getCell(1, j)).getContents().isEmpty()) {
-                        BaseInfoBean baseInfoBean = new BaseInfoBean();
-                        baseInfoBean.setId("22" + sheet.getCell(0, j).getContents().replace(" ", ""));
-                        baseInfoBean.setName(sheet.getCell(1, j).getContents());
-                        baseInfoBean.setByteLength(sheet.getCell(4, j).getContents().replace(" ", ""));
-                        baseInfoBean.setParsingType(sheet.getCell(9, j).getContents().replace(" ", ""));
-                        baseInfoBean.setEnumValue(sheet.getCell(10, j).getContents().replace(" ", ""));
-                        socketBeanList.add(baseInfoBean);
-                    }
-                }
-            }
-        } catch (Exception e) {
 
-        }
+        ArrayList<BaseInfoBean> socketBeanList = new ArrayList<>();
+//        try {
+//            Workbook book = Workbook.getWorkbook(new File(Constant.xlsFilePath));
+//            // 获得第一个工作表对象
+//            Sheet sheet = book.getSheet(7);
+//            for (int j = 0; j < sheet.getRows(); j++) {
+//                if (j != 0) {
+//                    if (!(sheet.getCell(0, j)).getContents().isEmpty() && !(sheet.getCell(1, j)).getContents().isEmpty()) {
+//                        BaseInfoBean baseInfoBean = new BaseInfoBean();
+//                        baseInfoBean.setId("22" + sheet.getCell(0, j).getContents().replace(" ", ""));
+//                        baseInfoBean.setName(sheet.getCell(1, j).getContents());
+//                        baseInfoBean.setByteLength(sheet.getCell(4, j).getContents().replace(" ", ""));
+//                        baseInfoBean.setParsingType(sheet.getCell(9, j).getContents().replace(" ", ""));
+//                        baseInfoBean.setEnumValue(sheet.getCell(10, j).getContents().replace(" ", ""));
+//                        socketBeanList.add(baseInfoBean);
+//                    }
+//                }
+//            }
+//        } catch (Exception e) {
+//
+//        }
         return socketBeanList;
     }
 
@@ -133,27 +131,28 @@ public class ECUConstant {
 //        socketBeanList.add(new SocketBean("噪声Simu语音配置：", 1, "2EF1AB"));
 //        socketBeanList.add(new SocketBean("车辆配置信息：", 1, "2EF1A1"));
 //        return socketBeanList;
-        ArrayList<BaseInfoBean> socketBeanList = new ArrayList<>();
-        try {
-            Workbook book = Workbook.getWorkbook(new File(Constant.xlsFilePath));
-            // 获得第一个工作表对象
-            Sheet sheet = book.getSheet(7);
-            for (int j = 0; j < sheet.getRows(); j++) {
-                if (j != 0) {
-                    if (!(sheet.getCell(0, j)).getContents().isEmpty() && !(sheet.getCell(1, j)).getContents().isEmpty()) {
-                        BaseInfoBean baseInfoBean = new BaseInfoBean();
-                        baseInfoBean.setId("2E" + sheet.getCell(0, j).getContents().replace(" ", ""));
-                        baseInfoBean.setName(sheet.getCell(1, j).getContents());
-                        baseInfoBean.setByteLength(sheet.getCell(4, j).getContents().replace(" ", ""));
-                        baseInfoBean.setParsingType(sheet.getCell(9, j).getContents().replace(" ", ""));
-                        baseInfoBean.setEnumValue(sheet.getCell(10, j).getContents().replace(" ", ""));
-                        socketBeanList.add(baseInfoBean);
-                    }
-                }
-            }
-        } catch (Exception e) {
 
-        }
+        ArrayList<BaseInfoBean> socketBeanList = new ArrayList<>();
+//        try {
+//            Workbook book = Workbook.getWorkbook(new File(Constant.xlsFilePath));
+//            // 获得第一个工作表对象
+//            Sheet sheet = book.getSheet(7);
+//            for (int j = 0; j < sheet.getRows(); j++) {
+//                if (j != 0) {
+//                    if (!(sheet.getCell(0, j)).getContents().isEmpty() && !(sheet.getCell(1, j)).getContents().isEmpty()) {
+//                        BaseInfoBean baseInfoBean = new BaseInfoBean();
+//                        baseInfoBean.setId("2E" + sheet.getCell(0, j).getContents().replace(" ", ""));
+//                        baseInfoBean.setName(sheet.getCell(1, j).getContents());
+//                        baseInfoBean.setByteLength(sheet.getCell(4, j).getContents().replace(" ", ""));
+//                        baseInfoBean.setParsingType(sheet.getCell(9, j).getContents().replace(" ", ""));
+//                        baseInfoBean.setEnumValue(sheet.getCell(10, j).getContents().replace(" ", ""));
+//                        socketBeanList.add(baseInfoBean);
+//                    }
+//                }
+//            }
+//        } catch (Exception e) {
+//
+//        }
         return socketBeanList;
     }
 
@@ -164,21 +163,21 @@ public class ECUConstant {
      */
     public static ArrayList<ErrorCodeBean> getErrorCodeData() {
         ArrayList<ErrorCodeBean> socketBeanList = new ArrayList<>();
-        try {
-            Workbook book = Workbook.getWorkbook(new File(Constant.xlsFilePath));
-            // 获得第一个工作表对象
-            Sheet sheet = book.getSheet(8);
-            for (int j = 0; j < sheet.getRows(); j++) {
-                if (j != 0) {
-                    if (!(sheet.getCell(0, j)).getContents().isEmpty() && !(sheet.getCell(1, j)).getContents().isEmpty()) {
-                        socketBeanList.add(new ErrorCodeBean((sheet.getCell(0, j)).getContents().replace(" ", ""),
-                                (sheet.getCell(1, j)).getContents()));
-                    }
-                }
-            }
-        } catch (Exception e) {
-
-        }
+//        try {
+//            Workbook book = Workbook.getWorkbook(new File(Constant.xlsFilePath));
+//            // 获得第一个工作表对象
+//            Sheet sheet = book.getSheet(8);
+//            for (int j = 0; j < sheet.getRows(); j++) {
+//                if (j != 0) {
+//                    if (!(sheet.getCell(0, j)).getContents().isEmpty() && !(sheet.getCell(1, j)).getContents().isEmpty()) {
+//                        socketBeanList.add(new ErrorCodeBean((sheet.getCell(0, j)).getContents().replace(" ", ""),
+//                                (sheet.getCell(1, j)).getContents()));
+//                    }
+//                }
+//            }
+//        } catch (Exception e) {
+//
+//        }
         return socketBeanList;
     }
 
@@ -189,29 +188,29 @@ public class ECUConstant {
      */
     public static CopyOnWriteArrayList<DynamicDataBean> getDynamicData() {
         CopyOnWriteArrayList<DynamicDataBean> dynamicDataBeans = new CopyOnWriteArrayList<>();
-        try {
-            Workbook book = Workbook.getWorkbook(new File(Constant.xlsFilePath));
-            // 获得第一个工作表对象
-            Sheet sheet = book.getSheet(6);
-            for (int j = 0; j < sheet.getRows(); j++) {
-                if (j != 0) {
-                    if (!(sheet.getCell(0, j)).getContents().isEmpty() && !(sheet.getCell(1, j)).getContents().isEmpty()) {
-                        DynamicDataBean dynamicDataBean = new DynamicDataBean();
-                        dynamicDataBean.setId("22" + (sheet.getCell(0, j)).getContents().replace(" ", ""));
-                        dynamicDataBean.setName((sheet.getCell(1, j)).getContents());
-                        dynamicDataBean.setByteLength(sheet.getCell(4, j).getContents().replace(" ", ""));
-                        dynamicDataBean.setCoefficient((sheet.getCell(7, j)).getContents().replace(" ", ""));
-                        dynamicDataBean.setOffset((sheet.getCell(8, j)).getContents().replace(" ", ""));
-                        dynamicDataBean.setParsingType((sheet.getCell(9, j)).getContents().replace(" ", ""));
-                        dynamicDataBean.setEnumValue((sheet.getCell(10, j)).getContents().replace(" ", ""));
-                        dynamicDataBean.setUnit((sheet.getCell(13, j)).getContents().replace(" ", ""));
-                        dynamicDataBeans.add(dynamicDataBean);
-                    }
-                }
-            }
-        } catch (Exception e) {
-
-        }
+//        try {
+//            Workbook book = Workbook.getWorkbook(new File(Constant.xlsFilePath));
+//            // 获得第一个工作表对象
+//            Sheet sheet = book.getSheet(6);
+//            for (int j = 0; j < sheet.getRows(); j++) {
+//                if (j != 0) {
+//                    if (!(sheet.getCell(0, j)).getContents().isEmpty() && !(sheet.getCell(1, j)).getContents().isEmpty()) {
+//                        DynamicDataBean dynamicDataBean = new DynamicDataBean();
+//                        dynamicDataBean.setId("22" + (sheet.getCell(0, j)).getContents().replace(" ", ""));
+//                        dynamicDataBean.setName((sheet.getCell(1, j)).getContents());
+//                        dynamicDataBean.setByteLength(sheet.getCell(4, j).getContents().replace(" ", ""));
+//                        dynamicDataBean.setCoefficient((sheet.getCell(7, j)).getContents().replace(" ", ""));
+//                        dynamicDataBean.setOffset((sheet.getCell(8, j)).getContents().replace(" ", ""));
+//                        dynamicDataBean.setParsingType((sheet.getCell(9, j)).getContents().replace(" ", ""));
+//                        dynamicDataBean.setEnumValue((sheet.getCell(10, j)).getContents().replace(" ", ""));
+//                        dynamicDataBean.setUnit((sheet.getCell(13, j)).getContents().replace(" ", ""));
+//                        dynamicDataBeans.add(dynamicDataBean);
+//                    }
+//                }
+//            }
+//        } catch (Exception e) {
+//
+//        }
         return dynamicDataBeans;
     }
 }
