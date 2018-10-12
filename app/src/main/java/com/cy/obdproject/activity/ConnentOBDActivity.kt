@@ -3,6 +3,7 @@ package com.cy.obdproject.activity
 import android.annotation.SuppressLint
 import android.content.ComponentName
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.view.View
@@ -14,6 +15,7 @@ import com.cy.obdproject.tools.SPTools
 import com.cy.obdproject.tools.StringTools
 import com.cy.obdproject.tools.WifiTools
 import kotlinx.android.synthetic.main.activity_connent_obd.*
+import org.jetbrains.anko.backgroundResource
 import org.jetbrains.anko.toast
 
 class ConnentOBDActivity : BaseActivity(), BaseActivity.ClickMethoListener {
@@ -51,7 +53,11 @@ class ConnentOBDActivity : BaseActivity(), BaseActivity.ClickMethoListener {
             } else {
                 tv_wifiState.text = "热点是否开启：未开启"
             }
-
+            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                btn_openWifi.text = "当前版本无法自动开启热点，请手动开启热点"
+                btn_openWifi.isClickable=false
+                btn_openWifi.backgroundResource=R.drawable.shape_btn_gary
+            }
             if (SocketService.getIntance() != null &&
                     SocketService.getIntance()!!.isConnected() &&
                     SocketService.isConnected) {
@@ -78,13 +84,12 @@ class ConnentOBDActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                 finish()
             }
             "btn_openWifi" -> {
-                var isOpen = wifiTools!!.setWifiApEnabled(true)
+                var isOpen = wifiTools!!.setWifiApEnabled(true,"","")
                 if (isOpen) {
                     tv_wifiState.text = "热点是否开启：已开启"
                     ll_ip.visibility = View.VISIBLE
                     ll_input_ip.visibility = View.VISIBLE
                     ll_ok.visibility = View.VISIBLE
-
                 } else {
                     tv_wifiState.text = "热点是否开启：未开启"
                 }

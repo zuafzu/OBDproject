@@ -20,7 +20,7 @@ public class WifiTools {
     }
 
     // wifi热点开关
-    public boolean setWifiApEnabled(boolean enabled) {
+    public boolean setWifiApEnabled(boolean enabled, String ssid, String pw) {
         if (enabled) { // disable WiFi in any case
             //wifi和热点不能同时打开，所以打开热点的时候需要关闭wifi
             wifiManager.setWifiEnabled(false);
@@ -28,11 +28,15 @@ public class WifiTools {
         try {
             //热点的配置类
             WifiConfiguration apConfig = new WifiConfiguration();
-            apConfig.SSID = "StationTest";
-            apConfig.preSharedKey = "66666666";
+            apConfig.SSID = ssid;
+            if (pw.equals("")) {
+                apConfig.allowedKeyManagement.set(0);
+            } else {
+                apConfig.allowedKeyManagement.set(4);
+                apConfig.preSharedKey = pw;
+            }
             apConfig.allowedAuthAlgorithms.set(WifiConfiguration.AuthAlgorithm.OPEN);
             apConfig.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
-            apConfig.allowedKeyManagement.set(4);
             apConfig.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.TKIP);
             apConfig.allowedProtocols.set(WifiConfiguration.Protocol.WPA);
             apConfig.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
@@ -60,30 +64,29 @@ public class WifiTools {
         return resultList.toString();
     }
 
-    private ArrayList<String> getConnectedHotIP() {
-        ArrayList<String> connectedIP = new ArrayList<String>();
+    public ArrayList<String> getConnectedHotIP() {
+        ArrayList<String> connectIpList = new ArrayList<String>();
         try {
-            BufferedReader br = new BufferedReader(new FileReader(
-                    "/proc/net/arp"));
+            BufferedReader br = new BufferedReader(new FileReader("/proc/net/arp"));
             String line;
             while ((line = br.readLine()) != null) {
                 String[] splitted = line.split(" +");
                 if (splitted != null && splitted.length >= 4) {
                     String ip = splitted[0];
-                    connectedIP.add(ip);
+                    connectIpList.add(ip);
                 }
             }
         } catch (Exception e) {
-            LogTools.errLog(e);
+            e.printStackTrace();
         }
-        return connectedIP;
+        return connectIpList;
     }
 
     public boolean isWifiApEnabled() {
         return getWifiApState() == WIFI_AP_STATE.WIFI_AP_STATE_ENABLED;
     }
 
-    private WIFI_AP_STATE getWifiApState(){
+    private WIFI_AP_STATE getWifiApState() {
         int tmp;
         try {
             Method method = wifiManager.getClass().getMethod("getWifiApState");
@@ -100,7 +103,7 @@ public class WifiTools {
     }
 
     public enum WIFI_AP_STATE {
-        WIFI_AP_STATE_DISABLING, WIFI_AP_STATE_DISABLED, WIFI_AP_STATE_ENABLING,  WIFI_AP_STATE_ENABLED, WIFI_AP_STATE_FAILED
+        WIFI_AP_STATE_DISABLING, WIFI_AP_STATE_DISABLED, WIFI_AP_STATE_ENABLING, WIFI_AP_STATE_ENABLED, WIFI_AP_STATE_FAILED
     }
 
 }

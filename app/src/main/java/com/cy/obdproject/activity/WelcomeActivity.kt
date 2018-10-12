@@ -41,6 +41,10 @@ class WelcomeActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_welcome)
         checkFile()
+        // 测试https
+//        NetTools.net(HashMap<String, String>(), "https://192.168.1.81:4050", this) {
+//
+//        }
     }
 
     // 创建文件夹，删除旧版本的apk和3天以前的日志
@@ -160,7 +164,7 @@ class WelcomeActivity : BaseActivity() {
                 startApp()
             } else {
                 // 删除旧文件
-                File(com.qiming.eol_public.InitClass.pathLiucheng + "/" + scriptName).deleteOnExit()
+                File(com.qiming.eol_public.InitClass.pathLiucheng + "/" + scriptName).delete()
                 // 下载更新
                 if (isLocal == "1") {
                     // 文件下载

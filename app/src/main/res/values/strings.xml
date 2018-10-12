@@ -7,6 +7,7 @@
     <string name="djz">冻结帧</string>
     <string name="dtsj">动态数据</string>
     <string name="iotest">输入输出控制</string>
+    <string name="ipsetting">IP设置</string>
     <string name="setting">设置</string>
     <string name="sxwj">刷写</string>
     <string name="connent_obd">连接OBD</string>

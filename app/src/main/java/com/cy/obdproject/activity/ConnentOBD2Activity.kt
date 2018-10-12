@@ -62,7 +62,7 @@ class ConnentOBD2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
                 finish()
             }
             "btn_openWifi" -> {
-                var isOpen = wifiTools!!.setWifiApEnabled(true)
+                var isOpen = wifiTools!!.setWifiApEnabled(true,"","")
                 if (isOpen) {
                     tv_wifiState.text = "热点是否开启：已开启"
                     ll_ip.visibility = View.VISIBLE

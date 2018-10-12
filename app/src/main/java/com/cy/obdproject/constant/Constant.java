@@ -19,6 +19,8 @@ public class Constant {
     public static final String USERNAME = "userName";
     public static final String PASSWORD = "passWord";
     public static final String IP = "ip";
+    public static final String SSID = "ssid";
+    public static final String SSPW = "pw";
 
     public static int pageSize = 10;
 

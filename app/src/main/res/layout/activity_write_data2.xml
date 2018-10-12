@@ -57,7 +57,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="1px"
             android:max="100"
-            android:progress="50" />
+            android:progress="0" />
 
         <ScrollView
             android:id="@+id/scrollView"

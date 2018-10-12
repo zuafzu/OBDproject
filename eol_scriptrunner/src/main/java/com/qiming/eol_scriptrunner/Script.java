@@ -66,11 +66,13 @@ public class Script {
         int iIP = 0;
         while (isRun) {
             try {
+                writeLog(scriptName + " -- " + "开始循环1" + "\n");
                 if (iIP >= miCmdCount || iIP < 0) {
                     isRun = false;
                     manager.setBreak(true);
                     break;
                 }
+                writeLog(scriptName + " -- " + "开始循环2" + "\n");
                 String strFucName = mCmds.get(iIP).strName;
                 String strFileName = mCmds.get(iIP).strFileName;
                 writeLog(scriptName + " -- " + mCmds.get(iIP).cmdLine + "\n");
@@ -88,7 +90,8 @@ public class Script {
                 } else {
                     manager.mEnviment.put(key, mCmds.get(iIP).Output);
                 }
-                Log.i("cyf", "当前iIP : " + iIP);
+                // Log.i("cyf", "当前iIP : " + iIP);
+                writeLog(scriptName + " -- " + "当前iIP：" + iIP + "\n");
                 // 根据返回结果跳转
                 if (jsonOut.get("RESULT").equals("SUCCESS")) {
                     iIP = mCmds.get(iIP).iIfSuccessGoto;
@@ -102,12 +105,14 @@ public class Script {
                     Log.e("cyf", "失败跳转iIP : " + iIP);
                     Log.e("cyf", "DESC : " + jsonOut.get("DESC"));
                 }
+                writeLog(scriptName + " -- " + "跳转iIP：" + iIP + "\n");
             } catch (Exception e) {
                 manager.setMiLastErrorNo(iIP);
                 manager.setMstrLastErrorMsg(e.getMessage());
 
                 showError(mCmds.get(iIP));
                 iIP = mCmds.get(iIP).iIfFaultGoto;
+                writeLog(scriptName + " -- " + "错误跳转iIP：" + iIP + "\n");
             }
         }
         return true;

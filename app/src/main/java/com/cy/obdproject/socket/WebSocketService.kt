@@ -458,6 +458,7 @@ class WebSocketService : Service() {
         }
         // 开始连接
         if (!msgClient!!.isOpen) {
+            WebSocketConfig.wssConfig(msgClient!!)
             msgClient!!.connect()
         }
         Log.e("cyf", "WebSocketServie 开始连接")
@@ -477,7 +478,7 @@ class WebSocketService : Service() {
     }
 
     fun sendMsg(msg: String) {
-        Log.i("cyf", "WebSocketServie 发送 : $msg")
+        Log.i("cyf", "WebSocketServie2 发送 : $msg")
         try {
             if (NetworkUtil.isNetworkAvailable(this) && msgClient != null && msgClient!!.readyState == WebSocket.READYSTATE.OPEN) {
                 msgClient!!.sendMsg(msg)

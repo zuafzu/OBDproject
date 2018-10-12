@@ -10,6 +10,7 @@ import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 
@@ -207,6 +208,7 @@ public class BaseActivity extends AppCompatActivity {
                 @Override
                 protected String doInBackground(String... strings) {
                     try {
+                        Log.i("cyf", "WebSocketServie0 发送 : " + strings[0]);
                         return StrZipUtil.compress(strings[0]);
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -215,10 +217,10 @@ public class BaseActivity extends AppCompatActivity {
                 }
 
                 @Override
-                protected void onPostExecute(String s) {
+                protected void onPostExecute(final String s) {
                     super.onPostExecute(s);
                     if (!s.equals("")) {
-                        Map<String, String> map = new HashMap<>();
+                        final Map<String, String> map = new HashMap<>();
                         map.put("data", s);
                         NetTools.net(map, new Urls().updateMsg, BaseActivity.this, new NetTools.MyCallBack() {
                             @Override
@@ -234,6 +236,7 @@ public class BaseActivity extends AppCompatActivity {
                                             webSocketBean.setD(jsonObject.optString("id"));
                                             webSocketBean.setE("");
                                             WebSocketService.Companion.getIntance().sendMsg(new Gson().toJson(webSocketBean));
+                                            Log.i("cyf", "WebSocketServie1 发送 : " + jsonObject.optString("id"));
                                         }
                                     } catch (JSONException e) {
                                         e.printStackTrace();
@@ -265,7 +268,7 @@ public class BaseActivity extends AppCompatActivity {
                     }
                 }, 1000);
 
-                // 如果长连接开启，并且我是专家端
+                // 如果长连接开启，并且我是专家端，并且不是断开按钮
                 if (clickMethoListener != null) {
                     sendClick(BaseActivity.this.getLocalClassName(), view.getTag().toString());
                     clickMethoListener.doMethod(view.getTag().toString());
@@ -276,7 +279,9 @@ public class BaseActivity extends AppCompatActivity {
 
     @SuppressLint("StaticFieldLeak")
     public void sendClick(String className, String tag) {
-        if (WebSocketService.Companion.getIntance() != null && (int) SPTools.INSTANCE.get(this, Constant.USERTYPE, 0) == Constant.userProfessional) {
+        if (WebSocketService.Companion.getIntance() != null &&
+                (int) SPTools.INSTANCE.get(this, Constant.USERTYPE, 0) == Constant.userProfessional &&
+                !"tv_ycxz".equals(tag)) {
             // 点击事件的远程控制
             String str = "{\"activity\":\"" + className + "\",\"tag\":\"" + tag + "\"}";
             new AsyncTask<String, Void, String>() {

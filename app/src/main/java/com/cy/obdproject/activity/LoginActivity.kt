@@ -47,7 +47,10 @@ class LoginActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                 finish()
             }
             "tv_setting" -> {
-                val mIntent = Intent(this@LoginActivity, ConnentOBDActivity::class.java)
+//                val mIntent = Intent(this@LoginActivity, ConnentOBDActivity::class.java)
+//                mIntent.putExtra("isSave", true)
+//                startActivity(mIntent)
+                val mIntent = Intent(this@LoginActivity, SettingIpActivity::class.java)
                 mIntent.putExtra("isSave", true)
                 startActivity(mIntent)
             }
@@ -89,7 +92,8 @@ class LoginActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                     SPTools.put(this@LoginActivity, Constant.USERTYPE, Constant.userNormal)
                     if (SPTools[this@LoginActivity, Constant.IP, ""].toString() == "") {
                         // 第一次登录设置IP
-                        startActivity(Intent(this@LoginActivity, ConnentOBDActivity::class.java))
+                        // startActivity(Intent(this@LoginActivity, ConnentOBDActivity::class.java))
+                        startActivity(Intent(this@LoginActivity, SettingIpActivity::class.java))
                         finish()
                     } else {
                         // 默认连接
@@ -107,7 +111,8 @@ class LoginActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                                     startActivity(Intent(this@LoginActivity, SelectCarTypeActivity::class.java))
                                 } else {
                                     toast("请先确认连接设备")
-                                    startActivity(Intent(this@LoginActivity, ConnentOBDActivity::class.java))
+                                    // startActivity(Intent(this@LoginActivity, ConnentOBDActivity::class.java))
+                                    startActivity(Intent(this@LoginActivity, SettingIpActivity::class.java))
                                     finish()
                                 }
                             }, 2000)
