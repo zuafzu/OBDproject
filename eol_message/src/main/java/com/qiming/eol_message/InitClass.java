@@ -60,12 +60,12 @@ public class InitClass {
             jsonObject.put("RESULT", "SUCCESS");
             jsonObject.put("DESC", "");
         } catch (Exception e) {
-            e.printStackTrace();
+            LogTools.errLog(e);
             try {
                 jsonObject.put("RESULT", "FAULT");
                 jsonObject.put("DESC", "错误信息：" + e.getMessage());
             } catch (JSONException e1) {
-                e1.printStackTrace();
+                LogTools.errLog(e1);
             }
         }
         return jsonObject.toString();
@@ -96,12 +96,12 @@ public class InitClass {
             jsonObject.put("RESULT", "SUCCESS");
             jsonObject.put("DESC", "");
         } catch (Exception e) {
-            e.printStackTrace();
+            LogTools.errLog(e);
             try {
                 jsonObject.put("RESULT", "FAULT");
                 jsonObject.put("DESC", "错误信息：" + e.getMessage());
             } catch (JSONException e1) {
-                e1.printStackTrace();
+                LogTools.errLog(e1);
             }
         }
         return jsonObject.toString();
@@ -122,12 +122,12 @@ public class InitClass {
             getHandler().sendMessage(message);
             getStringList().clear();
         } catch (Exception e) {
-            e.printStackTrace();
+            LogTools.errLog(e);
             try {
                 jsonObject.put("RESULT", "FAULT");
                 jsonObject.put("DESC", "错误信息：" + e.getMessage());
             } catch (JSONException e1) {
-                e1.printStackTrace();
+                LogTools.errLog(e1);
             }
         }
         return jsonObject.toString();
@@ -166,12 +166,12 @@ public class InitClass {
             jsonObject.put("RESULT", "SUCCESS");
             jsonObject.put("DESC", "");
         } catch (Exception e) {
-            e.printStackTrace();
+            LogTools.errLog(e);
             try {
                 jsonObject.put("RESULT", "FAULT");
                 jsonObject.put("DESC", "错误信息：" + e.getMessage());
             } catch (JSONException e1) {
-                e1.printStackTrace();
+                LogTools.errLog(e1);
             }
         }
         return jsonObject.toString();
@@ -198,12 +198,12 @@ public class InitClass {
             jsonObject.put("RESULT", "SUCCESS");
             jsonObject.put("DESC", "");
         } catch (Exception e) {
-            e.printStackTrace();
+            LogTools.errLog(e);
             try {
                 jsonObject.put("RESULT", "FAULT");
                 jsonObject.put("DESC", "错误信息：" + e.getMessage());
             } catch (JSONException e1) {
-                e1.printStackTrace();
+                LogTools.errLog(e1);
             }
         }
         return jsonObject.toString();
@@ -230,12 +230,12 @@ public class InitClass {
             jsonObject.put("RESULT", "SUCCESS");
             jsonObject.put("DESC", "");
         } catch (Exception e) {
-            e.printStackTrace();
+            LogTools.errLog(e);
             try {
                 jsonObject.put("RESULT", "FAULT");
                 jsonObject.put("DESC", "错误信息：" + e.getMessage());
             } catch (JSONException e1) {
-                e1.printStackTrace();
+                LogTools.errLog(e1);
             }
         }
         return jsonObject.toString();
@@ -254,12 +254,12 @@ public class InitClass {
             jsonObject.put("RESULT", "SUCCESS");
             jsonObject.put("DESC", "");
         } catch (Exception e) {
-            e.printStackTrace();
+            LogTools.errLog(e);
             try {
                 jsonObject.put("RESULT", "FAULT");
                 jsonObject.put("DESC", "错误信息：" + e.getMessage());
             } catch (JSONException e1) {
-                e1.printStackTrace();
+                LogTools.errLog(e1);
             }
         }
         return jsonObject.toString();
@@ -278,12 +278,12 @@ public class InitClass {
             jsonObject.put("RESULT", "SUCCESS");
             jsonObject.put("DESC", "");
         } catch (Exception e) {
-            e.printStackTrace();
+            LogTools.errLog(e);
             try {
                 jsonObject.put("RESULT", "FAULT");
                 jsonObject.put("DESC", "错误信息：" + e.getMessage());
             } catch (JSONException e1) {
-                e1.printStackTrace();
+                LogTools.errLog(e1);
             }
         }
         return jsonObject.toString();
@@ -302,12 +302,12 @@ public class InitClass {
             jsonObject.put("RESULT", "SUCCESS");
             jsonObject.put("DESC", "");
         } catch (Exception e) {
-            e.printStackTrace();
+            LogTools.errLog(e);
             try {
                 jsonObject.put("RESULT", "FAULT");
                 jsonObject.put("DESC", "错误信息：" + e.getMessage());
             } catch (JSONException e1) {
-                e1.printStackTrace();
+                LogTools.errLog(e1);
             }
         }
         return jsonObject.toString();
@@ -326,12 +326,12 @@ public class InitClass {
             jsonObject.put("RESULT", "SUCCESS");
             jsonObject.put("DESC", "");
         } catch (Exception e) {
-            e.printStackTrace();
+            LogTools.errLog(e);
             try {
                 jsonObject.put("RESULT", "FAULT");
                 jsonObject.put("DESC", "错误信息：" + e.getMessage());
             } catch (JSONException e1) {
-                e1.printStackTrace();
+                LogTools.errLog(e1);
             }
         }
         return jsonObject.toString();

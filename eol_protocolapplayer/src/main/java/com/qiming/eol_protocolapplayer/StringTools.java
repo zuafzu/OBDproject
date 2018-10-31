@@ -76,6 +76,7 @@ public class StringTools {
                         }
                     }
                 } catch (Exception e) {
+                    LogTools.errLog(e);
                     return false;
                 }
                 return true;
@@ -134,6 +135,25 @@ public class StringTools {
         }
 
         return sbs.toString();
+    }
+
+    /**
+     * 10进制数转16进制字符串
+     *
+     * @param n 10进制数
+     * @return 16进制字符串
+     */
+    public static String intToHex(int n) {
+        //StringBuffer s = new StringBuffer();
+        StringBuilder sb = new StringBuilder(8);
+        String a;
+        char[] b = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+        while (n != 0) {
+            sb = sb.append(b[n % 16]);
+            n = n / 16;
+        }
+        a = sb.reverse().toString();
+        return a;
     }
 
 }

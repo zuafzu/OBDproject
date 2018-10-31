@@ -8,16 +8,18 @@ public class WriteFileBean implements Serializable {
     private String address;
     private String endAddress;
     private String length;
+    private String crc;
     private byte[] data;
 
     public WriteFileBean() {
         super();
     }
 
-    public WriteFileBean(String address, String endAddress, String length, byte[] data, short[] data2) {
+    public WriteFileBean(String address, String endAddress, String length, String crc, byte[] data) {
         this.address = address;
         this.endAddress = endAddress;
         this.length = length;
+        this.crc = crc;
         this.data = data;
     }
 
@@ -45,6 +47,14 @@ public class WriteFileBean implements Serializable {
         this.length = length;
     }
 
+    public String getCrc() {
+        return crc;
+    }
+
+    public void setCrc(String crc) {
+        this.crc = crc;
+    }
+
     public byte[] getData() {
         return data;
     }
@@ -59,6 +69,7 @@ public class WriteFileBean implements Serializable {
                 "address='" + address + '\'' +
                 ", endAddress='" + endAddress + '\'' +
                 ", length='" + length + '\'' +
+                ", crc='" + crc + '\'' +
                 ", data=" + Arrays.toString(data) +
                 '}';
     }

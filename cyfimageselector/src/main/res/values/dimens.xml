@@ -1,0 +1,8 @@
+<resources>
+
+    <dimen name="toolbar_title">16sp</dimen>
+    <dimen name="toolbar_btn">12sp</dimen>
+
+    <dimen name="delete_height">45dp</dimen>
+
+</resources>

@@ -7,6 +7,9 @@ public class WriteDataBean {
     private String filePath;
     private String isLocal;
     private String localHas;
+    private String needCheck;// 是否需要审核，1需要，其它不需要
+    private String checkState;// 审核状态，0待审核，1审核中，2审核成功，3审核失败
+    private String stateName;// 审核状态名称
 
     public WriteDataBean() {
         super();
@@ -52,6 +55,30 @@ public class WriteDataBean {
         this.localHas = localHas;
     }
 
+    public String getNeedCheck() {
+        return needCheck;
+    }
+
+    public void setNeedCheck(String needCheck) {
+        this.needCheck = needCheck;
+    }
+
+    public String getCheckState() {
+        return checkState;
+    }
+
+    public void setCheckState(String checkState) {
+        this.checkState = checkState;
+    }
+
+    public String getStateName() {
+        return stateName;
+    }
+
+    public void setStateName(String stateName) {
+        this.stateName = stateName;
+    }
+
     @Override
     public String toString() {
         return "WriteDataBean{" +
@@ -60,6 +87,9 @@ public class WriteDataBean {
                 ", filePath='" + filePath + '\'' +
                 ", isLocal='" + isLocal + '\'' +
                 ", localHas='" + localHas + '\'' +
+                ", needCheck='" + needCheck + '\'' +
+                ", checkState='" + checkState + '\'' +
+                ", stateName='" + stateName + '\'' +
                 '}';
     }
 }

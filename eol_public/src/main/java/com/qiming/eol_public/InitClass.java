@@ -171,6 +171,7 @@ public class InitClass {
             m = stringClassMap.get("eol_scriptrunner").clazz.getMethod("Run", String.class);
 
             m.invoke(o, event);
+
         } catch (Exception e) {
             Log.e("cyf", "e: " + e.getMessage());
         }

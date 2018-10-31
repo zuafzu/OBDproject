@@ -18,7 +18,7 @@ public class ECUTools {
     }
 
     /**
-     * 解析返回的数据(读数据)
+     * 解析返回的数据(can线 读数据)
      *
      * @param data
      * @param type
@@ -29,15 +29,15 @@ public class ECUTools {
         if (data.toLowerCase().endsWith("78aa") && data.toLowerCase().contains("7f")) {
             return WAIT;
         }
-        int a = myData.toLowerCase().indexOf(ECUagreement.canId.toLowerCase());
-        String mKey1 = myData.substring(a + ECUagreement.canId.length() + 4, a + ECUagreement.canId.length() + 6);
-        int b = data.toLowerCase().indexOf(ECUagreement.reCanId.toLowerCase());
-        String mKey2 = data.substring(b + ECUagreement.reCanId.length() + 4, b + ECUagreement.reCanId.length() + 6);
+        int a = myData.toLowerCase().indexOf(ECUagreement.Id.toLowerCase());
+        String mKey1 = myData.substring(a + ECUagreement.Id.length() + 4, a + ECUagreement.Id.length() + 6);
+        int b = data.toLowerCase().indexOf(ECUagreement.rId.toLowerCase());
+        String mKey2 = data.substring(b + ECUagreement.rId.length() + 4, b + ECUagreement.rId.length() + 6);
         if (a != -1 && b != -1 && Integer.valueOf(mKey2, 16) - Integer.valueOf(mKey1, 16) == 0x40) {
             StringBuilder mData = new StringBuilder();
             try {
                 // --------------------------已和张哥确认（+6这个长度是固定的，3个字节）---------------------------------------
-                String msg = data.substring(b + ECUagreement.reCanId.length() + 4 + 6, data.length() - 2);
+                String msg = data.substring(b + ECUagreement.rId.length() + 4 + 6, data.length() - 2);
                 if (msg.length() % 2 == 0) {
                     Integer[] strings = new Integer[msg.length() / 2];
                     if (type == 12 || type == 1 || type == 3) {
@@ -60,7 +60,7 @@ public class ECUTools {
                     return mData.toString();
                 }
             } catch (Exception e) {
-                // Log.e("cyf","ECUTools getData "+e.getMessage());
+                // LogTools.errLog(e);
                 return "";
             }
         }
@@ -68,7 +68,7 @@ public class ECUTools {
     }
 
     /**
-     * 解析返回的数据(安全请求)
+     * 解析返回的数据(can线 安全请求)
      *
      * @param data
      * @param type
@@ -76,16 +76,16 @@ public class ECUTools {
      * @return
      */
     public static String getData2(String data, int type, String mKey1) {
-        if (data.toLowerCase().endsWith("78aa") && data.toLowerCase().contains("7f")) {
+        if (data.toLowerCase().endsWith("78aa") && data.toLowerCase().contains("00037f")) {
             return WAIT;
         }
-        int b = data.toLowerCase().indexOf(ECUagreement.reCanId.toLowerCase());
-        String mKey2 = data.substring(b + ECUagreement.reCanId.length() + 4, b + ECUagreement.reCanId.length() + 6);
+        int b = data.toLowerCase().indexOf(ECUagreement.rId.toLowerCase());
+        String mKey2 = data.substring(b + ECUagreement.rId.length() + 4, b + ECUagreement.rId.length() + 6);
         if (b != -1 && Integer.valueOf(mKey2, 16) - Integer.valueOf(mKey1, 16) == 0x40) {
             StringBuilder mData = new StringBuilder();
             try {
                 // --------------------------已和张哥确认（+6这个长度是固定的，3个字节）---------------------------------------
-                String msg = data.substring(b + ECUagreement.reCanId.length() + 4 + 6, data.length() - 2);
+                String msg = data.substring(b + ECUagreement.rId.length() + 4 + 6, data.length() - 2);
                 if (msg.length() % 2 == 0) {
                     Integer[] strings = new Integer[msg.length() / 2];
                     if (type == 12 || type == 1 || type == 3) {
@@ -108,10 +108,61 @@ public class ECUTools {
                     return mData.toString();
                 }
             } catch (Exception e) {
-                // Log.e("cyf","ECUTools getData "+e.getMessage());
+                // LogTools.errLog(e);
                 return "";
             }
         }
+        return ERR;
+    }
+
+    /**
+     * 解析返回的数据(k线 读数据)
+     *
+     * @param data
+     * @param type
+     * @param myData
+     * @return
+     */
+    public static String getData3(String data, int type, String myData) {
+//        if (data.toLowerCase().endsWith("78aa") && data.toLowerCase().contains("7f")) {
+//            return WAIT;
+//        }
+//        int a = myData.toLowerCase().indexOf(ECUagreement.Id.toLowerCase());
+//        String mKey1 = myData.substring(a + ECUagreement.Id.length() + 4, a + ECUagreement.Id.length() + 6);
+//        int b = data.toLowerCase().indexOf(ECUagreement.rId.toLowerCase());
+//        String mKey2 = data.substring(b + ECUagreement.rId.length() + 4, b + ECUagreement.rId.length() + 6);
+//        if (a != -1 && b != -1 && Integer.valueOf(mKey2, 16) - Integer.valueOf(mKey1, 16) == 0x40) {
+//            StringBuilder mData = new StringBuilder();
+//            try {
+//                // --------------------------已和张哥确认（+6这个长度是固定的，3个字节）---------------------------------------
+//                String msg = data.substring(b + ECUagreement.rId.length() + 4 + 6, data.length() - 2);
+//                if (msg.length() % 2 == 0) {
+//                    Integer[] strings = new Integer[msg.length() / 2];
+//                    if (type == 12 || type == 1 || type == 3) {
+//                        // 返回原始数据
+//                        mData = new StringBuilder(msg);
+//                    }
+////                    else if (type == -1) {
+////                        // 返回十进制数字
+////                        for (int i = 0; i < msg.length() / 2; i++) {
+////                            strings[i] = Integer.parseInt(msg.substring(i * 2, (i + 1) * 2), 16);
+////                            mData.append(Integer.parseInt(msg.substring(i * 2, (i + 1) * 2), 16));
+////                        }
+////                    }
+//                    else if (type == 2) {
+//                        // 返回char
+//                        for (int i = 0; i < strings.length; i++) {
+//                            mData.append(((char) Integer.parseInt(msg.substring(i * 2, (i + 1) * 2), 16)));
+//                        }
+//                    }
+//                    return mData.toString();
+//                }
+//            } catch (Exception e) {
+//                // LogTools.errLog(e);
+//                return "";
+//            }
+//        }
+//        return ERR;
         return ERR;
     }
 

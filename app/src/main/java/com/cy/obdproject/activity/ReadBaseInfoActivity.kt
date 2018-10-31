@@ -67,18 +67,18 @@ class ReadBaseInfoActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                     }
                 })
                 myApp.publicUnit.SetEvent(handler, mCode)
-                Thread {
-                    while (true) {
-                        val isRun = myApp.publicUnit.GetScriptIsRun(mCode)
-                        if (!isRun) {
-                            runOnUiThread {
-                                // 完成
-                                dismissProgressDialog()
-                            }
-                            break
-                        }
-                    }
-                }.start()
+//                Thread {
+//                    while (true) {
+//                        val isRun = myApp.publicUnit.GetScriptIsRun(mCode)
+//                        if (!isRun) {
+//                            runOnUiThread {
+//                                // 完成
+//                                dismissProgressDialog()
+//                            }
+//                            break
+//                        }
+//                    }
+//                }.start()
             } catch (e: Exception) {
                 LogTools.errLog(e)
             }
@@ -90,6 +90,7 @@ class ReadBaseInfoActivity : BaseActivity(), BaseActivity.ClickMethoListener {
             Log.i("cyf", "data : $data")
             if(data.startsWith("toast")){
                 toast(data!!.replace("toast", ""))
+                Log.e("cyf123","22222222")
                 dismissProgressDialog()
             }else{
                 try {
@@ -102,6 +103,7 @@ class ReadBaseInfoActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                     } else {
                         baseInfoAdapter!!.notifyDataSetChanged()
                     }
+                    Log.e("cyf123","33333333")
                     dismissProgressDialog()
                 } catch (e: Exception) {
                     Log.i("cyf", "e : ${e.message}")
@@ -125,6 +127,7 @@ class ReadBaseInfoActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                             baseInfoAdapter!!.notifyDataSetChanged()
                         }
                         if (list!!.size == 0 || list!![0].value != "") {
+                            Log.e("cyf123","4444444")
                             dismissProgressDialog()
                         }
                     } catch (e: Exception) {

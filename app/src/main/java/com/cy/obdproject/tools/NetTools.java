@@ -15,13 +15,16 @@ import com.cy.obdproject.app.MyApp;
 import com.cy.obdproject.base.BaseActivity;
 import com.cy.obdproject.bean.BaseBean;
 import com.cy.obdproject.constant.Constant;
+import com.cy.obdproject.url.Urls;
 import com.google.gson.Gson;
 import com.zhy.http.okhttp.OkHttpUtils;
+import com.zhy.http.okhttp.builder.PostFormBuilder;
 import com.zhy.http.okhttp.callback.Callback;
 import com.zhy.http.okhttp.request.RequestCall;
 
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -187,6 +190,72 @@ public class NetTools {
             @Override
             public void onAfter(int id) {
 
+            }
+
+        });
+    }
+
+    /**
+     * 上传文件
+     *
+     * @param map
+     * @param context
+     * @param myCallBack
+     */
+    public static void netFile(final Map<String, File> map, final Activity context, final MyCallBack myCallBack) {
+        PostFormBuilder builder = OkHttpUtils.post().url(Urls.uploadImg);
+        builder.addHeader(Constant.TOKEN, (String) SPTools.INSTANCE.get(context, Constant.TOKEN, ""));
+        for (int i = 0; i < map.size(); i++) {
+            builder.addFile("file" + i, map.get("file" + i).getName(), map.get("file" + i));
+        }
+        RequestCall call = builder.build();
+        call.execute(new Callback<BaseBean>() {
+            @Override
+            public void onBefore(Request request, int id) {
+                if (context != null) {
+                    ((BaseActivity) context).showProgressDialog("正在上传...");
+                }
+            }
+
+            @Override
+            public BaseBean parseNetworkResponse(Response response, int id) throws Exception {
+                String json = response.body().string();
+                Log.e("cyf7", "response : " + json);
+                JSONObject jsonObject = new JSONObject(json);
+                BaseBean bean = new BaseBean();
+                bean.setCode(jsonObject.optString("code"));
+                bean.setMsg(jsonObject.optString("msg"));
+                String json2 = jsonObject.optString("data");
+                if (!"".equals(json2) && !"{}".equals(json2) && !"{ }".equals(json2)) {
+                    bean.setData(json2);
+                }
+                return bean;
+            }
+
+            @Override
+            public void onError(Call call, Exception e, int id) {
+                if (e.getClass().getSimpleName().equals("ConnectException")) {
+                    // 无法连接网络
+                    Toast.makeText(context, "无法连接服务器", Toast.LENGTH_SHORT).show();
+                } else if (e.getClass().getSimpleName().equals("SocketTimeoutException")) {
+                    // 网络连接超时
+                    Toast.makeText(context, "服务器连接超时", Toast.LENGTH_SHORT).show();
+                } else {
+                    // 其它异常
+                    Toast.makeText(context, "网络错误", Toast.LENGTH_SHORT).show();
+                    Log.e("Exception gson：", e.toString());
+                }
+                ((BaseActivity) context).dismissProgressDialog();
+            }
+
+            @Override
+            public void onResponse(BaseBean baseBean, int id) {
+                if ("0".equals(baseBean.getCode())) {
+                    myCallBack.getData(baseBean);
+                } else {
+                    ((BaseActivity) context).dismissProgressDialog();
+                    Toast.makeText(context, baseBean.getMsg(), Toast.LENGTH_SHORT).show();
+                }
             }
 
         });

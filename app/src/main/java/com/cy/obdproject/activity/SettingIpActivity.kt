@@ -5,10 +5,13 @@ import android.content.ClipboardManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.net.wifi.WifiManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.os.Message
 import android.support.v7.app.AlertDialog
+import android.util.Log
 import android.view.View
 import com.cy.obdproject.R
 import com.cy.obdproject.base.BaseActivity
@@ -22,10 +25,44 @@ import kotlinx.android.synthetic.main.activity_setting_ip.*
 import org.jetbrains.anko.backgroundResource
 import org.jetbrains.anko.toast
 import org.json.JSONObject
+import java.net.DatagramPacket
+import java.net.DatagramSocket
+import java.net.InetAddress
 
 
 class SettingIpActivity : BaseActivity(), BaseActivity.ClickMethoListener {
 
+    private var SEND_IP = "255.255.255.255" //发送IP
+    private var listenStatus = true //接收线程的循环标识
+    private var buf: ByteArray? = null
+    private var receiveSocket: DatagramSocket? = null
+    private var sendSocket: DatagramSocket? = null
+    private var serverAddr: InetAddress? = null
+    private var sendHandler = SendHandler()
+    private var receiveHandler = ReceiveHandler()
+    private var lock: WifiManager.MulticastLock? = null
+
+    internal inner class ReceiveHandler : Handler() {
+        override fun handleMessage(msg: Message) {
+            super.handleMessage(msg)
+            listenStatus = false
+            if (et_input_ip.text.toString() != stringIp) {
+                et_input_ip.setText(stringIp)
+                stringIp = ""
+            }
+            // Log.e("cyf_udp", "接收到数据了 : " + receiveInfo.toString())
+        }
+    }
+
+    internal inner class SendHandler : Handler() {
+        override fun handleMessage(msg: Message) {
+            super.handleMessage(msg)
+            // UDP报文发送成功
+            Log.e("cyf_udp", "UDP报文发送成功")
+        }
+    }
+
+    private var stringIp = ""
     private var mIntent2: Intent? = null
     private var mAlertDialog: AlertDialog? = null
     private var wifiTools: WifiTools? = null
@@ -34,6 +71,7 @@ class SettingIpActivity : BaseActivity(), BaseActivity.ClickMethoListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_setting_ip)
         initView()
+        initUdp()
     }
 
     private fun initView() {
@@ -54,16 +92,20 @@ class SettingIpActivity : BaseActivity(), BaseActivity.ClickMethoListener {
         iv_back.visibility = View.INVISIBLE
     }
 
+    private fun initUdp() {
+        val manager = this.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        lock = manager!!.createMulticastLock("test wifi")
+        lock!!.acquire()
+        UdpSendThread().start()
+        UdpReceiveThread().start()
+    }
+
     @SuppressLint("SetTextI18n")
     override fun onResume() {
         super.onResume()
         showProgressDialog()
         Handler().postDelayed({
-            if (wifiTools!!.isWifiApEnabled) {
-                tv_wifiState.text = "热点是否开启：已开启"
-            } else {
-                tv_wifiState.text = "热点是否开启：未开启"
-            }
+            changeWifiBtnState(wifiTools!!.isWifiApEnabled)
             btn_jumpWifi.visibility = View.VISIBLE
             if (android.os.Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
                 btn_openWifi.text = "当前版本无法自动开启热点"
@@ -93,6 +135,24 @@ class SettingIpActivity : BaseActivity(), BaseActivity.ClickMethoListener {
             }
             dismissProgressDialog()
         }, 1000)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        lock!!.release()
+        //停止接收线程，关闭套接字连接
+        listenStatus = false
+        if (receiveSocket != null) {
+            receiveSocket!!.close()
+        }
+    }
+
+    private fun changeWifiBtnState(isOpen: Boolean) {
+        if (isOpen) {
+            tv_wifiState.text = "热点是否开启：已开启"
+        } else {
+            tv_wifiState.text = "热点是否开启：未开启"
+        }
     }
 
     private fun showAutoDialog(message: String) {
@@ -160,11 +220,7 @@ class SettingIpActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                     return
                 }
                 val isOpen = wifiTools!!.setWifiApEnabled(true, et_name.text.toString(), et_pw.text.toString())
-                if (isOpen) {
-                    tv_wifiState.text = "热点是否开启：已开启"
-                } else {
-                    tv_wifiState.text = "热点是否开启：未开启"
-                }
+                changeWifiBtnState(isOpen)
             }
             "btn_seeIp" -> {
                 showAutoDialog("请确保手机Wi-Fi已经关闭，热点已经打开，并且有且只有一个OBD设备已经连接。\n" +
@@ -220,6 +276,65 @@ class SettingIpActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                     }
                 }
             }
+        }
+    }
+
+    /*
+     *   UDP数据发送线程
+     * */ inner class UdpSendThread : Thread() {
+        override fun run() {
+            try {
+                buf = "send".toByteArray() // 创建DatagramSocket对象，使用随机端口
+                sendSocket = DatagramSocket()
+                serverAddr = InetAddress.getByName(SEND_IP)
+                val outPacket = DatagramPacket(buf, buf!!.size, serverAddr, Constant.SEND_PORT)
+                sendSocket!!.send(outPacket)
+                sendSocket!!.close()
+                sendHandler.sendEmptyMessage(1)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+
+        }
+    }
+
+
+    /*
+    *   UDP数据接收线程
+    * */ inner class UdpReceiveThread : Thread() {
+        override fun run() {
+            try {
+                receiveSocket = DatagramSocket(Constant.RECEIVE_PORT)
+                while (listenStatus) {
+                    val inBuf = ByteArray(1024)
+                    val inPacket = DatagramPacket(inBuf, inBuf.size)
+                    receiveSocket!!.receive(inPacket)
+                    val length = inPacket.length
+                    val mbyte = inPacket.data
+                    var message = StringTools.byte2hex(mbyte).substring(0, length * 2)
+                    if (message.toLowerCase().startsWith("aa") && message.toLowerCase().endsWith("bb") && length == 8) {
+                        message = message.substring(2, message.length - 2)
+                        for (i in 0 until 4) {
+                            val hex = message.substring(i * 2, i * 2 + 2)
+                            stringIp = if (stringIp == "") {
+                                "" + Integer.parseInt(hex, 16)
+                            } else {
+                                stringIp + "." + Integer.parseInt(hex, 16)
+                            }
+                        }
+                    }
+                    Log.e("cyf_udp", "stringIp : $stringIp")
+                    // 判断协议里面IP地址和真实IP地址是否一致
+                    if (inPacket.address.hostAddress == stringIp) {
+                        receiveHandler.sendEmptyMessage(1)
+                    } else {
+                        stringIp = ""
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+
         }
     }
 

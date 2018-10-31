@@ -55,7 +55,9 @@ class WriteDataActivity : BaseActivity(), BaseActivity.ClickMethoListener, Adapt
     private fun initView() {
         findViewById<TextView>(R.id.tv_notice).visibility = View.VISIBLE
         findViewById<TextView>(R.id.tv_notice).text = "暂无生产文件"
-        code = intent.getStringExtra("code")
+        if (intent.hasExtra("code")) {
+            code = intent.getStringExtra("code")
+        }
         setClickMethod(iv_back)
         setClickMethod(tv_refresh)
         list = ArrayList()
@@ -63,17 +65,29 @@ class WriteDataActivity : BaseActivity(), BaseActivity.ClickMethoListener, Adapt
     }
 
     override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-        sendClick(this@WriteDataActivity.localClassName, "" + p2)
-        val mIntent = Intent(this, WriteData2Activity::class.java)
-        mIntent.putExtra("code", code)
-        if (list!![p2].isLocal == null) {
-            mIntent.putExtra("isLocal", "0")
+        // 本地文件 或 用户远程连接中 或 需要审核的文件审核通过 或 不需要审核
+        if (list!![p2].localHas == "1" ||
+                isUserConnected ||
+                (list!![p2].needCheck == "1" && list!![p2].checkState == "2") ||
+                list!![p2].needCheck != "1") {
+            sendClick(this@WriteDataActivity.localClassName, "" + p2)
+            val mIntent = Intent(this, WriteData2Activity::class.java)
+            mIntent.putExtra("code", code)
+            if (list!![p2].isLocal == null) {
+                mIntent.putExtra("isLocal", "0")
+            } else {
+                mIntent.putExtra("isLocal", list!![p2].isLocal)
+            }
+            mIntent.putExtra("url", list!![p2].filePath)
+            mIntent.putExtra("name", list!![p2].fileName)
+            startActivity(mIntent)
+        } else if ((list!![p2].needCheck == "1" && list!![p2].checkState == "1")) {
+            toast(list!![p2].stateName)
         } else {
-            mIntent.putExtra("isLocal", list!![p2].isLocal)
+            val mIntent = Intent(this, WriteDataCheckActivity::class.java)
+            mIntent.putExtra("name", list!![p2].fileName)
+            startActivity(mIntent)
         }
-        mIntent.putExtra("url", list!![p2].filePath)
-        mIntent.putExtra("name", list!![p2].fileName)
-        startActivity(mIntent)
     }
 
     override fun doMethod(string: String?) {

@@ -41,7 +41,8 @@ class SettingActivity : BaseActivity() {
         }
         ll_cp.setOnClickListener {
             // 修改密码
-
+            val mIntent = Intent(this, ChangePwActivity::class.java)
+            startActivity(mIntent)
         }
         ll_update.setOnClickListener {
             // 检查更新app

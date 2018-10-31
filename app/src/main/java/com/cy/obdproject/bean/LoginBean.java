@@ -2,11 +2,12 @@ package com.cy.obdproject.bean;
 
 import java.io.Serializable;
 
-public class LoginBean implements Serializable{
+public class LoginBean implements Serializable {
 
     private String token;
     private String userType;
     private String userId;
+    private String tcpPort;//tcp socket
 
     private String heartBeat;// 间隔时间
     private String threshold;// 超时时间
@@ -54,12 +55,21 @@ public class LoginBean implements Serializable{
         this.threshold = threshold;
     }
 
+    public String getTcpPort() {
+        return tcpPort;
+    }
+
+    public void setTcpPort(String tcpPort) {
+        this.tcpPort = tcpPort;
+    }
+
     @Override
     public String toString() {
         return "LoginBean{" +
                 "token='" + token + '\'' +
                 ", userType='" + userType + '\'' +
                 ", userId='" + userId + '\'' +
+                ", tcpPort='" + tcpPort + '\'' +
                 ", heartBeat='" + heartBeat + '\'' +
                 ", threshold='" + threshold + '\'' +
                 '}';

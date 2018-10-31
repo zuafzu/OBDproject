@@ -10,6 +10,8 @@
     <string name="ipsetting">IP设置</string>
     <string name="setting">设置</string>
     <string name="sxwj">刷写</string>
+    <string name="xgmm">修改密码</string>
+    <string name="vintj">vin提交</string>
     <string name="connent_obd">连接OBD</string>
 
     <string name="select_role">选择角色</string>

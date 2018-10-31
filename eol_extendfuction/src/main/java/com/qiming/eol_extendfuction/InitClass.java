@@ -20,11 +20,12 @@ import java.util.Map;
 public class InitClass {
 
     private com.qiming.eol_public.InitClass publicUnit;
-    public void setPublicUnit(com.qiming.eol_public.InitClass publicUnit){
+
+    public void setPublicUnit(com.qiming.eol_public.InitClass publicUnit) {
         this.publicUnit = publicUnit;
     }
 
-    public  String GetSubString(String inputdata) {
+    public String GetSubString(String inputdata) {
         JSONObject jsonObject = new JSONObject();
         try {
             JSONObject jo = new JSONObject(inputdata);
@@ -39,18 +40,18 @@ public class InitClass {
                 jsonObject.put("DATA", string.substring(START, START + LEN));
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LogTools.errLog(e);
             try {
                 jsonObject.put("RESULT", "FAULT");
                 jsonObject.put("DESC", "错误信息：" + e.getMessage());
             } catch (JSONException e1) {
-                e1.printStackTrace();
+                LogTools.errLog(e1);
             }
         }
         return jsonObject.toString();
     }
 
-    public  String GetDate(String inputdata) {
+    public String GetDate(String inputdata) {
         JSONObject jsonObject = new JSONObject();
         try {
             JSONObject jo = new JSONObject(inputdata);
@@ -58,27 +59,33 @@ public class InitClass {
             Date date = new Date();
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
             String string = sdf.format(date);
-            if (FORMAT.equals("3")) {
-                string = string.substring(2, string.length());
-            } else if (FORMAT.equals("4")) {
+            switch (FORMAT) {
+                case "2":
 
+                    break;
+                case "3":
+                    string = string.substring(2, string.length());
+                    break;
+                case "4":
+
+                    break;
             }
             jsonObject.put("DATA", string);
             jsonObject.put("RESULT", "SUCCESS");
             jsonObject.put("DESC", "");
         } catch (Exception e) {
-            e.printStackTrace();
+            LogTools.errLog(e);
             try {
                 jsonObject.put("RESULT", "FAULT");
                 jsonObject.put("DESC", "错误信息：" + e.getMessage());
             } catch (JSONException e1) {
-                e1.printStackTrace();
+                LogTools.errLog(e1);
             }
         }
         return jsonObject.toString();
     }
 
-    public  String SetGlobalVariable(String inputdata) {
+    public String SetGlobalVariable(String inputdata) {
         JSONObject jsonObject = new JSONObject();
         try {
             JSONObject jo = new JSONObject(inputdata);
@@ -87,18 +94,18 @@ public class InitClass {
             jsonObject.put("RESULT", "SUCCESS");
             jsonObject.put("DESC", "");
         } catch (Exception e) {
-            e.printStackTrace();
+            LogTools.errLog(e);
             try {
                 jsonObject.put("RESULT", "FAULT");
                 jsonObject.put("DESC", "错误信息：" + e.getMessage());
             } catch (JSONException e1) {
-                e1.printStackTrace();
+                LogTools.errLog(e1);
             }
         }
         return jsonObject.toString();
     }
 
-    public  String ParserDtcExtendStateBitInfo(String inputdata) {
+    public String ParserDtcExtendStateBitInfo(String inputdata) {
         JSONObject jsonObject = new JSONObject();
         try {
             JSONObject jo = new JSONObject(inputdata);
@@ -200,12 +207,92 @@ public class InitClass {
             jsonObject.put("RESULT", "SUCCESS");
             jsonObject.put("DESC", "");
         } catch (Exception e) {
-            e.printStackTrace();
+            LogTools.errLog(e);
             try {
                 jsonObject.put("RESULT", "FAULT");
                 jsonObject.put("DESC", "错误信息：" + e.getMessage());
             } catch (JSONException e1) {
-                e1.printStackTrace();
+                LogTools.errLog(e1);
+            }
+        }
+        return jsonObject.toString();
+    }
+
+    public String Delay(String inputdata) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            JSONObject jo = new JSONObject(inputdata);
+            int time = Integer.valueOf(jo.optString("DATA"));
+            Thread.sleep(time);
+            jsonObject.put("RESULT", "SUCCESS");
+            jsonObject.put("DESC", "");
+        } catch (Exception e) {
+            LogTools.errLog(e);
+            try {
+                jsonObject.put("RESULT", "FAULT");
+                jsonObject.put("DESC", "错误信息：" + e.getMessage());
+            } catch (JSONException e1) {
+                LogTools.errLog(e1);
+            }
+        }
+        return jsonObject.toString();
+    }
+
+    public String IF(String inputdata) {
+        // STRING_EQUAL STRING_NO_EQUAL NUM_EQUAL NUM_NO_EUQAL NUM_BIG NUM_SMALL NUM_BIG_EUQAL NUM_SMALL_EUQAL
+        JSONObject jsonObject = new JSONObject();
+        try {
+            JSONObject jo = new JSONObject(inputdata);
+            String MODE = jo.optString("MODE");
+            String data1 = jo.optString("DATA1");
+            String data2 = jo.optString("DATA2");
+            long dataNum1 = 0;
+            long dataNum2 = 0;
+            if (MODE.contains("NUM")) {
+                dataNum1 = Long.valueOf(data1, 16);
+                dataNum2 = Long.valueOf(data2, 16);
+            }
+            boolean flag = false;
+            switch (MODE) {
+                case "STRING_EQUAL":
+                    flag = data1.equals(data2);
+                    break;
+                case "STRING_NO_EQUAL":
+                    flag = !data1.equals(data2);
+                    break;
+                case "NUM_EQUAL":
+                    flag = (dataNum1 == dataNum2);
+                    break;
+                case "NUM_NO_EUQAL":
+                    flag = (dataNum1 != dataNum2);
+                    break;
+                case "NUM_BIG":
+                    flag = (dataNum1 > dataNum2);
+                    break;
+                case "NUM_SMALL":
+                    flag = (dataNum1 < dataNum2);
+                    break;
+                case "NUM_BIG_EUQAL":
+                    flag = (dataNum1 >= dataNum2);
+                    break;
+                case "NUM_SMALL_EUQAL":
+                    flag = (dataNum1 <= dataNum2);
+                    break;
+            }
+            if (flag) {
+                jsonObject.put("RESULT", "SUCCESS");
+                jsonObject.put("DESC", "");
+            } else {
+                jsonObject.put("RESULT", "FAULT");
+                jsonObject.put("DESC", "判断不相符");
+            }
+        } catch (Exception e) {
+            LogTools.errLog(e);
+            try {
+                jsonObject.put("RESULT", "FAULT");
+                jsonObject.put("DESC", "错误信息：" + e.getMessage());
+            } catch (JSONException e1) {
+                LogTools.errLog(e1);
             }
         }
         return jsonObject.toString();

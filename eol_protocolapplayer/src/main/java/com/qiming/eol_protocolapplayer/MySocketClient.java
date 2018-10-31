@@ -48,12 +48,8 @@ public class MySocketClient {
             Class clazz = Class.forName("com.qiming.eol_scriptrunner.ScriptManager");
             Field field1 = clazz.getField("isImLog");
             isImLog = field1.getBoolean(clazz);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            LogTools.errLog(e);
         }
         if (mClient == null) {
             mClient = new Socket();
@@ -103,26 +99,27 @@ public class MySocketClient {
      * @param data 需要发送的内容
      */
     public void send(byte[] data) {
-        // 发送（写日志）
-        if (isImLog) {
-            String filePath = InitClass.pathTongxun;
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy年MM月dd日");
-            SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("HH:mm:ss.SSS");
-            Date date = new Date(System.currentTimeMillis());
-            String fileName = simpleDateFormat.format(date) + "log.txt";
-            if (data.length > 512) {
-                FileUtil.writeTxtToFile(simpleDateFormat2.format(date) + "  发送  " + "大于512字节...", filePath, fileName);
-            } else {
-                FileUtil.writeTxtToFile(simpleDateFormat2.format(date) + "  发送  " + StringTools.byte2hex(data), filePath, fileName);
-            }
-            Log.e("cyf77", "写完通讯发送的日志");
-        }
         try {
             if (mClient != null && mClient.isConnected()) {
                 OutputStream outputStream = mClient.getOutputStream();
                 outputStream.write(data);
             }
+            // 发送（写日志）
+            if (isImLog) {
+                String filePath = InitClass.pathTongxun;
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy年MM月dd日");
+                SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("HH:mm:ss.SSS");
+                Date date = new Date(System.currentTimeMillis());
+                String fileName = simpleDateFormat.format(date) + "log.txt";
+                if (data.length > 512) {
+                    FileUtil.writeTxtToFile(simpleDateFormat2.format(date) + "  发送  " + "大于512字节...", filePath, fileName);
+                } else {
+                    FileUtil.writeTxtToFile(simpleDateFormat2.format(date) + "  发送  " + StringTools.byte2hex(data), filePath, fileName);
+                }
+                Log.e("cyf77", "写完通讯发送的日志");
+            }
         } catch (Exception e) {
+            LogTools.errLog(e);
             Log.e("cyf", "obd连接异常，无法发送数据了");
         }
     }
@@ -152,7 +149,7 @@ public class MySocketClient {
             }
             Log.e("cyf", "是否断开了 ： " + (mClient == null));
         } catch (Exception e) {
-
+            LogTools.errLog(e);
         }
     }
 
@@ -201,7 +198,7 @@ public class MySocketClient {
             try {
                 netResult = mClient.getInputStream().read(result, currentRecvBuffAddr, DataSizeNeedToRecv);
             } catch (Exception e) {
-                // TODO Auto-generated catch block
+                LogTools.errLog(e);
                 return null;
             }
 

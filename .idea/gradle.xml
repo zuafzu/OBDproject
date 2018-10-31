@@ -9,6 +9,7 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/cyfimageselector" />
             <option value="$PROJECT_DIR$/cyfqrcode" />
             <option value="$PROJECT_DIR$/eol_extendfuction" />
             <option value="$PROJECT_DIR$/eol_message" />

@@ -51,6 +51,7 @@ class WriteData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
     private var handler: Handler? = null
     private var jsonArray = JSONArray()
     var isStart = false// 是否开始刷写
+    var isDownload = false// 是否下载完成或者读取完成
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,6 +81,7 @@ class WriteData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
     override fun doMethod(string: String) {
         when (string) {
             "btn_start" -> {
+                isDownload = false
                 isStart = true
                 progressBar.progress = 0
                 progressBar.visibility = View.VISIBLE
@@ -136,7 +138,9 @@ class WriteData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
                     toast(data!!.replace("toast", ""))
                 }
                 else -> {
-                    if (data == "刷写结束") {
+                    if (data == "") {
+                        tv_msg.text = ""
+                    } else if (data == "刷写结束") {
                         toast("刷写结束")
                         isStart = false
                         progressBar.progress = 0
@@ -162,6 +166,19 @@ class WriteData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
             }
             if (isD) {
                 super.setData(data)
+            }
+            // 防止刷写结束按钮
+            if (SPTools[this, Constant.USERTYPE, 0] as Int == Constant.userNormal &&
+                    btn_start.text.toString() == "刷写中......" &&
+                    !data!!.startsWith("-") &&
+                    !data!!.startsWith("toast") &&
+                    isDownload) {
+                val isRun = myApp.publicUnit.GetScriptIsRun(code)
+                if (!isRun) {
+                    Log.e("cyf777", "data ; " + data)
+                    // 恢复按钮可以点击
+                    setData("刷写结束")
+                }
             }
         }
     }
@@ -267,18 +284,18 @@ class WriteData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
         val formatter = SimpleDateFormat("HH:mm:ss")
         val dateString = formatter.format(currentTime)
         jsonArray.put("$dateString        生产文件下载完成")
-        unloadFileInfo()
         setData(jsonArray.toString())
+        unloadFileInfo()
 
-        if (SocketService.getIntance() == null || !SocketService.getIntance()!!.isConnected()) {
-            // if (isUserConnected) {
-            val currentTime = Date()
-            val formatter = SimpleDateFormat("HH:mm:ss")
-            val dateString = formatter.format(currentTime)
-            jsonArray.put("<font color='#FF0000'>$dateString        OBD未连接</font>")
-            setData(jsonArray.toString())
-            // }
-        }
+//        if (SocketService.getIntance() == null || !SocketService.getIntance()!!.isConnected()) {
+//            // if (isUserConnected) {
+//            val currentTime = Date()
+//            val formatter = SimpleDateFormat("HH:mm:ss")
+//            val dateString = formatter.format(currentTime)
+//            jsonArray.put("<font color='#FF0000'>$dateString        OBD未连接</font>")
+//            setData(jsonArray.toString())
+//            // }
+//        }
     }
 
     // 下载文件成功调用通知接口(判断本地文件是否可以刷写)
@@ -325,6 +342,7 @@ class WriteData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
                                 val dateString = formatter.format(currentTime)
                                 jsonArray.put("<font color='#FF0000'>$dateString        OBD未连接</font>")
                                 setData(jsonArray.toString())
+                                setData("刷写结束")
                                 // }
                             }
                         } else if (baseBean!!.code == "1002") {
@@ -395,13 +413,16 @@ class WriteData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
                 }
             })
             myApp.publicUnit.SetEvent(handler, code)
+            isDownload = true
             Thread {
                 while (true) {
                     val isRun = myApp.publicUnit.GetScriptIsRun(code)
                     if (!isRun) {
                         runOnUiThread {
                             // 恢复按钮可以点击
-                            setData("刷写结束")
+                            if (btn_start.text.toString() == "刷写中......") {
+                                setData("刷写结束")
+                            }
                         }
                         break
                     }

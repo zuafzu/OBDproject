@@ -46,6 +46,7 @@ public class ParseBean {
             this.setValueMin(Double.parseDouble(checkEmpty((rs.has("Value_Min") ? rs.getString("Value_Min") : "-1"), "-1")));
             this.setValueMax(Double.parseDouble(checkEmpty((rs.has("Value_Max") ? rs.getString("Value_Max") : "1"), "1")));
         } catch (JSONException e) {
+            LogTools.errLog(e);
         }
 
 

@@ -111,21 +111,35 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     public void showProgressDialog() {
-        if (progressDialog == null) {
-            progressDialog = new ProgressDialog(this);
-            progressDialog.setTitle("");//2.设置标题
-            progressDialog.setMessage("正在加载中，请稍等......");
-            progressDialog.setCancelable(false);
-            progressDialog.show();
-        } else if (!progressDialog.isShowing()) {
-            progressDialog.show();
-        }
+        showProgressDialog("正在加载中，请稍等......");
+    }
+
+    public void showProgressDialog(final String string) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (progressDialog == null) {
+                    progressDialog = new ProgressDialog(BaseActivity.this);
+                    progressDialog.setTitle("");//2.设置标题
+                    progressDialog.setMessage(string);
+                    progressDialog.setCancelable(false);
+                    progressDialog.show();
+                } else if (!progressDialog.isShowing()) {
+                    progressDialog.show();
+                }
+            }
+        });
     }
 
     public void dismissProgressDialog() {
-        if (progressDialog != null && progressDialog.isShowing()) {
-            progressDialog.dismiss();
-        }
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (progressDialog != null && progressDialog.isShowing()) {
+                    progressDialog.dismiss();
+                }
+            }
+        });
     }
 
     public void showWebSocketStopDialog(String msg) {

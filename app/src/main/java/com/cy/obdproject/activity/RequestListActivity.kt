@@ -40,8 +40,8 @@ class RequestListActivity : BaseActivity(), BaseActivity.ClickMethoListener {
 
     private fun initView() {
         SPTools.put(this@RequestListActivity, Constant.ISLOGIN, "1")
-        setClickMethod(iv_back)
-        setClickMethod(iv_quit)
+//        setClickMethod(iv_back)
+//        setClickMethod(iv_quit)
         requestList = ArrayList()
         listView!!.setOnItemClickListener { _, _, position, _ ->
             showProgressDialog()
@@ -54,6 +54,13 @@ class RequestListActivity : BaseActivity(), BaseActivity.ClickMethoListener {
             WebSocketService.getIntance()!!.sendMsg(Gson().toJson(webSocketBean))
         }
         iv_quit.visibility = View.VISIBLE
+        iv_back.setOnClickListener {
+            finish()
+        }
+        iv_quit.setOnClickListener {
+            val mIntent = Intent(this@RequestListActivity, SettingActivity::class.java)
+            startActivity(mIntent)
+        }
     }
 
     override fun doMethod(string: String?) {
@@ -75,7 +82,7 @@ class RequestListActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                 toast("再按一次退出程序")
                 mExitTime = System.currentTimeMillis()
             } else {
-                if( WebSocketService.getIntance()!=null){
+                if (WebSocketService.getIntance() != null) {
                     WebSocketService.getIntance()!!.stopSelf()
                 }
                 val ip = SPTools[this@RequestListActivity, Constant.IP, ""]

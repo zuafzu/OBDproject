@@ -38,7 +38,7 @@ public class MyApp extends Application {
         Bugly.init(getApplicationContext(), "7cfd480a08", false);
         activityList = new ArrayList<>();
         publicUnit.context = this;
-
+        // 设置https
         try {
             InputStream is = getAssets().open("static-s.cer");
             HttpsUtils.SSLParams sslParams = HttpsUtils.getSslSocketFactory(new InputStream[]{is}, null, null);

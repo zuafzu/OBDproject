@@ -5,15 +5,19 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 public class InitClass {
 
     private byte[] allBytesData = null;// 刷写文件byte数组
     private byte[] bytesData = null;// 提供给36block的部分byte数组
+    private List<Byte> crcBytesData = new ArrayList<>();
     private Map<String, EOLBean> map = new HashMap<>();
+    private Map<String, WriteFileBean> eolMap = new HashMap<>();
     private int index = 0;
 
     private com.qiming.eol_public.InitClass publicUnit;
@@ -79,7 +83,7 @@ public class InitClass {
                     ba2[3] = buffer[i * 8 + 11 + a];
                     String str = StringTools.byte2hex(ba1);
                     String str2 = StringTools.byte2hex(ba2);
-                    int b = (Integer.valueOf(str2, 16) - Integer.valueOf(str, 16) + 1);
+                    int b = (int) (Long.valueOf(str2, 16) - Long.valueOf(str, 16) + 1);
                     byte[] bytesData = ByteTools.subBytes(buffer, i * 8 + 14 + a + 1, b);
 
                     WriteFileBean writeFileBean = new WriteFileBean();
@@ -144,12 +148,12 @@ public class InitClass {
 //                jsonObject.put("DESC", "文件不存在");
 //            }
         } catch (Exception e) {
-            e.printStackTrace();
+            LogTools.errLog(e);
             try {
                 jsonObject.put("RESULT", "FAULT");
                 jsonObject.put("DESC", "错误信息：" + e.getMessage());
             } catch (JSONException e1) {
-                e1.printStackTrace();
+                LogTools.errLog(e1);
             }
         }
         return jsonObject.toString();
@@ -198,7 +202,7 @@ public class InitClass {
                         ba2[3] = buffer[i * 8 + 11 + a];
                         String str = StringTools.byte2hex(ba1);
                         String str2 = StringTools.byte2hex(ba2);
-                        int b = (Integer.valueOf(str2, 16) - Integer.valueOf(str, 16) + 1);
+                        int b = (int) (Long.valueOf(str2, 16) - Long.valueOf(str, 16) + 1);
                         byte[] bytesData = ByteTools.subBytes(buffer, i * 8 + 14 + a + 1, b);
 
                         WriteFileBean writeFileBean = new WriteFileBean();
@@ -263,12 +267,12 @@ public class InitClass {
                 jsonObject.put("DESC", "文件不存在");
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LogTools.errLog(e);
             try {
                 jsonObject.put("RESULT", "FAULT");
                 jsonObject.put("DESC", "错误信息：" + e.getMessage());
             } catch (JSONException e1) {
-                e1.printStackTrace();
+                LogTools.errLog(e1);
             }
         }
         return jsonObject.toString();
@@ -350,24 +354,212 @@ public class InitClass {
                 index = 0;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LogTools.errLog(e);
             try {
                 jsonObject.put("RESULT", "FAULT");
                 jsonObject.put("DESC", "错误信息：" + e.getMessage());
             } catch (JSONException e1) {
-                e1.printStackTrace();
+                LogTools.errLog(e1);
             }
         }
         return jsonObject.toString();
     }
 
     private String oderString(String string, int len) {
-        int size = len - string.length();
-        StringBuilder value = new StringBuilder();
-        for (int i = 0; i < size; i++) {
-            value.append("0");
+        if (string.length() > len) {
+            return string.substring(string.length() - len, string.length());
+        } else {
+            int size = len - string.length();
+            StringBuilder value = new StringBuilder();
+            for (int i = 0; i < size; i++) {
+                value.append("0");
+            }
+            return value.toString() + string;
         }
-        return value.toString() + string;
+    }
+
+    public String EOLFileParserByteInit(String inputdata) {
+        JSONObject jsonObject = new JSONObject();
+        index = 0;
+        try {
+            if (allBytesData == null) {
+                jsonObject.put("RESULT", "FAULT");
+                jsonObject.put("DESC", "错误信息：刷写文件字节为空");
+                return jsonObject.toString();
+            }
+            byte[] buffer = allBytesData;
+            eolMap.clear();
+            byte[] mByte = {buffer[6]};
+            int num = Integer.valueOf(StringTools.byte2hex(mByte), 16);
+            int a = 0;
+            for (int i = 0; i < num; i++) {
+                byte[] ba1 = new byte[4];
+                ba1[0] = buffer[i * 8 + 10 + a];
+                ba1[1] = buffer[i * 8 + 9 + a];
+                ba1[2] = buffer[i * 8 + 8 + a];
+                ba1[3] = buffer[i * 8 + 7 + a];
+                byte[] ba2 = new byte[4];
+                ba2[0] = buffer[i * 8 + 14 + a];
+                ba2[1] = buffer[i * 8 + 13 + a];
+                ba2[2] = buffer[i * 8 + 12 + a];
+                ba2[3] = buffer[i * 8 + 11 + a];
+                String str = StringTools.byte2hex(ba1);
+                String str2 = StringTools.byte2hex(ba2);
+                int b = (int) (Long.valueOf(str2, 16) - Long.valueOf(str, 16) + 1);
+                byte[] bytesData = ByteTools.subBytes(buffer, i * 8 + 14 + a + 1, b);
+
+                WriteFileBean writeFileBean = new WriteFileBean();
+                writeFileBean.setAddress(str);
+                writeFileBean.setEndAddress(str2);
+                writeFileBean.setLength(b + "");
+                writeFileBean.setData(bytesData);
+                String crc = StringTools.byte2hex(intToBytes(getCRC32(bytesData)));
+                if (crc.length() == 1) {
+                    crc = "0000000" + crc;
+                } else if (crc.length() == 2) {
+                    crc = "000000" + crc;
+                } else if (crc.length() == 3) {
+                    crc = "00000" + crc;
+                } else if (crc.length() == 4) {
+                    crc = "0000" + crc;
+                } else if (crc.length() == 5) {
+                    crc = "000" + crc;
+                } else if (crc.length() == 6) {
+                    crc = "00" + crc;
+                } else if (crc.length() == 7) {
+                    crc = "0" + crc;
+                }
+                writeFileBean.setCrc(crc);
+                eolMap.put("" + i, writeFileBean);
+                a += b;
+            }
+            jsonObject.put("RESULT", "SUCCESS");
+            jsonObject.put("DESC", "");
+        } catch (Exception e) {
+            LogTools.errLog(e);
+            try {
+                jsonObject.put("RESULT", "FAULT");
+                jsonObject.put("DESC", "错误信息：" + e.getMessage());
+            } catch (JSONException e1) {
+                LogTools.errLog(e1);
+            }
+        }
+        return jsonObject.toString();
+    }
+
+    public String EOLFileReadNext(String inputdata) {
+        //{"ADDRESS_LEN":"3","SIZE_LEN":"3","CHECK_LEN":"4"}
+        JSONObject jsonObject = new JSONObject();
+        try {
+            JSONObject jo = new JSONObject(inputdata);
+            String ADDRESS_LEN = jo.optString("ADDRESS_LEN").trim();
+            String SIZE_LEN = jo.optString("SIZE_LEN").trim();
+            String CHECK_LEN = jo.optString("CHECK_LEN").trim();
+            if (eolMap.size() > index) {
+                String key = String.valueOf(index);
+                WriteFileBean writeFileBean = eolMap.get(key);
+                String strBeginAddress = oderString(writeFileBean.getAddress(), 8);
+                if (ADDRESS_LEN.equals("3")) {
+                    strBeginAddress = strBeginAddress.substring(2, strBeginAddress.length());
+                }
+                jsonObject.put("BEGIN_ADDRESS", strBeginAddress);
+                String LEN = oderString(Integer.toHexString(Integer.valueOf(writeFileBean.getLength())), 8);
+                if (SIZE_LEN.equals("3")) {
+                    LEN = LEN.substring(2, LEN.length());
+                }
+                jsonObject.put("DATA_LEN_HEX", LEN);
+                jsonObject.put("DATA_LEN", LEN);
+                bytesData = writeFileBean.getData();
+                // jsonObject.put("DATA_MEMORY", StringTools.byte2hex(eolBean.getDatas().get(index).getData()));
+                String crc = writeFileBean.getCrc();
+                if (CHECK_LEN.equals("3")) {
+                    crc = crc.substring(2, crc.length());
+                }
+                jsonObject.put("TOTAL_CHECK", crc);
+                jsonObject.put("CHECKDATA", crc);
+                jsonObject.put("RESULT", "SUCCESS");
+                jsonObject.put("DESC", "");
+                index++;
+            } else {
+                jsonObject.put("RESULT", "FAULT");
+                jsonObject.put("DESC", "循环完毕");
+                index = 0;
+            }
+        } catch (Exception e) {
+            LogTools.errLog(e);
+            try {
+                jsonObject.put("RESULT", "FAULT");
+                jsonObject.put("DESC", "错误信息：" + e.getMessage());
+            } catch (JSONException e1) {
+                LogTools.errLog(e1);
+            }
+        }
+        return jsonObject.toString();
+    }
+
+    public String SetCRCData(String inputdata) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("RESULT", "SUCCESS");
+            jsonObject.put("DESC", "");
+            for (int i = 0; i < bytesData.length; i++) {
+                crcBytesData.add(bytesData[i]);
+            }
+        } catch (Exception e) {
+            LogTools.errLog(e);
+            try {
+                jsonObject.put("RESULT", "FAULT");
+                jsonObject.put("DESC", "错误信息：" + e.getMessage());
+            } catch (JSONException e1) {
+                LogTools.errLog(e1);
+            }
+        }
+        return jsonObject.toString();
+    }
+
+    public String GetCRCValue(String inputdata) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("RESULT", "SUCCESS");
+            jsonObject.put("DESC", "");
+            JSONObject jo = new JSONObject(inputdata);
+            String CHECK_LEN = jo.optString("CHECK_LEN").trim();
+
+            byte[] mmByte = new byte[crcBytesData.size()];
+            for (int i = 0; i < crcBytesData.size(); i++) {
+                mmByte[i] = crcBytesData.get(i);
+            }
+            String crc = StringTools.byte2hex(intToBytes(getCRC32(mmByte)));
+            if (crc.length() == 1) {
+                crc = "0000000" + crc;
+            } else if (crc.length() == 2) {
+                crc = "000000" + crc;
+            } else if (crc.length() == 3) {
+                crc = "00000" + crc;
+            } else if (crc.length() == 4) {
+                crc = "0000" + crc;
+            } else if (crc.length() == 5) {
+                crc = "000" + crc;
+            } else if (crc.length() == 6) {
+                crc = "00" + crc;
+            } else if (crc.length() == 7) {
+                crc = "0" + crc;
+            }
+            if (CHECK_LEN.equals("3")) {
+                crc = crc.substring(2, crc.length());
+            }
+            jsonObject.put("DATA", crc);
+            crcBytesData.clear();
+        } catch (Exception e) {
+            LogTools.errLog(e);
+            try {
+                jsonObject.put("RESULT", "FAULT");
+                jsonObject.put("DESC", "错误信息：" + e.getMessage());
+            } catch (JSONException e1) {
+                LogTools.errLog(e1);
+            }
+        }
+        return jsonObject.toString();
     }
 
 }

@@ -309,6 +309,14 @@ class WebSocketService : Service() {
                             } else {
                                 // 专家
                                 for (i in 0 until (application as MyApp).activityList.size) {
+                                    if ((application as MyApp).activityList[i].localClassName.contains("SelectRoleActivity")) {
+                                        ((application as MyApp).activityList[i] as BaseActivity).runOnUiThread {
+                                            (application as MyApp).activityList[i].finish()
+                                        }
+                                        break
+                                    }
+                                }
+                                for (i in 0 until (application as MyApp).activityList.size) {
                                     if ((application as MyApp).activityList[i].localClassName.contains("LoginActivity")) {
                                         ((application as MyApp).activityList[i] as BaseActivity).runOnUiThread {
                                             val mIntent = Intent(((application as MyApp).activityList[i] as LoginActivity),

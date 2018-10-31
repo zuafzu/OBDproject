@@ -108,7 +108,7 @@ public class ScriptManager {
                 mEnviment.put(key, obj.optString(key));
             }
         } catch (JSONException e) {
-            e.printStackTrace();
+            LogTools.errLog(e);
             return false;
         }
         return true;
@@ -120,6 +120,7 @@ public class ScriptManager {
             InputStream instream = new FileInputStream(file);
             LoadScript(instream);
         } catch (Exception e) {
+            LogTools.errLog(e);
             setMstrLastErrorMsg(e.getMessage());
 //            if (context != null) {
 //                activity.runOnUiThread(new Runnable() {
@@ -218,6 +219,7 @@ public class ScriptManager {
             }
             instream.close();
         } catch (Exception e) {
+            LogTools.errLog(e);
             setMstrLastErrorMsg(e.getMessage());
 //            if (context != null) {
 //                activity.runOnUiThread(new Runnable() {

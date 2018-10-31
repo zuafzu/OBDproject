@@ -16,8 +16,8 @@ public class FileUtil {
             rf = new RandomAccessFile(file, "r");
             data = new byte[(int) rf.length()];
             rf.readFully(data);
-        } catch (Exception exception) {
-            exception.printStackTrace();
+        } catch (Exception e) {
+            LogTools.errLog(e);
         } finally {
             closeQuietly(rf);
         }
@@ -30,8 +30,8 @@ public class FileUtil {
             if (closeable != null) {
                 closeable.close();
             }
-        } catch (Exception exception) {
-            exception.printStackTrace();
+        } catch (Exception e) {
+            LogTools.errLog(e);
         }
     }
 
@@ -58,7 +58,7 @@ public class FileUtil {
                 raf.write(strContent.getBytes());
                 raf.close();
             } catch (Exception e) {
-                Log.e("TestFile", "Error on write File:" + e);
+                LogTools.errLog(e);
             }
         }
     }
@@ -84,7 +84,7 @@ public class FileUtil {
                 raf.write(strContent.getBytes());
                 raf.close();
             } catch (Exception e) {
-                Log.e("TestFile", "Error on write File:" + e);
+                LogTools.errLog(e);
             }
         }
     }
@@ -99,7 +99,7 @@ public class FileUtil {
                 file.createNewFile();
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LogTools.errLog(e);
         }
         return file;
     }
@@ -113,7 +113,7 @@ public class FileUtil {
                 file.mkdir();
             }
         } catch (Exception e) {
-            Log.i("error:", e + "");
+            LogTools.errLog(e);
         }
     }
 

@@ -65,7 +65,7 @@ public class Command {
 
             }
         } catch (JSONException e) {
-            e.printStackTrace();
+            LogTools.errLog(e);
         }
         return tmpParam.toString();
     }

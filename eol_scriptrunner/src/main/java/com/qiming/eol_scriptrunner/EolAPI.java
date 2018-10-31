@@ -21,9 +21,9 @@ public class EolAPI {
                 jsonObject.put("DESC", "jar包模块异常");
                 data = jsonObject.toString();
             } catch (JSONException e1) {
-                e1.printStackTrace();
+                LogTools.errLog(e1);
             }
-            e.printStackTrace();
+            LogTools.errLog(e);
         }
 
         return data;

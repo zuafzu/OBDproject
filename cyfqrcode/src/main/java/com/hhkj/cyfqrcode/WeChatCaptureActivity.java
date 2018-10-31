@@ -254,11 +254,11 @@ public class WeChatCaptureActivity extends AppCompatActivity {
             }
         }
 
-
         @Override
         public void onScanQRCodeOpenCameraError() {
             Log.e(TAG, "打开相机出错");
         }
+
     };
 
 }

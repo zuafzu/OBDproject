@@ -55,6 +55,7 @@ public class Script {
             }
             mCmds.put(miCmdCount++, Cmd);
         } catch (Exception e) {
+            LogTools.errLog(e);
             return false;
         }
         return true;
@@ -107,6 +108,7 @@ public class Script {
                 }
                 writeLog(scriptName + " -- " + "跳转iIP：" + iIP + "\n");
             } catch (Exception e) {
+                LogTools.errLog(e);
                 manager.setMiLastErrorNo(iIP);
                 manager.setMstrLastErrorMsg(e.getMessage());
 
@@ -167,7 +169,7 @@ public class Script {
 
                     manager.PublicUnit.AddMessage2("第" + iLineNo + "行错误：" + DESC);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    LogTools.errLog(e);
                 }
                 break;
             case 3:

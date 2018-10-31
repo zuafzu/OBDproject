@@ -78,7 +78,9 @@ class LoginActivity : BaseActivity(), BaseActivity.ClickMethoListener {
             val loginBean = Gson().fromJson(response.data, LoginBean::class.java)
             WebSocketService.spaceTime = loginBean.heartBeat!!.toLong() * 1000
             WebSocketService.outTime = 2 * ((loginBean.threshold!!.toLong() - loginBean.heartBeat!!.toLong()) * 1000)// 超时时间乘以2，增大容错空间
-
+            if (loginBean.tcpPort != null && loginBean.tcpPort != "" && loginBean.tcpPort.toInt() > 0) {
+                Constant.mDstPort = loginBean.tcpPort.toInt()
+            }
             SPTools.put(this@LoginActivity, Constant.USERNAME, "" + et_name.text.toString())
             SPTools.put(this@LoginActivity, Constant.TOKEN, "" + loginBean.token)
             SPTools.put(this@LoginActivity, Constant.USERID, "" + loginBean.userId)
@@ -131,7 +133,7 @@ class LoginActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                 intent.putExtra("password", et_pw.text.toString())
                 intent.putExtra("list", list)
                 startActivity(intent)
-                finish()
+                // finish()
             } else {
                 toast("返回角色信息错误")
                 dismissProgressDialog()
