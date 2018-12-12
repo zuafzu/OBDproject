@@ -1,7 +1,5 @@
 package com.qiming.eol_protocolapplayer;
 
-import android.util.Log;
-
 public class OBDagreement {
 
     public static Integer num = 0;// 1个字节（2位的16进制）
@@ -27,7 +25,7 @@ public class OBDagreement {
      * @return
      */
     public static String decodeString(String string) {
-        Log.e("cyf", "加密前发送数据：" + string);
+        // Log.e("cyf", "加密前发送数据：" + string);
         // return string;
         String crt = string.substring(8, 10);
         byte[] oldByte = StringTools.hex2byte(string.substring(12, string.length() - 2));
@@ -98,11 +96,21 @@ public class OBDagreement {
     /**
      * 设置15765流控中STmin时间
      *
+     * @return
+     */
+    public static String e() {
+        // return decodeString("aa000471" + numPlus() + "" + ECUagreement.canLinkNum + "" + stmin + "55");
+        return decodeString("aa000471" + numPlus() + "" + ECUagreement.canLinkNum + "" + "01" + "55");
+    }
+
+    /**
+     * 设置15765流控中STmin时间2
+     *
      * @param stmin 1个字节
      * @return
      */
-    public static String e(String stmin) {
-        return decodeString("aa000471" + numPlus() + "" + ECUagreement.canLinkNum + "" + stmin + "55");
+    public static String t(String stmin) {
+        return decodeString("aa000472" + numPlus() + "" + ECUagreement.canLinkNum + "" + stmin + "55");
     }
 
     /**

@@ -162,12 +162,18 @@ public class InitClass {
                         jsonObject.put("DESC", DESC);
                         return jsonObject.toString();
                     }
-                    msg = OBDagreement.e(String.format("%02x", Integer.valueOf(jo.optString("STMIN"))));
+                    msg = OBDagreement.t(String.format("%02x", Integer.valueOf(jo.optString("STMIN"))));
                     if (replay()) {
                         jsonObject.put("RESULT", "FAULT");
                         jsonObject.put("DESC", DESC);
                         return jsonObject.toString();
                     }
+//                    msg = OBDagreement.e();
+//                    if (replay()) {
+//                        jsonObject.put("RESULT", "FAULT");
+//                        jsonObject.put("DESC", DESC);
+//                        return jsonObject.toString();
+//                    }
                     msg = OBDagreement.f("00");
                     if (replay()) {
                         jsonObject.put("RESULT", "FAULT");

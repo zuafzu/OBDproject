@@ -25,7 +25,7 @@ android {
         }
     }
     sourceSets { main { assets.srcDirs = ['src/assets', 'src/assets/'] } }
-    buildToolsVersion '28.0.3'
+
 }
 
 dependencies {

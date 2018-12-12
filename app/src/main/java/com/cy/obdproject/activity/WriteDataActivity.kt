@@ -114,7 +114,7 @@ class WriteDataActivity : BaseActivity(), BaseActivity.ClickMethoListener, Adapt
             toast(data!!.replace("toast", ""))
         } else {
             try {
-                val mdata = data!!.replace("//", "\\/\\/").replace("/?", "\\/?").replace("\\", "\\\\")
+                val mdata = data!!.replace("\\", "\\\\")
                 val beans = Gson().fromJson<List<WriteDataBean>>(mdata, object : TypeToken<ArrayList<WriteDataBean>>() {}.type) as ArrayList<WriteDataBean>?
                 list!!.clear()
                 list!!.addAll(beans!!)
@@ -192,7 +192,7 @@ class WriteDataActivity : BaseActivity(), BaseActivity.ClickMethoListener, Adapt
                         bean.msg = jsonObject.optString("msg")
                         val json2 = jsonObject.optString("data")
                         if ("" != json2 && "{}" != json2 && "{ }" != json2) {
-                            bean.data = json2
+                            bean.data = json2.replace("\\/", "/")
                         }
                         return bean
                     }

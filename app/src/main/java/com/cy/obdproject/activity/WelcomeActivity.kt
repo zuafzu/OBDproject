@@ -129,7 +129,11 @@ class WelcomeActivity : BaseActivity() {
     // 最新模块文件
     private fun getModuleFile() {
         tv_msg.text = "检查模块文件..."
-        val file = SPTools[this, "ModuleFile", ""] as String
+        var file = SPTools[this, "ModuleFile", ""] as String
+        if (!File(com.qiming.eol_public.InitClass.pathMokuai + "/" + file).exists()) {
+            // 防止用户主动删除文件，导致有记录但是没有文件
+            file = ""
+        }
         val map = HashMap<String, String>()
         map["file"] = "" + file
         NetTools.net(map, Urls().getModuleFile, this, {
@@ -150,7 +154,11 @@ class WelcomeActivity : BaseActivity() {
     // 最新流程文件
     private fun getControlFile() {
         tv_msg.text = "检查流程文件..."
-        val file = SPTools[this, "ControlFile", ""] as String
+        var file = SPTools[this, "ControlFile", ""] as String
+        if (!File(com.qiming.eol_public.InitClass.pathLiucheng + "/" + file).exists()) {
+            // 防止用户主动删除文件，导致有记录但是没有文件
+            file = ""
+        }
         scriptName = file
         val map = HashMap<String, String>()
         map["file"] = "" + file

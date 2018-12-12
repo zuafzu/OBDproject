@@ -232,50 +232,54 @@ class WriteData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
 
     @SuppressLint("StaticFieldLeak")
     private fun download2() {
-        object : AsyncTask<String, Void, ByteArray>() {
+        try {
+            object : AsyncTask<String, Void, ByteArray>() {
 
-            override fun onPreExecute() {
-                super.onPreExecute()
-                val currentTime = Date()
-                val formatter = SimpleDateFormat("HH:mm:ss")
-                val dateString = formatter.format(currentTime)
-                jsonArray.put("$dateString        生产文件开始读取")
-                setData(jsonArray.toString())
-            }
+                override fun onPreExecute() {
+                    super.onPreExecute()
+                    val currentTime = Date()
+                    val formatter = SimpleDateFormat("HH:mm:ss")
+                    val dateString = formatter.format(currentTime)
+                    jsonArray.put("$dateString        生产文件开始读取")
+                    setData(jsonArray.toString())
+                }
 
-            override fun doInBackground(vararg strings: String): ByteArray? {
-                SPTools.put(this@WriteData2Activity, "ControlFile", "")
-                val mUrl = URL(strings[0])
-                val connection = mUrl.openConnection()
-                //获取内容长度
-                val contentLength = connection.contentLength
-                val scriptInputStream = connection.getInputStream()
-                var totalReaded = 0L
-                val baos = ByteArrayOutputStream()
-                val buffer = ByteArray(1024)
-                var len = 0
-                do {
-                    len = scriptInputStream!!.read(buffer)
-                    if (len == -1) {
-                        break
-                    }
-                    baos.write(buffer, 0, len)
-                    totalReaded += len
-                    val progress = totalReaded * 100 / contentLength
-                    setData("-" + progress.toInt())
-                } while (true)
-                scriptInputStream!!.close()
-                val result = baos.toByteArray()
-                baos.close()
-                return result
-            }
+                override fun doInBackground(vararg strings: String): ByteArray? {
+                    SPTools.put(this@WriteData2Activity, "ControlFile", "")
+                    val mUrl = URL(strings[0])
+                    val connection = mUrl.openConnection()
+                    //获取内容长度
+                    val contentLength = connection.contentLength
+                    val scriptInputStream = connection.getInputStream()
+                    var totalReaded = 0L
+                    val baos = ByteArrayOutputStream()
+                    val buffer = ByteArray(1024)
+                    var len = 0
+                    do {
+                        len = scriptInputStream!!.read(buffer)
+                        if (len == -1) {
+                            break
+                        }
+                        baos.write(buffer, 0, len)
+                        totalReaded += len
+                        val progress = totalReaded * 100 / contentLength
+                        setData("-" + progress.toInt())
+                    } while (true)
+                    scriptInputStream!!.close()
+                    val result = baos.toByteArray()
+                    baos.close()
+                    return result
+                }
 
-            override fun onPostExecute(result: ByteArray?) {
-                super.onPostExecute(result)
-                downloadNext(result)
-            }
+                override fun onPostExecute(result: ByteArray?) {
+                    super.onPostExecute(result)
+                    downloadNext(result)
+                }
 
-        }.execute(url)
+            }.execute(url)
+        } catch (e: Exception) {
+            LogTools.errLog(e)
+        }
     }
 
     private fun downloadNext(result: ByteArray?) {

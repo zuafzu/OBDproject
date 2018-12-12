@@ -44,6 +44,18 @@ public class InitClass {
                     mask = 0x00000000a28ee118L;
                     data = StringTools.byte2hex(_GetBootKey(mask, Long.valueOf(seed, 16)));
                     break;
+                case "EV_SCCU":
+                    mask = 0x00000000a703395dL;
+                    data = StringTools.byte2hex(_GetBootKey(mask, Long.valueOf(seed, 16)));
+                    break;
+                case "EV_HUD":
+                    mask = 0x00000000bbb4b937L;
+                    data = StringTools.byte2hex(_GetBootKey(mask, Long.valueOf(seed, 16)));
+                    break;
+                case "EV_PLGM":
+                    mask = 0x00000000ab59ef31L;
+                    data = StringTools.byte2hex(_GetBootKey(mask, Long.valueOf(seed, 16)));
+                    break;
             }
             if (mask == 0) {
                 jsonObject.put("RESULT", "FAULT");
