@@ -45,11 +45,10 @@ public class WriteDataAdapter extends BaseAdapter {
         Holder holder = null;
         if (convertView == null) {
             holder = new Holder();
-            convertView = LayoutInflater.from(context).inflate(R.layout.list_item_base_info, parent, false);
+            convertView = LayoutInflater.from(context).inflate(R.layout.list_item_write_data, parent, false);
             holder.tv_name = (TextView) convertView.findViewById(R.id.tv_name);
             holder.tv_name2 = (TextView) convertView.findViewById(R.id.tv_name2);
             holder.tv_value = (TextView) convertView.findViewById(R.id.tv_value);
-            holder.view_line = (View) convertView.findViewById(R.id.view_line);
             convertView.setTag(holder);
         } else {
             holder = (Holder) convertView.getTag();
@@ -103,7 +102,6 @@ public class WriteDataAdapter extends BaseAdapter {
 
     public class Holder {
         public TextView tv_name, tv_name2, tv_value;
-        public View view_line;
     }
 
 }

@@ -2,8 +2,6 @@ package com.cy.obdproject.activity
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.graphics.BitmapFactory
-import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.support.v7.widget.GridLayoutManager
@@ -23,15 +21,12 @@ import com.cy.obdproject.bean.WebSocketBean
 import com.cy.obdproject.constant.Constant
 import com.cy.obdproject.socket.SocketService
 import com.cy.obdproject.socket.WebSocketService
-import com.cy.obdproject.tools.FastBlurUtil
 import com.cy.obdproject.tools.LogTools
 import com.cy.obdproject.tools.SPTools
 import com.cy.obdproject.tools.WifiTools
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.activity_main.*
-import org.jetbrains.anko.dip
-import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.toast
 import org.json.JSONArray
 import org.json.JSONObject
@@ -101,14 +96,6 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
     }
 
     private fun initView() {
-        // 获取需要被模糊的原图bitmap
-        val res = resources
-        val scaledBitmap = BitmapFactory.decodeResource(res, R.mipmap.ic_background)
-
-        //        scaledBitmap为目标图像，10是缩放的倍数（越大模糊效果越高）
-        val blurBitmap = FastBlurUtil.toBlur(scaledBitmap, 2)
-        iv_background.scaleType = ImageView.ScaleType.CENTER_CROP
-        iv_background.setImageBitmap(blurBitmap)
 
         SPTools.put(this@MainActivity, Constant.ISLOGIN, "1")
         if (null != SelectRoleActivity.INSTANCE) {
@@ -357,16 +344,17 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
         }
 
         override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-            val lp = LinearLayout.LayoutParams(matchParent, matchParent)
-            lp.bottomMargin = dip(8)
-            lp.topMargin = dip(8)
-            if (position % 2 == 0) {
-                lp.leftMargin = dip(16)
-                lp.rightMargin = dip(8)
+            val width = (resources.displayMetrics.widthPixels) / 2
+            var a = if (homes!!.size % 2 == 0) {
+                homes!!.size / 2
             } else {
-                lp.leftMargin = dip(8)
-                lp.rightMargin = dip(16)
+                homes!!.size / 2 + 1
             }
+            if (a < 2) {
+                a = 2
+            }
+            val height = (resources.displayMetrics.heightPixels - dip2px(this@MainActivity, 67f)) / 2 / a
+            val lp = LinearLayout.LayoutParams(width, height)
             holder.ll_main!!.layoutParams = lp
             when (homes!![position]) {
                 "221" -> {
@@ -374,8 +362,8 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                         click("ll_main1")
                     }
                     holder.textView!!.text = getString(R.string.djbxx)
-                    holder.imageView!!.setImageResource(R.mipmap.ic_card1)
-                    holder.imageView!!.setBackgroundColor(Color.parseColor("#4f5d73"))
+                    holder.imageView!!.setImageResource(R.mipmap.ic_file)
+                    // holder.imageView!!.setBackgroundColor(Color.parseColor("#4f5d73"))
                 }
                 "222" -> {
                     holder.ll_main!!.setOnClickListener {
@@ -383,23 +371,23 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                     }
                     holder.textView!!.text = getString(R.string.xjbxx)
                     holder.imageView!!.setImageResource(R.mipmap.ic_card2)//4f5d73
-                    holder.imageView!!.setBackgroundColor(Color.parseColor("#77b3d4"))
+                    // holder.imageView!!.setBackgroundColor(Color.parseColor("#77b3d4"))
                 }
                 "223" -> {
                     holder.ll_main!!.setOnClickListener {
                         click("ll_main3")
                     }
                     holder.textView!!.text = getString(R.string.gzdm)
-                    holder.imageView!!.setImageResource(R.mipmap.ic_card3)
-                    holder.imageView!!.setBackgroundColor(Color.parseColor("#77b3d4"))
+                    holder.imageView!!.setImageResource(R.mipmap.alert)
+                    // holder.imageView!!.setBackgroundColor(Color.parseColor("#77b3d4"))
                 }
                 "224" -> {
                     holder.ll_main!!.setOnClickListener {
                         click("ll_main4")
                     }
                     holder.textView!!.text = getString(R.string.dtsj)
-                    holder.imageView!!.setImageResource(R.mipmap.ic_card4)
-                    holder.imageView!!.setBackgroundColor(Color.parseColor("#4f5d73"))
+                    holder.imageView!!.setImageResource(R.mipmap.ic_graph_chart)
+                    // holder.imageView!!.setBackgroundColor(Color.parseColor("#4f5d73"))
                 }
                 "225" -> {
                     holder.ll_main!!.setOnClickListener {
@@ -407,15 +395,15 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                     }
                     holder.textView!!.text = getString(R.string.iotest)
                     holder.imageView!!.setImageResource(R.mipmap.ic_card5)
-                    holder.imageView!!.setBackgroundColor(Color.parseColor("#4f5d73"))
+                    // holder.imageView!!.setBackgroundColor(Color.parseColor("#4f5d73"))
                 }
                 "226" -> {
                     holder.ll_main!!.setOnClickListener {
                         click("ll_main6")
                     }
                     holder.textView!!.text = getString(R.string.sxwj)
-                    holder.imageView!!.setImageResource(R.mipmap.ic_card6)
-                    holder.imageView!!.setBackgroundColor(Color.parseColor("#77b3d4"))
+                    holder.imageView!!.setImageResource(R.mipmap.ic_inbox_outgoing)
+                    // holder.imageView!!.setBackgroundColor(Color.parseColor("#77b3d4"))
                 }
             }
         }

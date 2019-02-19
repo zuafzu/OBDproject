@@ -10,7 +10,6 @@ import android.widget.TextView;
 import com.cy.obdproject.R;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class SelectAdapter extends BaseAdapter {
 
@@ -44,25 +43,17 @@ public class SelectAdapter extends BaseAdapter {
             holder = new Holder();
             convertView = LayoutInflater.from(context).inflate(R.layout.list_item_selecet, parent, false);
             holder.tv_name = (TextView) convertView.findViewById(R.id.tv_name);
-            holder.tv_value = (TextView) convertView.findViewById(R.id.tv_value);
-            holder.view_line = (View) convertView.findViewById(R.id.view_line);
             convertView.setTag(holder);
         } else {
             holder = (Holder) convertView.getTag();
         }
 
         holder.tv_name.setText(items.get(position).toString());
-//        if (position != (getCount() - 1)) {
-//            holder.view_line.setVisibility(View.VISIBLE);
-//        } else {
-//            holder.view_line.setVisibility(View.GONE);
-//        }
         return convertView;
     }
 
     public class Holder {
-        public TextView tv_name, tv_value;
-        public View view_line;
+        public TextView tv_name;
     }
 
 }

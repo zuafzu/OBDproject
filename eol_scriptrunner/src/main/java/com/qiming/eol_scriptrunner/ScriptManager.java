@@ -13,9 +13,9 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import dalvik.system.DexClassLoader;
 
@@ -38,7 +38,7 @@ public class ScriptManager {
     private int miLastErrorNo = 0;
 
     public JSONObject mEnviment = new JSONObject();
-    private Map<String, Script> list = new HashMap<>();
+    private Map<String, Script> scriptMap = new ConcurrentHashMap<>();
 
     com.qiming.eol_public.InitClass PublicUnit = null;
 
@@ -84,7 +84,7 @@ public class ScriptManager {
     }
 
     public void Run(String name) {
-        new Thread(new RunnableWithParams(list.get(name), new RunnableWithParams.IRunnableWithParams() {
+        new Thread(new RunnableWithParams(scriptMap.get(name), new RunnableWithParams.IRunnableWithParams() {
 
             @Override
             public void Run(Object UserParams) {
@@ -182,7 +182,7 @@ public class ScriptManager {
                     continue;
                 }
                 if (strSingleLine.indexOf("CODE_END") >= 0) {
-                    list.put(name, script);
+                    scriptMap.put(name, script);
                     strParserType = "CODE_END";
                     continue;
                 }
@@ -190,7 +190,15 @@ public class ScriptManager {
                     LoadUISeg(strSingleLine);
                 }
                 if (strParserType.equals("FUN_BEGIN")) {
-                    String libPath = InitClass.pathMokuai + "/" + strSingleLine.toLowerCase() + ".jar"; // 要动态加载的jar
+                    // 有测试模块包文件夹的时候使用本地测试模块包
+                    String libPath;
+                    if ((new File(InitClass.pathTestMokuai)).exists()) {
+                        // 测试
+                        libPath = InitClass.pathTestMokuai + "/" + strSingleLine.toLowerCase() + ".jar"; // 要动态加载的jar
+                    } else {
+                        // 生产
+                        libPath = InitClass.pathMokuai + "/" + strSingleLine.toLowerCase() + ".jar"; // 要动态加载的jar
+                    }
                     File dexDir = PublicUnit.context.getDir("dex", MODE_PRIVATE); // 优化后dex的路径
                     /**
                      * 进行动态加载，利用java的反射调用com.test.dynamic.MyClass的方法
@@ -235,23 +243,23 @@ public class ScriptManager {
     }
 
     public boolean isRun(String name) {
-        if (list.get(name) == null) {
+        if (scriptMap.get(name) == null) {
             return false;
         }
-        return list.get(name).isRun();
+        return scriptMap.get(name).isRun();
     }
 
     public void stopRun(String name) {
-        if (list.get(name) != null) {
-            list.get(name).stopRun();
+        if (scriptMap.get(name) != null) {
+            scriptMap.get(name).stopRun();
         }
     }
 
     public void stopRun() {
         // 全体停止
-        for (String key : list.keySet()) {
-            if (list.get(key) != null) {
-                list.get(key).stopRun();
+        for (String key : scriptMap.keySet()) {
+            if (scriptMap.get(key) != null) {
+                scriptMap.get(key).stopRun();
             }
         }
     }

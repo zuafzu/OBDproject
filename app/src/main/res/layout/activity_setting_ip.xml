@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@mipmap/ic_background_gary"
     android:orientation="vertical"
     tools:context=".activity.SettingIpActivity">
 
@@ -26,7 +27,7 @@
                 android:layout_height="44dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:padding="12dp"
-                android:src="@mipmap/ic_back"
+                android:src="@mipmap/ic_arrow_back"
                 android:tag="iv_back"
                 android:visibility="visible" />
 
@@ -59,27 +60,28 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
                 android:orientation="vertical">
 
                 <Button
                     android:id="@+id/btn_crcode"
-                    android:layout_width="match_parent"
+                    android:layout_width="134dp"
                     android:layout_height="38dp"
                     android:layout_marginLeft="16dp"
-                    android:layout_marginTop="16dp"
+                    android:layout_marginTop="40dp"
                     android:layout_marginRight="16dp"
                     android:background="@drawable/shape_btn_colorprimary"
                     android:tag="btn_crcode"
                     android:text="识别二维码"
                     android:textAllCaps="false"
                     android:textColor="@android:color/white"
-                    android:textSize="14sp" />
+                    android:textSize="15sp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="38dp"
                     android:layout_marginLeft="16dp"
-                    android:layout_marginTop="16dp"
+                    android:layout_marginTop="32dp"
                     android:layout_marginRight="16dp"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
@@ -87,7 +89,9 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="热点名称：" />
+                        android:text="热点名称："
+                        android:textColor="@color/colorAccent"
+                        android:textSize="17sp" />
 
                     <EditText
                         android:id="@+id/et_name"
@@ -95,17 +99,20 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:tag="et_name"
-                        android:textSize="14sp" />
+                        android:textSize="14sp"
+                        android:theme="@style/MyEditText" />
 
                     <Button
                         android:id="@+id/btn_copy1"
                         android:layout_width="60dp"
                         android:layout_height="match_parent"
                         android:layout_margin="0dp"
+                        android:background="@drawable/shape_btn_red"
                         android:padding="0dp"
                         android:tag="btn_copy1"
                         android:text="复制"
-                        android:textSize="12sp" />
+                        android:textColor="@android:color/white"
+                        android:textSize="15sp" />
 
                 </LinearLayout>
 
@@ -113,6 +120,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="38dp"
                     android:layout_marginLeft="16dp"
+                    android:layout_marginTop="30dp"
                     android:layout_marginRight="16dp"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
@@ -120,7 +128,9 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="热点密码：" />
+                        android:text="热点密码："
+                        android:textColor="@color/colorAccent"
+                        android:textSize="17sp" />
 
                     <EditText
                         android:id="@+id/et_pw"
@@ -128,23 +138,27 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:tag="et_pw"
-                        android:textSize="14sp" />
+                        android:textSize="14sp"
+                        android:theme="@style/MyEditText" />
 
                     <Button
                         android:id="@+id/btn_copy2"
                         android:layout_width="60dp"
                         android:layout_height="match_parent"
                         android:layout_margin="0dp"
+                        android:background="@drawable/shape_btn_red"
                         android:padding="0dp"
                         android:tag="btn_copy2"
                         android:text="复制"
-                        android:textSize="12sp" />
+                        android:textColor="@android:color/white"
+                        android:textSize="15sp" />
 
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:layout_marginTop="30dp"
                     android:orientation="horizontal">
 
                     <Button
@@ -152,7 +166,6 @@
                         android:layout_width="0dp"
                         android:layout_height="38dp"
                         android:layout_marginLeft="16dp"
-                        android:layout_marginTop="16dp"
                         android:layout_marginRight="16dp"
                         android:layout_marginBottom="8dp"
                         android:layout_weight="1"
@@ -161,13 +174,12 @@
                         android:text="开启热点"
                         android:textAllCaps="false"
                         android:textColor="@android:color/white"
-                        android:textSize="14sp" />
+                        android:textSize="15sp" />
 
                     <Button
                         android:id="@+id/btn_jumpWifi"
                         android:layout_width="wrap_content"
                         android:layout_height="38dp"
-                        android:layout_marginTop="16dp"
                         android:layout_marginRight="16dp"
                         android:layout_marginBottom="8dp"
                         android:background="@drawable/shape_btn_colorprimary"
@@ -175,7 +187,7 @@
                         android:text="手动开启"
                         android:textAllCaps="false"
                         android:textColor="@android:color/white"
-                        android:textSize="14sp"
+                        android:textSize="15sp"
                         android:visibility="visible" />
 
                 </LinearLayout>
@@ -185,10 +197,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="16dp"
+                    android:layout_marginTop="30dp"
                     android:layout_marginRight="16dp"
                     android:tag="tv_wifiState"
                     android:text="热点是否开启：未开启"
-                    android:textColor="@color/colorPrimary" />
+                    android:textColor="@color/colorAccent"
+                    android:textSize="17sp" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -204,7 +218,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="38dp"
                     android:layout_marginLeft="16dp"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="30dp"
                     android:layout_marginRight="16dp"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
@@ -212,7 +226,9 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="硬件IP地址：" />
+                        android:text="硬件IP地址："
+                        android:textColor="@color/colorAccent"
+                        android:textSize="17sp" />
 
                     <EditText
                         android:id="@+id/et_input_ip"
@@ -220,26 +236,29 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:tag="et_input_ip"
-                        android:textSize="14sp" />
+                        android:textSize="14sp"
+                        android:theme="@style/MyEditText" />
 
                     <Button
                         android:id="@+id/btn_seeIp"
                         android:layout_width="60dp"
                         android:layout_height="match_parent"
                         android:layout_margin="0dp"
+                        android:background="@drawable/shape_btn_red"
                         android:padding="0dp"
                         android:tag="btn_seeIp"
                         android:text="获取"
-                        android:textSize="12sp" />
+                        android:textColor="@android:color/white"
+                        android:textSize="15sp" />
 
                 </LinearLayout>
 
                 <Button
                     android:id="@+id/btn_ok"
-                    android:layout_width="match_parent"
-                    android:layout_height="38dp"
+                    android:layout_width="170dp"
+                    android:layout_height="44dp"
                     android:layout_marginLeft="16dp"
-                    android:layout_marginTop="16dp"
+                    android:layout_marginTop="58dp"
                     android:layout_marginRight="16dp"
                     android:layout_marginBottom="16dp"
                     android:background="@drawable/shape_btn_colorprimary"
@@ -247,7 +266,7 @@
                     android:text="@string/start_obd"
                     android:textAllCaps="false"
                     android:textColor="@android:color/white"
-                    android:textSize="14sp" />
+                    android:textSize="17sp" />
 
             </LinearLayout>
 

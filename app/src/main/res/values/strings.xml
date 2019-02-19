@@ -45,9 +45,9 @@
     <string name="ok">确定</string>
     <string name="start_obd">启动OBD</string>
 
-    <string name="yhm">登录名</string>
+    <string name="yhm">User Name/用户名</string>
     <string name="yhm2">用户名</string>
-    <string name="mm">密码</string>
+    <string name="mm">Password/密码</string>
     <string name="zddl">自动登录</string>
     <string name="dl">登录</string>
 </resources>

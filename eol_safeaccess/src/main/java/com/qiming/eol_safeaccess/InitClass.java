@@ -24,6 +24,109 @@ public class InitClass {
                     mask = 0x000000004a68795bL;
                     data = StringTools.byte2hex(_GetKey(mask, StringTools.hex2byte(seed)));
                     break;
+
+                case "EV_DSCU":
+                    mask = 0x00000000a28ee118L;
+                    data = StringTools.byte2hex(_GetBootKey(mask, Long.valueOf(seed, 16)));
+                    break;
+                case "EV_EPS":
+                    mask = 0x000000006C5F40BB;
+                    data = StringTools.byte2hex(_GetBootKey(mask, Long.valueOf(seed, 16)));
+                    break;
+                case "EV_PLGM":
+                    mask = 0x00000000ab59ef31L;
+                    data = StringTools.byte2hex(_GetBootKey(mask, Long.valueOf(seed, 16)));
+                    break;
+                case "EV_SCCU":
+                    mask = 0x00000000a703395dL;
+                    data = StringTools.byte2hex(_GetBootKey(mask, Long.valueOf(seed, 16)));
+                    break;
+                case "EV_AC":
+                    mask = 0x00000000ad7adfaaL;
+                    data = StringTools.byte2hex(_GetBootKey(mask, Long.valueOf(seed, 16)));
+                    break;
+                case "EV_ACP-F(高配)":
+                    mask = 0x00000000AF9534FBL;
+                    data = StringTools.byte2hex(_GetBootKey(mask, Long.valueOf(seed, 16)));
+                    break;
+                case "EV_ACP-F(低配)":
+                    mask = 0x00000000AF9534FBL;
+                    data = StringTools.byte2hex(_GetBootKey(mask, Long.valueOf(seed, 16)));
+                    break;
+                case "EV_ACPF":
+                    mask = 0x00000000AF9534FBL;
+                    data = StringTools.byte2hex(_GetBootKey(mask, Long.valueOf(seed, 16)));
+                    break;
+                case "EV_ADV":
+                    mask = 0x00000000D39A6ED2L;
+                    data = StringTools.byte2hex(_GetBootKey(mask, Long.valueOf(seed, 16)));
+                    break;
+                case "EV_BMS":
+                    mask = 0x0000000059DB7D73L;
+                    data = StringTools.byte2hex(_GetBootKey(mask, Long.valueOf(seed, 16)));
+                    break;
+                case "EV_OBC":
+                    mask = 0x0000000061AF6E20L;
+                    data = StringTools.byte2hex(_GetBootKey(mask, Long.valueOf(seed, 16)));
+                    break;
+                case "EV_DCDC":
+                    mask = 0x000000005DDA5C9CL;
+                    data = StringTools.byte2hex(_GetBootKey(mask, Long.valueOf(seed, 16)));
+                    break;
+                case "EV_PDCU":
+                    mask = 0x000000009BA336A8L;
+                    data = StringTools.byte2hex(_GetBootKey(mask, Long.valueOf(seed, 16)));
+                    break;
+                case "EV_RLDCU":
+                    mask = 0x000000009DFA64A8L;
+                    data = StringTools.byte2hex(_GetBootKey(mask, Long.valueOf(seed, 16)));
+                    break;
+                case "EV_DDCU":
+                    mask = 0x000000009942E26BL;
+                    data = StringTools.byte2hex(_GetBootKey(mask, Long.valueOf(seed, 16)));
+                    break;
+                case "EV_RRDCU":
+                    mask = 0x00000000A048D307L;
+                    data = StringTools.byte2hex(_GetBootKey(mask, Long.valueOf(seed, 16)));
+                    break;
+                case "EV_HUD":
+                    mask = 0x00000000A28EE118L;
+                    data = StringTools.byte2hex(_GetBootKey(mask, Long.valueOf(seed, 16)));
+                    break;
+                case "EV_MCU":
+                    mask = 0x0000000055ACF799L;
+                    data = StringTools.byte2hex(_GetBootKey(mask, Long.valueOf(seed, 16)));
+                    break;
+                case "EV_T-Box":
+                    mask = 0x00000000B9BD8A2DL;
+                    data = StringTools.byte2hex(_GetBootKey(mask, Long.valueOf(seed, 16)));
+                    break;
+                case "EV_AVM":
+                    mask = 0x00000000877710E9L;
+                    data = StringTools.byte2hex(_GetBootKey(mask, Long.valueOf(seed, 16)));
+                    break;
+                case "EV_ESP":
+                    mask = 0x0000000072F229D0L;
+                    data = StringTools.byte2hex(_GetBootKey(mask, Long.valueOf(seed, 16)));
+                    break;
+                case "EV_BCM1":
+                    mask = 0x000000008e9bbd8eL;
+                    data = StringTools.byte2hex(_GetKey(mask, StringTools.hex2byte(seed)));
+                    break;
+                case "EV_BCM2":
+                    mask = 0x000000008eacbd9fL;
+                    data = StringTools.byte2hex(_GetKey(mask, StringTools.hex2byte(seed)));
+                    break;
+
+                //----------------
+                case "HS5_EPS":
+                    mask = 0x000000006C5F40BB;
+                    data = StringTools.byte2hex(_GetBootKey(mask, Long.valueOf(seed, 16)));
+                    break;
+                case "HS5_ACU":
+                    mask = 0x0000000076188246;
+                    data = StringTools.byte2hex(_GetBootKey(mask, Long.valueOf(seed, 16)));
+                    break;
                 case "HS5_TCU":
                     mask = 0x000000002650b89bL;
                     data = StringTools.byte2hex(_GetBootKey(mask, Long.valueOf(seed, 16)));
@@ -36,30 +139,131 @@ public class InitClass {
                     mask = 0x000000006fb51729L;
                     data = StringTools.byte2hex(_GetBootKey(mask, Long.valueOf(seed, 16)));
                     break;
-                case "EV_AC":
-                    mask = 0x00000000ad7adfaaL;
+                //add by zxy
+
+                case "HS5_EMS":
+                    mask = 0x000000001B17D02FL;
                     data = StringTools.byte2hex(_GetBootKey(mask, Long.valueOf(seed, 16)));
                     break;
-                case "EV_DSCU":
-                    mask = 0x00000000a28ee118L;
+
+
+                case "HS5_EGSM":
+                    mask = 0x00000000362FA05EL;
                     data = StringTools.byte2hex(_GetBootKey(mask, Long.valueOf(seed, 16)));
                     break;
-                case "EV_SCCU":
-                    mask = 0x00000000a703395dL;
+
+                case "HS5_ACM":
+                    mask = 0x000000003C94F328L;
                     data = StringTools.byte2hex(_GetBootKey(mask, Long.valueOf(seed, 16)));
                     break;
-                case "EV_HUD":
-                    mask = 0x00000000bbb4b937L;
+
+                case "HS5_ESP_APB":
+                    mask = 0x0000000072F229D0L;
                     data = StringTools.byte2hex(_GetBootKey(mask, Long.valueOf(seed, 16)));
                     break;
-                case "EV_PLGM":
-                    mask = 0x00000000ab59ef31L;
+
+
+                case "HS5_AC":
+                    mask = 0x00000000AD7ADFAAL;
                     data = StringTools.byte2hex(_GetBootKey(mask, Long.valueOf(seed, 16)));
                     break;
+
+                case "HS5_SCM":
+                    mask = 0x0000000096D8F940L;
+                    data = StringTools.byte2hex(_GetBootKey(mask, Long.valueOf(seed, 16)));
+                    break;
+
+                case "HS5_DSCU":
+                    mask = 0x00000000A28EE118L;
+                    data = StringTools.byte2hex(_GetBootKey(mask, Long.valueOf(seed, 16)));
+                    break;
+
+                case "HS5_SCCU":
+                    mask = 0x00000000A703395DL;
+                    data = StringTools.byte2hex(_GetBootKey(mask, Long.valueOf(seed, 16)));
+                    break;
+
+                case "HS5_BCM1":
+                    mask = 0x0000000091E67F4AL;
+                    data = StringTools.byte2hex(_GetBootKey(mask, Long.valueOf(seed, 16)));
+                    break;
+                case "HS5_BCM2":
+                    mask = 0x0000000091E67F4AL;
+                    data = StringTools.byte2hex(_GetBootKey(mask, Long.valueOf(seed, 16)));
+                    break;
+
+                case "HS5_HUD":
+                    mask = 0x00000000BBB4B937L;
+                    data = StringTools.byte2hex(_GetBootKey(mask, Long.valueOf(seed, 16)));
+                    break;
+
+
+                case "HS5_AVS":
+                    mask = 0x00000000877710E9L;
+                    data = StringTools.byte2hex(_GetBootKey(mask, Long.valueOf(seed, 16)));
+                    break;
+                case "HS5_PDC":
+                    mask = 0x0000000084BA681AL;
+                    data = StringTools.byte2hex(_GetBootKey(mask, Long.valueOf(seed, 16)));
+                    break;
+
+                case "HS5_IFC":
+                    mask = 0x000000007F13D8FCL;
+                    data = StringTools.byte2hex(_GetBootKey(mask, Long.valueOf(seed, 16)));
+                    break;
+                case "HS5_T_BOX":
+                    mask = 0x00000000B9BD8A2DL;
+                    data = StringTools.byte2hex(_GetBootKey(mask, Long.valueOf(seed, 16)));
+                    break;
+
+                case "HS5_DDCU":
+                    mask = 0x000000009942E26BL;
+                    data = StringTools.byte2hex(_GetBootKey(mask, Long.valueOf(seed, 16)));
+                    break;
+                case "HS5_PDCU":
+                    mask = 0x000000009BA336A8L;
+                    data = StringTools.byte2hex(_GetBootKey(mask, Long.valueOf(seed, 16)));
+                    break;
+
+                case "HS5_RLDCU":
+                    mask = 0x000000009DFA64A8L;
+                    data = StringTools.byte2hex(_GetBootKey(mask, Long.valueOf(seed, 16)));
+                    break;
+                case "HS5_RRDCU":
+                    mask = 0x00000000A048D307L;
+                    data = StringTools.byte2hex(_GetBootKey(mask, Long.valueOf(seed, 16)));
+                    break;
+
+
+                case "HS5_GW":
+                    mask = 0x00000000BDA6B146L;
+                    data = StringTools.byte2hex(_GetBootKey(mask, Long.valueOf(seed, 16)));
+                    break;
+                case "HS5_ADV":
+                    mask = 0x00000000D39A6ED2L;
+                    data = StringTools.byte2hex(_GetBootKey(mask, Long.valueOf(seed, 16)));
+                    break;
+                case "HS5_ALS":
+                    mask = 0x000000008CC78AE9L;
+                    data = StringTools.byte2hex(_GetBootKey(mask, Long.valueOf(seed, 16)));
+                    break;
+                case "HS5_4WD":
+                    mask = 0x0000000047AE6FD9L;
+                    data = StringTools.byte2hex(_GetBootKey(mask, Long.valueOf(seed, 16)));
+                    break;
+                case "HS5_DMSCU":
+                    mask = 0x000000004CA17136L;
+                    data = StringTools.byte2hex(_GetBootKey(mask, Long.valueOf(seed, 16)));
+                    break;
+                case "HS5_LCDA":
+                    mask = 0x0000000081EEFDDCL;
+                    data = StringTools.byte2hex(_GetBootKey(mask, Long.valueOf(seed, 16)));
+                    break;
+
             }
             if (mask == 0) {
                 jsonObject.put("RESULT", "FAULT");
-                jsonObject.put("DESC", "错误信息：无对应电控安全算法");
+                jsonObject.put("DESC", "错误信息：无对应电控安全算法。");
                 return jsonObject.toString();
             }
             jsonObject.put("DATA", data);
@@ -77,7 +281,7 @@ public class InitClass {
         return jsonObject.toString();
     }
 
-    private byte[] _GetKey(long mask, byte[] seed) {
+    private static byte[] _GetKey(long mask, byte[] seed) {
         long wort = 0;
         wort = (long) (seed[0] & 0xFF);
         wort = wort << 8;

@@ -784,6 +784,7 @@ public class PhotoWallActivity2 extends PhotoBaseActivity {
             } else {
                 holder = (ViewHolder) convertView.getTag();
             }
+            holder.imageView.setBackgroundColor(Color.WHITE);
             //tag的key必须使用id的方式定义以保证唯一，否则会出现IllegalArgumentException.
             holder.checkBox.setTag(R.string.app_name, holder.imageView);
             boolean flag_selected = false;

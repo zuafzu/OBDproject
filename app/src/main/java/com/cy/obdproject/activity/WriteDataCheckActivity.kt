@@ -65,7 +65,7 @@ class WriteDataCheckActivity : BaseActivity(), BaseActivity.ClickMethoListener {
         val config = PhotoConfigure().setType(PhotoConfigure.EditImg).setColnum(3).setDelete(false).setCanDrag(true).setAutoDelThm(true).setOriginalShow(true)
         recyclerView.setTv_delete(textView).setOnUpdateData {
             recyclerView.post {
-                val h = DensityUtil.dip2px(this@WriteDataCheckActivity, 126f) +
+                val h = DensityUtil.dip2px(this@WriteDataCheckActivity, 244f) +
                         ((recyclerView.width - DensityUtil.dip2px(this@WriteDataCheckActivity, 32f)) / 3 * it)
                 if (rl_view.height != h) {
                     rl_view.layoutParams = LinearLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, h)

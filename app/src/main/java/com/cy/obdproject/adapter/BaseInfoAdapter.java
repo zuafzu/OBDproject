@@ -48,7 +48,6 @@ public class BaseInfoAdapter extends BaseAdapter {
             convertView = LayoutInflater.from(context).inflate(R.layout.list_item_base_info, parent, false);
             holder.tv_name = (TextView) convertView.findViewById(R.id.tv_name);
             holder.tv_value = (TextView) convertView.findViewById(R.id.tv_value);
-            holder.view_line = (View) convertView.findViewById(R.id.view_line);
             holder.iv_left = (ImageView) convertView.findViewById(R.id.iv_left);
             convertView.setTag(holder);
         } else {
@@ -66,7 +65,6 @@ public class BaseInfoAdapter extends BaseAdapter {
 
     public class Holder {
         public TextView tv_name, tv_value;
-        public View view_line;
         public ImageView iv_left;
     }
 

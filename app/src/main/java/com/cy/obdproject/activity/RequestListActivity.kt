@@ -2,6 +2,8 @@ package com.cy.obdproject.activity
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.KeyEvent
 import android.view.View
 import com.cy.obdproject.R
@@ -25,6 +27,7 @@ class RequestListActivity : BaseActivity(), BaseActivity.ClickMethoListener {
     private var mExitTime: Long = 0
 
     private var requestList: ArrayList<RequestBean>? = null
+    private var requestAllList: ArrayList<RequestBean>? = null
     private var adapter: SelectRequestAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,6 +46,7 @@ class RequestListActivity : BaseActivity(), BaseActivity.ClickMethoListener {
 //        setClickMethod(iv_back)
 //        setClickMethod(iv_quit)
         requestList = ArrayList()
+        requestAllList = ArrayList()
         listView!!.setOnItemClickListener { _, _, position, _ ->
             showProgressDialog()
             SPTools.put(this, Constant.ZFORUID, "" + requestList!![position].requestId)
@@ -61,6 +65,30 @@ class RequestListActivity : BaseActivity(), BaseActivity.ClickMethoListener {
             val mIntent = Intent(this@RequestListActivity, SettingActivity::class.java)
             startActivity(mIntent)
         }
+        et_name.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(p0: Editable?) {
+                requestList!!.clear()
+                val key = et_name.text.toString().trim()
+                if (key == "") {
+                    requestList!!.addAll(requestAllList!!)
+                } else {
+                    for (i in 0 until requestAllList!!.size) {
+                        if (requestAllList!![i].requestName.contains(key)) {
+                            requestList!!.add(requestAllList!![i])
+                        }
+                    }
+                }
+                adapter!!.notifyDataSetChanged()
+            }
+
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+
+            }
+
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+
+            }
+        })
     }
 
     override fun doMethod(string: String?) {
@@ -111,6 +139,8 @@ class RequestListActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                 val beans = Gson().fromJson<List<RequestBean>>(response.data, object : TypeToken<ArrayList<RequestBean>>() {}.type) as ArrayList<RequestBean>?
                 requestList!!.clear()
                 requestList!!.addAll(beans!!)
+                requestAllList!!.clear()
+                requestAllList!!.addAll(beans!!)
                 if (adapter == null) {
                     adapter = SelectRequestAdapter(requestList!!, this)
                     if (listView != null) {

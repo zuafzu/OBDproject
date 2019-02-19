@@ -16,6 +16,7 @@ public class InitClass {
     private static final String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/红旗故障诊断";
     public static final String pathApk = path + "/APK";
     public static final String pathMokuai = path + "/模块包";
+    public static final String pathTestMokuai = path + "/测试模块包";
     public static final String pathLiucheng = path + "/流程文件";
     public static final String pathShuaxie = path + "/刷写文件";
     private static final String path2 = path + "/日志";
@@ -118,6 +119,20 @@ public class InitClass {
             m.invoke(o, isBreak);
         } catch (Exception e) {
         }
+    }
+
+    public boolean isBreak() {
+        boolean result = false;
+        try {
+            Object o = stringClassMap.get("eol_scriptrunner").Instance;
+
+            Method m = stringClassMap.get("eol_scriptrunner").clazz.getMethod("isBreak");
+
+            result = (boolean) m.invoke(o);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 
     public void InitDynamicData(Handler Success, String Items) {

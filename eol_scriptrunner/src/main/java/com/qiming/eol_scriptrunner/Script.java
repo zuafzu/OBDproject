@@ -132,7 +132,7 @@ public class Script {
     }
 
     private void showError(Command command) {
-        // 1弹出对话框阻塞，2输出到界面（红色字体），3记录到日志，0初始值
+        // 1弹出对话框阻塞/toast，2输出到界面（红色字体），3记录到日志，0初始值
         final int iLineNo = command.iLineNo;
         final String DESC = command.Output.optString("DESC");
         switch (command.ErrorPro) {

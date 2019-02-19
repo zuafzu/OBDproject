@@ -48,15 +48,13 @@ public class ParseBean {
         } catch (JSONException e) {
             LogTools.errLog(e);
         }
-
-
     }
 
     private String checkEmpty(String data, String value) {
-        if (data == null || data.equals("")) {
+        if (data == null || data.trim().equals("")) {
             return value;
         }
-        return data;
+        return data.trim();
     }
 
     public String getSid() {

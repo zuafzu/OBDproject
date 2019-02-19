@@ -100,6 +100,20 @@ public class MySocketClient {
      */
     public void send(byte[] data) {
         try {
+            // 发送（写日志）
+            if (isImLog) {
+                String filePath = InitClass.pathTongxun;
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy年MM月dd日");
+                SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("HH:mm:ss.SSS");
+                Date date = new Date(System.currentTimeMillis());
+                String fileName = simpleDateFormat.format(date) + "log.txt";
+                if (data.length > 512) {
+                    FileUtil.writeTxtToFile(simpleDateFormat2.format(date) + "  开始发送  " + "大于512字节...", filePath, fileName);
+                } else {
+                    FileUtil.writeTxtToFile(simpleDateFormat2.format(date) + "  开始发送  " + StringTools.byte2hex(data), filePath, fileName);
+                }
+                Log.e("cyf77", "写完通讯发送的日志");
+            }
             if (mClient != null && mClient.isConnected()) {
                 OutputStream outputStream = mClient.getOutputStream();
                 outputStream.write(data);
@@ -112,9 +126,9 @@ public class MySocketClient {
                 Date date = new Date(System.currentTimeMillis());
                 String fileName = simpleDateFormat.format(date) + "log.txt";
                 if (data.length > 512) {
-                    FileUtil.writeTxtToFile(simpleDateFormat2.format(date) + "  发送  " + "大于512字节...", filePath, fileName);
+                    FileUtil.writeTxtToFile(simpleDateFormat2.format(date) + "  发送完成  " + "大于512字节...", filePath, fileName);
                 } else {
-                    FileUtil.writeTxtToFile(simpleDateFormat2.format(date) + "  发送  " + StringTools.byte2hex(data), filePath, fileName);
+                    FileUtil.writeTxtToFile(simpleDateFormat2.format(date) + "  发送完成  " + StringTools.byte2hex(data), filePath, fileName);
                 }
                 Log.e("cyf77", "写完通讯发送的日志");
             }

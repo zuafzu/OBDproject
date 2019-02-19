@@ -8,11 +8,6 @@ public class EolAPI {
     public static String CALL(com.qiming.eol_public.InitClass publicUnit, String strDllPath, String strFucName, String strInput) {
         String data = "";
         try {
-
-
-
-
-
             data = publicUnit.CALL(strDllPath.toLowerCase().replace(".dll",""),strFucName,strInput);
         } catch (Exception e) {
             try {
@@ -25,7 +20,6 @@ public class EolAPI {
             }
             LogTools.errLog(e);
         }
-
         return data;
     }
 

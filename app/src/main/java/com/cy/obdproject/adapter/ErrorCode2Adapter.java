@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.cy.obdproject.R;
@@ -48,26 +47,17 @@ public class ErrorCode2Adapter extends BaseAdapter {
             convertView = LayoutInflater.from(context).inflate(R.layout.list_item_error_code2, parent, false);
             holder.tv_name = (TextView) convertView.findViewById(R.id.tv_name);
             holder.tv_value = (TextView) convertView.findViewById(R.id.tv_value);
-            holder.view_line = (View) convertView.findViewById(R.id.view_line);
-            holder.iv_left = (ImageView) convertView.findViewById(R.id.iv_left);
             convertView.setTag(holder);
         } else {
             holder = (Holder) convertView.getTag();
         }
         holder.tv_name.setText(items.get(position).getName());
         holder.tv_value.setText(items.get(position).getValue());
-        if (flag == 1) {
-            holder.iv_left.setVisibility(View.GONE);
-        } else {
-            holder.iv_left.setVisibility(View.VISIBLE);
-        }
         return convertView;
     }
 
     public class Holder {
         public TextView tv_name, tv_value;
-        public View view_line;
-        public ImageView iv_left;
     }
 
 }

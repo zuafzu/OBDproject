@@ -10,10 +10,15 @@ import android.support.v7.app.AlertDialog
 import android.view.KeyEvent
 import android.view.View
 import android.widget.ProgressBar
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CircleCrop
+import com.bumptech.glide.request.RequestOptions
 import com.cy.obdproject.R
 import com.cy.obdproject.base.BaseActivity
+import com.cy.obdproject.constant.Constant
 import com.cy.obdproject.tools.LogTools
 import com.cy.obdproject.tools.NetTools
+import com.cy.obdproject.tools.SPTools
 import com.cy.obdproject.url.Urls
 import com.zhy.http.okhttp.OkHttpUtils
 import com.zhy.http.okhttp.callback.FileCallBack
@@ -35,7 +40,10 @@ class SettingActivity : BaseActivity() {
 
     @SuppressLint("SetTextI18n")
     private fun initView() {
-        tv_update.text = "检查更新（当前版本：${getLocalVersionName(this)}）"
+        val strUrl = "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1545047587086&di=ed48ea529b1cef3a981a8ea02b70ed61&imgtype=0&src=http%3A%2F%2Fimg.zcool.cn%2Fcommunity%2F010ae45a3626b7a80121db80f25c77.jpg%401280w_1l_2o_100sh.jpg"
+        Glide.with(this).load(strUrl).apply(RequestOptions.bitmapTransform(CircleCrop()).error(R.mipmap.ic_head)).into(iv_head)
+        tv_name.text = SPTools[this@SettingActivity, Constant.USERNAME, ""].toString()
+        tv_update.text = "（当前版本：" + getLocalVersionName(this) + "）"
         iv_back.setOnClickListener {
             finish()
         }

@@ -16,7 +16,7 @@ public class RoundImageView extends android.support.v7.widget.AppCompatImageView
 
 
     //圆角大小，默认为10
-    private int mBorderRadius = 23;
+    private int mBorderRadius = 100;
 
     private Paint mPaint;
 

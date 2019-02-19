@@ -2,7 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#36353D">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -24,7 +25,7 @@
                 android:layout_height="44dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:padding="12dp"
-                android:src="@mipmap/ic_back"
+                android:src="@mipmap/ic_arrow_back"
                 android:tag="iv_back"
                 android:visibility="invisible" />
 
@@ -42,98 +43,84 @@
                 android:id="@+id/ibtn_setting"
                 android:layout_width="44dp"
                 android:layout_height="44dp"
-                android:padding="4dp"
+                android:adjustViewBounds="true"
                 android:background="@android:color/transparent"
+                android:padding="12dp"
                 android:src="@mipmap/ic_setting"
                 android:tag="ibtn_setting" />
         </LinearLayout>
 
-        <ImageView
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_below="@+id/ll_toolsbar"
-            android:scaleType="fitXY"
-            android:src="@mipmap/ic_toolbar_down"
-            android:tint="@color/colorPrimary"
-            android:translationZ="2dp" />
+            android:orientation="vertical">
 
-
-        <RelativeLayout
-            android:id="@+id/iv_head"
-            android:layout_width="match_parent"
-            android:layout_height="130dp"
-            android:layout_below="@+id/ll_toolsbar"
-            android:layout_marginBottom="8dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
-            android:background="@drawable/shape_corner_white2"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:translationZ="4dp">
-
-
-            <com.cy.obdproject.view.RoundImageView
-                android:id="@+id/iv_background"
+            <FrameLayout
+                android:id="@+id/iv_head"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_margin="2dp"
-                android:scaleType="fitXY"
-                android:src="@mipmap/ic_background"
-                android:tag="iv_background" />
+                android:layout_height="0dp"
+                android:layout_weight="1">
+                
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:adjustViewBounds="true"
+                    android:src="@mipmap/ic_img2"
+                    android:scaleType="centerCrop"
+                    android:tag="iv_background" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_margin="8dp"
-                android:orientation="vertical">
+                <ImageView
+                    android:id="@+id/iv_background"
+                    android:layout_width="276dp"
+                    android:layout_height="276dp"
+                    android:layout_centerInParent="true"
+                    android:layout_gravity="center"
+                    android:adjustViewBounds="true"
+                    android:src="@mipmap/circle"
+                    android:tag="iv_background" />
 
                 <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
+                    android:layout_width="276dp"
+                    android:layout_height="276dp"
+                    android:layout_centerInParent="true"
                     android:layout_gravity="center"
-                    android:layout_marginBottom="2dp"
-                    android:layout_weight="1"
-                    android:orientation="horizontal">
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="40dp">
 
                     <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="2dp"
+                        android:gravity="center"
                         android:orientation="horizontal">
 
                         <TextView
                             android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
+                            android:layout_height="wrap_content"
                             android:gravity="center_vertical"
                             android:text="车型："
                             android:textColor="@android:color/white"
-                            android:textStyle="bold" />
+                            android:textSize="17sp" />
 
                         <TextView
                             android:id="@+id/tv_carName"
                             android:layout_width="wrap_content"
-
-                            android:layout_height="match_parent"
+                            android:layout_height="wrap_content"
                             android:gravity="center_vertical"
                             android:tag="tv_carName"
                             android:text=""
-                            android:textColor="@android:color/white" />
+                            android:textColor="@android:color/white"
+                            android:textSize="17sp" />
+
                     </LinearLayout>
 
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_gravity="center"
-                    android:layout_marginBottom="2dp"
-                    android:layout_weight="1"
-                    android:orientation="horizontal">
-
                     <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="2dp"
+                        android:gravity="center"
                         android:orientation="horizontal">
 
                         <TextView
@@ -142,7 +129,7 @@
                             android:gravity="center_vertical"
                             android:text="用户名："
                             android:textColor="@android:color/white"
-                            android:textStyle="bold" />
+                            android:textSize="17sp" />
 
                         <TextView
                             android:id="@+id/tv_username"
@@ -151,34 +138,16 @@
                             android:gravity="center_vertical"
                             android:tag="tv_username"
                             android:text=""
-                            android:textColor="@android:color/white" />
+                            android:textColor="@android:color/white"
+                            android:textSize="17sp" />
+
                     </LinearLayout>
 
-                    <TextView
-                        android:id="@+id/tv_ycxz"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_margin="4dp"
-                        android:background="@drawable/shape_corner_accent"
-                        android:gravity="center_vertical"
-                        android:padding="4dp"
-                        android:tag="tv_ycxz"
-                        android:text="远程协助"
-                        android:textColor="@android:color/white"
-                        android:textSize="12sp" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/ll_obd"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:orientation="horizontal">
-
                     <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
+                        android:id="@+id/ll_obd"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
                         android:orientation="horizontal">
 
                         <TextView
@@ -187,7 +156,7 @@
                             android:gravity="center_vertical"
                             android:text="OBD连接状态："
                             android:textColor="@android:color/white"
-                            android:textStyle="bold" />
+                            android:textSize="17sp" />
 
                         <TextView
                             android:id="@+id/tv_obd_state"
@@ -196,39 +165,54 @@
                             android:gravity="center_vertical"
                             android:tag="tv_obd_state"
                             android:text="未连接"
-                            android:textColor="@android:color/white" />
+                            android:textColor="@android:color/white"
+                            android:textSize="17sp" />
+
                     </LinearLayout>
-
-
-                    <TextView
-                        android:id="@+id/tv_connnect_obd"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_margin="4dp"
-                        android:background="@drawable/shape_corner_accent"
-                        android:gravity="center_vertical"
-                        android:padding="4dp"
-                        android:tag="tv_connnect_obd"
-                        android:text="连接OBD"
-                        android:textColor="@android:color/white"
-                        android:textSize="12sp" />
-
                 </LinearLayout>
-            </LinearLayout>
 
+                <TextView
+                    android:id="@+id/tv_ycxz"
+                    android:layout_width="92dp"
+                    android:layout_height="28dp"
+                    android:layout_gravity="bottom|right"
+                    android:layout_margin="16dp"
+                    android:background="@drawable/shape_corner_accent"
+                    android:gravity="center"
+                    android:tag="tv_ycxz"
+                    android:text="远程协助"
+                    android:textColor="@android:color/white"
+                    android:textSize="17sp"
+                    android:visibility="visible" />
 
-        </RelativeLayout>
+                <TextView
+                    android:id="@+id/tv_connnect_obd"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_margin="4dp"
+                    android:background="@drawable/shape_corner_accent"
+                    android:gravity="center_vertical"
+                    android:padding="4dp"
+                    android:tag="tv_connnect_obd"
+                    android:text="连接OBD"
+                    android:textColor="@android:color/white"
+                    android:textSize="12sp"
+                    android:visibility="gone" />
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/recyclerview"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@+id/iv_head"
-            android:divider="@android:color/transparent"
-            android:overScrollFooter="@android:color/transparent"
-            android:overScrollHeader="@android:color/transparent"
-            android:overScrollMode="never"
-            android:tag="recyclerview" />
+            </FrameLayout>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recyclerview"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:divider="@android:color/transparent"
+                android:overScrollFooter="@android:color/transparent"
+                android:overScrollHeader="@android:color/transparent"
+                android:overScrollMode="never"
+                android:tag="recyclerview" />
+
+        </LinearLayout>
 
     </RelativeLayout>
 

@@ -46,29 +46,18 @@ public class ErrorCodeAdapter extends BaseAdapter {
             holder.tv_code = (TextView) convertView.findViewById(R.id.tv_code);
             holder.tv_msg = (TextView) convertView.findViewById(R.id.tv_msg);
             holder.tv_freeze = (TextView) convertView.findViewById(R.id.tv_freeze);
-
-            holder.view_line = (View) convertView.findViewById(R.id.view_line);
             convertView.setTag(holder);
         } else {
             holder = (Holder) convertView.getTag();
         }
         holder.tv_code.setText(items.get(position).getCode());
         holder.tv_msg.setText(items.get(position).getMsg());
-
-        // holder.tv_freeze.setVisibility(View.GONE);
         holder.tv_freeze.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onErrorCodeClick.setOnErrorCodeClick("", position);
-
             }
         });
-
-//        if (position != (getCount() - 1)) {
-//            holder.view_line.setVisibility(View.VISIBLE);
-//        } else {
-//            holder.view_line.setVisibility(View.GONE);
-//        }
         return convertView;
     }
 
@@ -83,8 +72,7 @@ public class ErrorCodeAdapter extends BaseAdapter {
     }
 
     public class Holder {
-        public TextView tv_code, tv_msg,tv_freeze;
-        public View view_line;
+        public TextView tv_code, tv_msg, tv_freeze;
     }
 
 }

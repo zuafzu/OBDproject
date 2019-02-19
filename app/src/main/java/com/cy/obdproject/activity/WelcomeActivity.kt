@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.AsyncTask
 import android.os.Bundle
+import android.os.Handler
 import android.support.v7.app.AlertDialog
 import android.view.View
 import com.cy.obdproject.R
@@ -40,11 +41,9 @@ class WelcomeActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_welcome)
-        checkFile()
-        // 测试https
-//        NetTools.net(HashMap<String, String>(), "https://192.168.1.81:4050", this) {
-//
-//        }
+        Handler().postDelayed({
+            checkFile()
+        },2000)
     }
 
     // 创建文件夹，删除旧版本的apk和3天以前的日志
@@ -292,8 +291,10 @@ class WelcomeActivity : BaseActivity() {
                     }
                     baos.write(buffer, 0, len)
                     totalReaded += len
-                    val progress = totalReaded * 100 / contentLength
-                    progressBar.progress = progress.toInt()
+                    runOnUiThread {
+                        val progress = totalReaded * 100 / contentLength
+                        progressBar.progress = progress.toInt()
+                    }
                 } while (true)
                 scriptInputStream!!.close()
                 val result = baos.toString()

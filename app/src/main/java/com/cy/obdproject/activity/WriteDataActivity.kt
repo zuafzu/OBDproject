@@ -170,6 +170,13 @@ class WriteDataActivity : BaseActivity(), BaseActivity.ClickMethoListener, Adapt
 
     private fun net_fileList() {
         val map = hashMapOf<String, String>()
+        val str = SPTools[this, Constant.CARNAME, ""] as String
+        val strs = str.split(" - ")
+        if (strs.size > 1) {
+            map["VT"] = strs[0]// 车型
+            map["ECU"] = strs[1]// 电控
+        }
+
 //        NetTools.net(map, Urls().fileList, this, { response ->
 //            if (response.code == "0") {
 //                setData(response.data)

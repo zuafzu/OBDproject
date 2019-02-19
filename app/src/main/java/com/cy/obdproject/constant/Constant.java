@@ -17,8 +17,6 @@ public class Constant {
     public static final String SSID = "ssid";
     public static final String SSPW = "pw";
 
-    public static int pageSize = 10;
-
     public static String mDstName = "192.168.43.68";
     //     public static int mDstPort = 9200;// tcp新obd端口号
     public static int mDstPort = 6954; // tcp老obd端口号

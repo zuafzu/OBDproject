@@ -22,7 +22,7 @@ public class InitClass {
     private String RESULT = "SUCCESS";
     private String DESC = "";
 
-    private long outTime = 10 * 1000;
+    private long outTime = 30 * 1000;
     private MySocketClient msgClient;
     //    private List<String> myData = Collections.synchronizedList(new ArrayList<String>());
     private MyDataList myDataList = new MyDataList();
@@ -32,7 +32,7 @@ public class InitClass {
     private Long sysTime1 = 0L;
     private Long sysTime2 = 0L;
 
-    private int errType = 0;// 基本信息动态数据错误类型，1超时断开，2消极响应
+    private int errType = 0;// 基本信息动态数据错误类型，1没返回数据超时断开，2返回7fxx78超时，3消极响应
     private String errData = "";// 临时错误数据
 
     private boolean isDynamicRun = false;
@@ -44,6 +44,356 @@ public class InitClass {
 
     public void setPublicUnit(com.qiming.eol_public.InitClass publicUnit) {
         this.publicUnit = publicUnit;
+    }
+
+    private boolean replay() {
+        if (myDataList.size() > 0) {
+            // myDataList.remove(0);
+            myDataList.clear();
+        }
+        if (msg.length() > 8) {
+            key = msg.substring(6, 8).toLowerCase();
+        }
+        if (msgClient != null && msgClient.isConnected()) {
+            Log.e("cyf", "发送信息 : " + msg + "  ");
+            msgClient.setOnConnectLinstener(new MySocketClient.ConnectLinstener() {
+                @Override
+                public void onReceiveData(String data) {
+                    Log.e("cyf", "收到信息 : " + OBDagreement.unDecodeString(data));
+                    myDataList.add(OBDagreement.unDecodeString(data));
+                }
+            });
+            msgClient.send(StringTools.hex2byte(msg));
+            sysTime1 = new Date().getTime();
+            sysTime2 = 0L;
+        } else {
+            DESC = "与ECU通信失败";
+            return true;
+        }
+        return checkData1While();
+    }
+
+    private boolean replay2() {
+        if (myDataList.size() > 0) {
+            // myDataList.remove(0);
+            myDataList.clear();
+        }
+        if (msgClient != null && msgClient.isConnected()) {
+            Log.e("cyf", "发送信息 : " + msg + "  ");
+            msgClient.setOnConnectLinstener(new MySocketClient.ConnectLinstener() {
+                @Override
+                public void onReceiveData(String data) {
+//                    Log.e("cyf", "收到信息 : " + OBDagreement.unDecodeString(data));
+//                    if (OBDagreement.unDecodeString(data).toLowerCase().contains(ECUagreement.reCanId.toLowerCase())) {
+//                        myData.add(OBDagreement.unDecodeString(data));
+//                    }
+                    Log.e("cyf", "收到信息 : " + data);
+                    if (OBDagreement.unDecodeString(data).toLowerCase().contains(ECUagreement.rId.toLowerCase())) {
+                        myDataList.add(data);
+                    }
+                }
+            });
+            msgClient.send(StringTools.hex2byte(msg));
+            sysTime1 = new Date().getTime();
+            sysTime2 = 0L;
+        } else {
+            DESC = "与ECU通信失败";
+            errType = 1;
+            return true;
+        }
+        return checkData2While();
+    }
+
+    private boolean replay3() {
+        if (myDataList.size() > 0) {
+            // myDataList.remove(0);
+            myDataList.clear();
+        }
+        Log.e("cyf", (msgClient != null) + "  判断  " + msgClient.isConnected());
+        if (msgClient != null && msgClient.isConnected()) {
+            if (msgBytes != null) {
+                Log.e("cyf", "发送36信息");
+            } else {
+                Log.e("cyf", "发送信息 : " + msg + "  ");
+            }
+            msgClient.setOnConnectLinstener(new MySocketClient.ConnectLinstener() {
+                @Override
+                public void onReceiveData(String data) {
+//                    Log.e("cyf", "收到信息 : " + OBDagreement.unDecodeString(data));
+//                    if (OBDagreement.unDecodeString(data).toLowerCase().contains(ECUagreement.reCanId.toLowerCase())) {
+//                        myData.add(OBDagreement.unDecodeString(data));
+//                    }
+                    Log.e("cyf", "收到信息 : " + data);
+                    if (OBDagreement.unDecodeString(data).toLowerCase().contains(ECUagreement.rId.toLowerCase())) {
+                        myDataList.add(data);
+                    }
+                }
+            });
+            // msgClient.send(StringTools.hex2byte(msg));
+            msgClient.send(msgBytes);
+            if (msgBytes != null) {
+                Log.e("cyf", "发送36信息 发完");
+            } else {
+                Log.e("cyf", "发送信息 : " + msg + "  ");
+            }
+            sysTime1 = new Date().getTime();
+            sysTime2 = 0L;
+        } else {
+            DESC = "与ECU通信失败";
+            return true;
+        }
+        return checkData3While();
+    }
+
+    private boolean replay4() {
+        if (myDataList.size() > 0) {
+            // myDataList.remove(0);
+            myDataList.clear();
+        }
+        if (msgClient != null && msgClient.isConnected()) {
+            Log.e("cyf", "发送信息 : " + msg + "  ");
+            msgClient.setOnConnectLinstener(new MySocketClient.ConnectLinstener() {
+                @Override
+                public void onReceiveData(String data) {
+//                    Log.e("cyf", "收到信息 : " + OBDagreement.unDecodeString(data));
+//                    if (OBDagreement.unDecodeString(data).toLowerCase().contains(ECUagreement.reCanId.toLowerCase())) {
+//                        myData.add(OBDagreement.unDecodeString(data));
+//                    }
+                    Log.e("cyf", "收到信息 : " + data);
+                    if (OBDagreement.unDecodeString(data).toLowerCase().contains(ECUagreement.rId.toLowerCase())) {
+                        myDataList.add(data);
+                    }
+                }
+            });
+            msgClient.send(StringTools.hex2byte(msg));
+            sysTime1 = new Date().getTime();
+            sysTime2 = 0L;
+        } else {
+            DESC = "与ECU通信失败";
+            errType = 1;
+            return true;
+        }
+        return checkData4While();
+    }
+
+    private boolean checkData1While() {
+        while (true) {
+            if (myDataList.size() != 0) {
+                String mKey = myDataList.get(0).substring(6, 8).toLowerCase();
+                int length = Integer.parseInt(Integer.parseInt(myDataList.get(0).substring(2, 4), 16) + ""
+                        + Integer.parseInt(myDataList.get(0).substring(4, 6), 16));
+                if (mKey.equals(key) && length == ((myDataList.get(0).length() - 8) / 2) && myDataList.get(0).endsWith("00AA")) {
+                    return false;
+                } else {
+                    // myDataList.remove(0);
+                    myDataList.clear();
+                    DESC = "返回数据异常";
+                    return true;
+                }
+            } else {
+                try {
+                    Thread.sleep(5);
+                } catch (InterruptedException e) {
+                    LogTools.errLog(e);
+                }
+            }
+            sysTime2 = new Date().getTime();
+            if (sysTime2 - sysTime1 > outTime) {
+                DESC = "返回数据超时";
+                return true;
+            }
+        }
+    }
+
+    private boolean checkData2While() {
+        int timeOutType = 0;//0什么都没返回超时，1返回7fxx78之后超时
+        while (true) {
+            if (myDataList.size() != 0) {
+                String mmsg = ECUTools.getData(myDataList.get(0), msg);
+                if (mmsg.equals(ECUTools.ERR)) {
+                    errData = myDataList.get(0);
+                    // myDataList.remove(0);
+                    myDataList.clear();
+                    DESC = "返回数据异常";
+                    errType = 3;
+                    return true;
+                } else if (mmsg.equals(ECUTools.WAIT)) {
+                    errData = myDataList.get(0);
+                    timeOutType = 1;
+                    myDataList.remove(0);
+                    sysTime1 = new Date().getTime();
+                    sysTime2 = 0L;
+                } else {
+                    return false;
+                }
+            } else {
+                try {
+                    Thread.sleep(5);
+                } catch (InterruptedException e) {
+                    LogTools.errLog(e);
+                }
+            }
+            sysTime2 = new Date().getTime();
+            if (sysTime2 - sysTime1 > outTime) {
+                if (timeOutType == 0) {
+                    DESC = "与ECU通信失败";
+                    errType = 1;
+                } else if (timeOutType == 1) {
+                    DESC = "返回数据超时";
+                    errType = 2;
+                }
+                return true;
+            }
+        }
+    }
+
+    private boolean checkData3While() {
+        while (true) {
+            if (myDataList.size() != 0) {
+                String mmsg = ECUTools.getData2(myDataList.get(0), "36");
+                if (mmsg.equals(ECUTools.ERR)) {
+                    // myDataList.remove(0);
+                    myDataList.clear();
+                    DESC = "返回数据异常";
+                    return true;
+                } else if (mmsg.equals(ECUTools.WAIT)) {
+                    myDataList.remove(0);
+                    sysTime1 = new Date().getTime();
+                    sysTime2 = 0L;
+                } else {
+                    return false;
+                }
+            } else {
+                try {
+                    Thread.sleep(5);
+                } catch (InterruptedException e) {
+                    LogTools.errLog(e);
+                }
+            }
+            sysTime2 = new Date().getTime();
+            if (sysTime2 - sysTime1 > outTime) {
+                DESC = "返回数据超时";
+                return true;
+            }
+        }
+    }
+
+    private boolean checkData4While() {
+        int timeOutType = 0;//0什么都没返回超时，1返回7f之后超时
+        while (true) {
+            if (myDataList.size() != 0) {
+                String mmsg = ECUTools.getData3(myDataList.get(0), msg);
+                if (mmsg.equals(ECUTools.ERR)) {
+                    errData = myDataList.get(0);
+                    // myDataList.remove(0);
+                    myDataList.clear();
+                    DESC = "返回数据异常";
+                    errType = 3;
+                    return true;
+                } else if (mmsg.equals(ECUTools.WAIT)) {
+                    errData = myDataList.get(0);
+                    timeOutType = 1;
+                    myDataList.remove(0);
+                    sysTime1 = new Date().getTime();
+                    sysTime2 = 0L;
+                } else {
+                    return false;
+                }
+            } else {
+                try {
+                    Thread.sleep(5);
+                } catch (InterruptedException e) {
+                    LogTools.errLog(e);
+                }
+            }
+            sysTime2 = new Date().getTime();
+            if (sysTime2 - sysTime1 > outTime) {
+                if (timeOutType == 0) {
+                    DESC = "与ECU通信失败";
+                    errType = 1;
+                } else if (timeOutType == 1) {
+                    DESC = "返回数据超时";
+                    errType = 2;
+                }
+                return true;
+            }
+        }
+    }
+
+    private String oderString(String string, int len) {
+        int size = len - string.length();
+        StringBuilder value = new StringBuilder();
+        for (int i = 0; i < size; i++) {
+            value.append("0");
+        }
+        return value.toString() + string;
+    }
+
+    SigNal ParseSigNal(String content, List<ParseBean> list) {
+        SigNal result = null;
+
+        String strDID = content.substring(2, 6);
+        for (ParseBean dictItem : list) {
+            String id = dictItem.getId();
+            if (id != null) {
+                if (id.equals(strDID)) {
+                    result = SigNal.Pase4Service(dictItem, content.substring(2));
+                    break;
+                }
+            }
+        }
+
+        return result;
+    }
+
+    List<ParseBean> ParseBeanList(String json) {
+        List<ParseBean> result = new ArrayList<ParseBean>();
+
+        try {
+            JSONObject jsonObject = new JSONObject(json);
+            JSONArray jsList = jsonObject.getJSONArray("List");
+            int count = jsList.length();
+            for (int i = 0; i < count; i++) {
+                JSONObject js = jsList.getJSONObject(i);
+                ParseBean item = new ParseBean();
+                item.Parse(js);
+                result.add(item);
+            }
+        } catch (JSONException e) {
+            LogTools.errLog(e);
+        }
+
+        return result;
+    }
+
+    List<SigNal> ParseFreezeSigNal(String content, List<ParseBean> freezes) {
+        String strBody = content.substring(14);
+        int n = 0;
+        List<SigNal> listFrz = new ArrayList<SigNal>();
+        try {
+            while (n < strBody.length()) {
+                String pid = strBody.substring(n, n += (2 * 2));
+                boolean found = false;
+
+                for (ParseBean pb : freezes) {
+                    String id = pb.getId();
+                    found = pid.equalsIgnoreCase(id);
+                    if (found) {
+                        int len = pb.getLength();
+                        String data = strBody.substring(n - (2 * 2), n += (len * 2));
+                        if (ParseTypeEnum.Null.equals(pb.getParseType()) == false) {
+                            SigNal signal = SigNal.Pase4Service(pb, data);
+                            listFrz.add(signal);
+                        }
+                        break;
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            LogTools.errLog(e);
+        }
+        return listFrz;
     }
 
     public String Controls(String inputdata) {
@@ -86,10 +436,10 @@ public class InitClass {
                                     msgClient = new MySocketClient(dstName, dstPort);
                                 }
                             }
-                            if (msgClient.isConnected()) {
-                                msgClient.disconnect();
-                            }
                             try {
+                                if (msgClient.isConnected()) {
+                                    msgClient.disconnect();
+                                }
                                 msgClient.connect();
                             } catch (IOException e) {
                                 LogTools.errLog(e);
@@ -275,111 +625,6 @@ public class InitClass {
         return jsonObject.toString();
     }
 
-    private String oderString(String string, int len) {
-        int size = len - string.length();
-        StringBuilder value = new StringBuilder();
-        for (int i = 0; i < size; i++) {
-            value.append("0");
-        }
-        return value.toString() + string;
-    }
-
-    private boolean replay() {
-        if (myDataList.size() > 0) {
-            myDataList.remove(0);
-        }
-        if (msg.length() > 8) {
-            key = msg.substring(6, 8).toLowerCase();
-        }
-        if (msgClient != null && msgClient.isConnected()) {
-            Log.e("cyf", "发送信息 : " + msg + "  ");
-            msgClient.setOnConnectLinstener(new MySocketClient.ConnectLinstener() {
-                @Override
-                public void onReceiveData(String data) {
-                    Log.e("cyf", "收到信息 : " + OBDagreement.unDecodeString(data));
-                    myDataList.add(OBDagreement.unDecodeString(data));
-                }
-            });
-            msgClient.send(StringTools.hex2byte(msg));
-            sysTime1 = new Date().getTime();
-            sysTime2 = 0L;
-        } else {
-            DESC = "OBD连接断开，请重新启动软件";
-            return true;
-        }
-        // return sleep() || checkData();
-        return checkData1While();
-    }
-
-    private boolean sleep() {
-        while (myDataList.size() == 0) {
-            try {
-                Thread.sleep(5);
-            } catch (InterruptedException e) {
-                LogTools.errLog(e);
-            }
-            sysTime2 = new Date().getTime();
-            if (sysTime2 - sysTime1 > outTime) {
-                DESC = "返回数据超时";
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean checkData() {
-        sysTime2 = new Date().getTime();
-        if (sysTime2 - sysTime1 <= outTime) {
-            for (int i = 0; i < myDataList.size(); i++) {
-                String mKey = myDataList.get(i).substring(6, 8).toLowerCase();
-                int length = Integer.parseInt(Integer.parseInt(myDataList.get(i).substring(2, 4), 16) + ""
-                        + Integer.parseInt(myDataList.get(i).substring(4, 6), 16));
-                if (mKey.equals(key) && length == ((myDataList.get(i).length() - 8) / 2) && myDataList.get(i).endsWith("00AA")) {
-                    break;
-                } else {
-                    myDataList.remove(i);
-                    i--;
-                }
-            }
-            if (myDataList.size() == 0) {
-                DESC = "返回数据异常";
-                return true;
-            }
-        } else {
-            DESC = "返回数据超时";
-            return true;
-        }
-        return false;
-    }
-
-    private boolean checkData1While() {
-        while (true) {
-            if (myDataList.size() != 0) {
-                String mKey = myDataList.get(0).substring(6, 8).toLowerCase();
-                int length = Integer.parseInt(Integer.parseInt(myDataList.get(0).substring(2, 4), 16) + ""
-                        + Integer.parseInt(myDataList.get(0).substring(4, 6), 16));
-                if (mKey.equals(key) && length == ((myDataList.get(0).length() - 8) / 2) && myDataList.get(0).endsWith("00AA")) {
-                    return false;
-                } else {
-                    myDataList.remove(0);
-                    DESC = "返回数据异常";
-                    return true;
-                }
-            } else {
-                try {
-                    Thread.sleep(5);
-                } catch (InterruptedException e) {
-                    LogTools.errLog(e);
-                }
-            }
-            sysTime2 = new Date().getTime();
-            if (sysTime2 - sysTime1 > outTime) {
-                DESC = "返回数据超时";
-                return true;
-            }
-        }
-    }
-
     public String SetVCIParamsCAN(String inputdata) {
         JSONObject jsonObject = new JSONObject();
         try {
@@ -502,163 +747,6 @@ public class InitClass {
         return jsonObject.toString();
     }
 
-    private boolean replay4() {
-        if (myDataList.size() > 0) {
-            myDataList.remove(0);
-        }
-        if (msgClient != null && msgClient.isConnected()) {
-            Log.e("cyf", "发送信息 : " + msg + "  ");
-            msgClient.setOnConnectLinstener(new MySocketClient.ConnectLinstener() {
-                @Override
-                public void onReceiveData(String data) {
-//                    Log.e("cyf", "收到信息 : " + OBDagreement.unDecodeString(data));
-//                    if (OBDagreement.unDecodeString(data).toLowerCase().contains(ECUagreement.reCanId.toLowerCase())) {
-//                        myData.add(OBDagreement.unDecodeString(data));
-//                    }
-                    Log.e("cyf", "收到信息 : " + data);
-                    if (OBDagreement.unDecodeString(data).toLowerCase().contains(ECUagreement.rId.toLowerCase())) {
-                        myDataList.add(data);
-                    }
-                }
-            });
-            msgClient.send(StringTools.hex2byte(msg));
-            sysTime1 = new Date().getTime();
-            sysTime2 = 0L;
-        } else {
-            DESC = "OBD连接断开，请重新启动软件";
-            errType = 1;
-            return true;
-        }
-        // return sleep() || checkData2();
-        return checkData2While();
-    }
-
-    private boolean checkData4While() {
-        while (true) {
-            if (myDataList.size() != 0) {
-                String mmsg = ECUTools.getData3(myDataList.get(0), 1, msg);
-                if (mmsg.equals(ECUTools.ERR)) {
-                    errData = myDataList.get(0);
-                    myDataList.remove(0);
-                    DESC = "返回数据异常";
-                    errType = 2;
-                    return true;
-                } else if (mmsg.equals(ECUTools.WAIT)) {
-                    myDataList.remove(0);
-                    sysTime1 = new Date().getTime();
-                    sysTime2 = 0L;
-                } else {
-                    return false;
-                }
-            } else {
-                try {
-                    Thread.sleep(5);
-                } catch (InterruptedException e) {
-                    LogTools.errLog(e);
-                }
-            }
-            sysTime2 = new Date().getTime();
-            if (sysTime2 - sysTime1 > outTime) {
-                DESC = "返回数据超时";
-                errType = 1;
-                return true;
-            }
-        }
-    }
-
-    private boolean replay2() {
-        if (myDataList.size() > 0) {
-            myDataList.remove(0);
-        }
-        if (msgClient != null && msgClient.isConnected()) {
-            Log.e("cyf", "发送信息 : " + msg + "  ");
-            msgClient.setOnConnectLinstener(new MySocketClient.ConnectLinstener() {
-                @Override
-                public void onReceiveData(String data) {
-//                    Log.e("cyf", "收到信息 : " + OBDagreement.unDecodeString(data));
-//                    if (OBDagreement.unDecodeString(data).toLowerCase().contains(ECUagreement.reCanId.toLowerCase())) {
-//                        myData.add(OBDagreement.unDecodeString(data));
-//                    }
-                    Log.e("cyf", "收到信息 : " + data);
-                    if (OBDagreement.unDecodeString(data).toLowerCase().contains(ECUagreement.rId.toLowerCase())) {
-                        myDataList.add(data);
-                    }
-                }
-            });
-            msgClient.send(StringTools.hex2byte(msg));
-            sysTime1 = new Date().getTime();
-            sysTime2 = 0L;
-        } else {
-            DESC = "OBD连接断开，请重新启动软件";
-            errType = 1;
-            return true;
-        }
-        // return sleep() || checkData2();
-        return checkData2While();
-    }
-
-    private boolean checkData2() {
-        sysTime2 = new Date().getTime();
-        if (sysTime2 - sysTime1 <= outTime) {
-            String mmsg = "";
-            for (int i = 0; i < myDataList.size(); i++) {
-                mmsg = ECUTools.getData(myDataList.get(i), 1, msg);
-                if (mmsg.equals(ECUTools.ERR)) {
-                    myDataList.remove(i);
-                    i--;
-                } else if (mmsg.equals(ECUTools.WAIT)) {
-                    myDataList.remove(i);
-                    sysTime1 = new Date().getTime();
-                    sysTime2 = 0L;
-                    return sleep() || checkData2();
-                } else {
-                    break;
-                }
-            }
-            if (myDataList.size() == 0) {
-                DESC = "返回数据异常";
-                return true;
-            }
-        } else {
-            DESC = "返回数据超时";
-            return true;
-        }
-        return false;
-    }
-
-    private boolean checkData2While() {
-        while (true) {
-            if (myDataList.size() != 0) {
-                String mmsg = ECUTools.getData(myDataList.get(0), 1, msg);
-                if (mmsg.equals(ECUTools.ERR)) {
-                    errData = myDataList.get(0);
-                    myDataList.remove(0);
-                    DESC = "返回数据异常";
-                    errType = 2;
-                    return true;
-                } else if (mmsg.equals(ECUTools.WAIT)) {
-                    myDataList.remove(0);
-                    sysTime1 = new Date().getTime();
-                    sysTime2 = 0L;
-                } else {
-                    return false;
-                }
-            } else {
-                try {
-                    Thread.sleep(5);
-                } catch (InterruptedException e) {
-                    LogTools.errLog(e);
-                }
-            }
-            sysTime2 = new Date().getTime();
-            if (sysTime2 - sysTime1 > outTime) {
-                DESC = "返回数据超时";
-                errType = 1;
-                return true;
-            }
-        }
-    }
-
     public String Datatrans36Block(String inputdata) {
         JSONObject jsonObject = new JSONObject();
         try {
@@ -777,107 +865,12 @@ public class InitClass {
         return jsonObject.toString();
     }
 
-    private boolean replay3() {
-        if (myDataList.size() > 0) {
-            myDataList.remove(0);
-        }
-        Log.e("cyf", (msgClient != null) + "  判断  " + msgClient.isConnected());
-        if (msgClient != null && msgClient.isConnected()) {
-            if (msgBytes != null) {
-                Log.e("cyf", "发送36信息");
-            } else {
-                Log.e("cyf", "发送信息 : " + msg + "  ");
-            }
-            msgClient.setOnConnectLinstener(new MySocketClient.ConnectLinstener() {
-                @Override
-                public void onReceiveData(String data) {
-//                    Log.e("cyf", "收到信息 : " + OBDagreement.unDecodeString(data));
-//                    if (OBDagreement.unDecodeString(data).toLowerCase().contains(ECUagreement.reCanId.toLowerCase())) {
-//                        myData.add(OBDagreement.unDecodeString(data));
-//                    }
-                    Log.e("cyf", "收到信息 : " + data);
-                    if (OBDagreement.unDecodeString(data).toLowerCase().contains(ECUagreement.rId.toLowerCase())) {
-                        myDataList.add(data);
-                    }
-                }
-            });
-            // msgClient.send(StringTools.hex2byte(msg));
-            msgClient.send(msgBytes);
-            if (msgBytes != null) {
-                Log.e("cyf", "发送36信息 发完");
-            } else {
-                Log.e("cyf", "发送信息 : " + msg + "  ");
-            }
-            sysTime1 = new Date().getTime();
-            sysTime2 = 0L;
-        } else {
-            DESC = "OBD连接断开，请重新启动软件";
-            return true;
-        }
-        // return sleep() || checkData3();
-        return checkData3While();
-    }
-
-    private boolean checkData3() {
-        sysTime2 = new Date().getTime();
-        if (sysTime2 - sysTime1 <= outTime) {
-            String mmsg = "";
-            for (int i = 0; i < myDataList.size(); i++) {
-                // mmsg = ECUTools.getData(myData.get(i), 1, msg);
-                mmsg = ECUTools.getData2(myDataList.get(i), 1, "36");
-                if (mmsg.equals(ECUTools.ERR)) {
-                    myDataList.remove(i);
-                    i--;
-                } else if (mmsg.equals(ECUTools.WAIT)) {
-                    myDataList.remove(i);
-                    sysTime1 = new Date().getTime();
-                    sysTime2 = 0L;
-                    return sleep() || checkData3();
-                } else {
-                    break;
-                }
-            }
-            if (myDataList.size() == 0) {
-                DESC = "返回数据异常";
-                return true;
-            }
-        } else {
-            DESC = "数据返回超时";
-            return true;
-        }
-        return false;
-    }
-
-    private boolean checkData3While() {
-        while (true) {
-            if (myDataList.size() != 0) {
-                String mmsg = ECUTools.getData2(myDataList.get(0), 1, "36");
-                if (mmsg.equals(ECUTools.ERR)) {
-                    myDataList.remove(0);
-                    DESC = "返回数据异常";
-                    return true;
-                } else if (mmsg.equals(ECUTools.WAIT)) {
-                    myDataList.remove(0);
-                    sysTime1 = new Date().getTime();
-                    sysTime2 = 0L;
-                } else {
-                    return false;
-                }
-            } else {
-                try {
-                    Thread.sleep(5);
-                } catch (InterruptedException e) {
-                    LogTools.errLog(e);
-                }
-            }
-            sysTime2 = new Date().getTime();
-            if (sysTime2 - sysTime1 > outTime) {
-                DESC = "返回数据超时";
-                return true;
-            }
-        }
-    }
-
+    /**
+     * 基本信息
+     *
+     * @param inputdata
+     * @return
+     */
     public String ReadMutilDatas(String inputdata) {
         JSONObject jsonObject = new JSONObject();
         String id = "";
@@ -904,8 +897,9 @@ public class InitClass {
                 if (replay2()) {
                     jsonObject.put("RESULT", "FAULT");
                     String desc = jsonObject.optString("DESC");
+                    Log.e("cyfxx", "desc1 : " + desc);
                     if (desc != null && !desc.equals("")) {
-                        jsonObject.put("DESC", DESC + ";" + "第" + (a + 1) + "条" + desc);
+                        jsonObject.put("DESC", "第" + (a + 1) + "条" + DESC + ";" + desc);
                     } else {
                         jsonObject.put("DESC", "第" + (a + 1) + "条" + DESC);
                     }
@@ -916,7 +910,7 @@ public class InitClass {
                             if (i >= a) {
                                 JSONObject jsonObject1 = new JSONObject();
                                 jsonObject1.put("Name", base.get(i).getNameZh());
-                                jsonObject1.put("Value", "返回数据超时");
+                                jsonObject1.put("Value", "与ECU通信失败");
                                 jsonArray.put(jsonObject1);
                             }
                         }
@@ -929,14 +923,34 @@ public class InitClass {
                         }
                         return jsonObject.toString();
                     } else if (errType == 2) {
-                        // 消极响应
+                        // 7Fxx78超时-消极响应
                         // 获取错误信息
                         int b = errData.toLowerCase().indexOf(ECUagreement.rId.toLowerCase());
                         String msg = errData.substring(b + ECUagreement.rId.length() + 4, errData.length() - 2);
                         // 添加值
                         JSONObject jsonObject1 = new JSONObject();
                         jsonObject1.put("Name", base.get(a).getNameZh());
-                        jsonObject1.put("Value", "数据异常：" + msg);
+                        jsonObject1.put("Value", "消极响应：" + msg);
+                        jsonArray.put(jsonObject1);
+                        a++;
+                    } else if (errType == 3) {
+                        // 消极响应
+                        // 获取错误信息
+                        int b = errData.toLowerCase().indexOf(ECUagreement.rId.toLowerCase());
+                        String msg = errData.substring(b + ECUagreement.rId.length() + 4, errData.length() - 2);
+                        JSONObject jsonObject1 = new JSONObject();
+                        if (msg.equals("")) {
+                            jsonObject1.put("Name", base.get(a).getNameZh());
+                            jsonObject1.put("Value", "长度不正确");
+                        } else {
+                            if (msg.toLowerCase().startsWith("7f") && msg.length() == 6) {
+                                jsonObject1.put("Name", base.get(a).getNameZh());
+                                jsonObject1.put("Value", "消极响应：" + msg);
+                            } else {
+                                jsonObject1.put("Name", base.get(a).getNameZh());
+                                jsonObject1.put("Value", "解析内容不正确：" + msg);
+                            }
+                        }
                         jsonArray.put(jsonObject1);
                         a++;
                     }
@@ -945,10 +959,35 @@ public class InitClass {
                     String data = myDataList.get(0);
                     int b = data.toLowerCase().indexOf(ECUagreement.rId.toLowerCase());
                     String msg = data.substring(b + ECUagreement.rId.length() + 4, data.length() - 2);
-                    SigNal s = ParseSigNal(msg, base);
                     JSONObject jsonObject1 = new JSONObject();
-                    jsonObject1.put("Name", s.getName());
-                    jsonObject1.put("Value", s.getValue());
+                    if (msg.equals("")) {
+                        // 理论上不会走到这里
+                        jsonObject1.put("Name", base.get(a).getNameZh());
+                        jsonObject1.put("Value", "长度不正确");
+                    } else {
+                        int aa = 0;
+                        if (msg.length() >= id.length()) {
+                            aa = msg.length() - id.length();
+                        }
+                        if (msg.substring(id.length()).equals("") || aa / 2 != base.get(a).getLength()) {
+                            jsonObject1.put("Name", base.get(a).getNameZh());
+                            jsonObject1.put("Value", "长度不正确：" + msg);
+                        } else {
+                            try {
+                                SigNal s = ParseSigNal(msg, base);
+                                jsonObject1.put("Name", s.getName());
+                                if (s.getValue() == null || s.getValue().equals("")) {
+                                    jsonObject1.put("Value", "解析内容不正确：" + msg);
+                                } else {
+                                    jsonObject1.put("Value", s.getValue());
+                                }
+                            } catch (Exception e) {
+                                jsonObject1.put("Name", base.get(a).getNameZh());
+                                jsonObject1.put("Value", "解析内容不正确：" + msg);
+                                LogTools.errLog(e);
+                            }
+                        }
+                    }
                     jsonArray.put(jsonObject1);
                     a++;
                 }
@@ -975,44 +1014,12 @@ public class InitClass {
         return jsonObject.toString();
     }
 
-    List<ParseBean> ParseBeanList(String json) {
-        List<ParseBean> result = new ArrayList<ParseBean>();
-
-        try {
-            JSONObject jsonObject = new JSONObject(json);
-            JSONArray jsList = jsonObject.getJSONArray("List");
-            int count = jsList.length();
-            for (int i = 0; i < count; i++) {
-                JSONObject js = jsList.getJSONObject(i);
-                ParseBean item = new ParseBean();
-                item.Parse(js);
-                result.add(item);
-            }
-        } catch (JSONException e) {
-            LogTools.errLog(e);
-        }
-
-        return result;
-    }
-
-    SigNal ParseSigNal(String content, List<ParseBean> list) {
-        SigNal result = null;
-
-        String strDID = content.substring(2, 6); // ��ĿID
-        // -------------������Ϣ
-        for (ParseBean dictItem : list) {
-            String id = dictItem.getId();
-            if (id != null) {
-                if (id.equals(strDID)) {
-                    result = SigNal.Pase4Service(dictItem, content.substring(2)/*ȥ�� 0x62*/);
-                    break;
-                }
-            }
-        }
-
-        return result;
-    }
-
+    /**
+     * 动态数据
+     *
+     * @param inputdata
+     * @return
+     */
     public String ReadContinusDatas(String inputdata) {
         JSONObject jsonObject = new JSONObject();
         String id = "";
@@ -1042,7 +1049,7 @@ public class InitClass {
                         jsonObject.put("RESULT", "FAULT");
                         String desc = jsonObject.optString("DESC");
                         if (desc != null && !desc.equals("")) {
-                            jsonObject.put("DESC", DESC + ";" + "第" + (a + 1) + "条" + desc);
+                            jsonObject.put("DESC", "第" + (a + 1) + "条" + DESC + ";" + desc);
                         } else {
                             jsonObject.put("DESC", "第" + (a + 1) + "条" + DESC);
                         }
@@ -1053,27 +1060,48 @@ public class InitClass {
                                 if (i >= a) {
                                     JSONObject jsonObject1 = new JSONObject();
                                     jsonObject1.put("Name", base.get(i).getNameZh());
-                                    jsonObject1.put("Value", "返回数据超时");
+                                    jsonObject1.put("Value", "与ECU通信失败");
                                     jsonArray.put(jsonObject1);
                                 }
                             }
                             // 返回数据
-                            jsonObject.put("DATA", "{\"List\":" + jsonArray.toString() + "}");
+                            // jsonObject.put("DATA", "{\"List\":" + jsonArray.toString() + "}");
+                            jsonObject.put("DATA", jsonArray.toString());
                             try {
-                                publicUnit.SetBaseInfo(jsonObject.toString());
+                                publicUnit.SetLiveInfo(jsonObject.toString());
                             } catch (Exception e) {
                                 LogTools.errLog(e);
                             }
                             return jsonObject.toString();
                         } else if (errType == 2) {
-                            // 消极响应
+                            // 7Fxx78超时-消极响应
                             // 获取错误信息
                             int b = errData.toLowerCase().indexOf(ECUagreement.rId.toLowerCase());
                             String msg = errData.substring(b + ECUagreement.rId.length() + 4, errData.length() - 2);
                             // 添加值
                             JSONObject jsonObject1 = new JSONObject();
                             jsonObject1.put("Name", base.get(a).getNameZh());
-                            jsonObject1.put("Value", "数据异常：" + msg);
+                            jsonObject1.put("Value", "消极响应：" + msg);
+                            jsonArray.put(jsonObject1);
+                            a++;
+                        } else if (errType == 3) {
+                            // 消极响应
+                            // 获取错误信息
+                            int b = errData.toLowerCase().indexOf(ECUagreement.rId.toLowerCase());
+                            String msg = errData.substring(b + ECUagreement.rId.length() + 4, errData.length() - 2);
+                            JSONObject jsonObject1 = new JSONObject();
+                            if (msg.equals("")) {
+                                jsonObject1.put("Name", base.get(a).getNameZh());
+                                jsonObject1.put("Value", "长度不正确");
+                            } else {
+                                if (msg.toLowerCase().startsWith("7f") && msg.length() == 6) {
+                                    jsonObject1.put("Name", base.get(a).getNameZh());
+                                    jsonObject1.put("Value", "消极响应：" + msg);
+                                } else {
+                                    jsonObject1.put("Name", base.get(a).getNameZh());
+                                    jsonObject1.put("Value", "解析内容不正确：" + msg);
+                                }
+                            }
                             jsonArray.put(jsonObject1);
                             a++;
                         }
@@ -1082,10 +1110,35 @@ public class InitClass {
                         String data = myDataList.get(0);
                         int b = data.toLowerCase().indexOf(ECUagreement.rId.toLowerCase());
                         String msg = data.substring(b + ECUagreement.rId.length() + 4, data.length() - 2);
-                        SigNal s = ParseSigNal(msg, base);
                         JSONObject jsonObject1 = new JSONObject();
-                        jsonObject1.put("Name", s.getName());
-                        jsonObject1.put("Value", s.getValue());
+                        if (msg.equals("")) {
+                            // 理论上不会走到这里
+                            jsonObject1.put("Name", base.get(a).getNameZh());
+                            jsonObject1.put("Value", "长度不正确");
+                        } else {
+                            int aa = 0;
+                            if (msg.length() >= id.length()) {
+                                aa = msg.length() - id.length();
+                            }
+                            if (msg.substring(id.length()).equals("") || aa / 2 != base.get(a).getLength()) {
+                                jsonObject1.put("Name", base.get(a).getNameZh());
+                                jsonObject1.put("Value", "长度不正确：" + msg);
+                            } else {
+                                try {
+                                    SigNal s = ParseSigNal(msg, base);
+                                    jsonObject1.put("Name", s.getName());
+                                    if (s.getValue() == null || s.getValue().equals("")) {
+                                        jsonObject1.put("Value", "解析内容不正确：" + msg);
+                                    } else {
+                                        jsonObject1.put("Value", s.getValue());
+                                    }
+                                } catch (Exception e) {
+                                    jsonObject1.put("Name", base.get(a).getNameZh());
+                                    jsonObject1.put("Value", "解析内容不正确：" + msg);
+                                    LogTools.errLog(e);
+                                }
+                            }
+                        }
                         jsonArray.put(jsonObject1);
                         a++;
                     }
@@ -1189,63 +1242,26 @@ public class InitClass {
         return jsonObject.toString();
     }
 
-    List<SigNal> ParseFreezeSigNal(String content, List<ParseBean> freezes) {
-        String strBody = content.substring(14);
-        int n = 0;
-        List<SigNal> listFrz = new ArrayList<SigNal>();
-        try {
-            while (n < strBody.length()) {
-                String pid = strBody.substring(n, n += (2 * 2));
-                boolean found = false;
-
-                for (ParseBean pb : freezes) {
-                    String id = pb.getId();
-                    found = pid.equalsIgnoreCase(id);
-                    if (found) {
-                        int len = pb.getLength();
-                        String data = strBody.substring(n - (2 * 2), n += (len * 2));
-                        if (ParseTypeEnum.Null.equals(pb.getParseType()) == false) {
-                            SigNal signal = SigNal.Pase4Service(pb, data);
-                            listFrz.add(signal);
-                        }
-                        break;
-                    }
-                }
-            }
-
-        } catch (Exception e) {
-            LogTools.errLog(e);
-        }
-        return listFrz;
-    }
-
     public String DatasendForCan(String inputdata) {
-        Log.e("cyfxx","000");
         JSONObject jsonObject = new JSONObject();
-        Log.e("cyfxx","111");
         try {
             jsonObject.put("RESULT", "SUCCESS");
             jsonObject.put("DESC", "");
-            Log.e("cyfxx","222");
             // 判断携带没携带canId信息
             String oldId = ECUagreement.Id;
             if (new JSONObject(inputdata).has("TESTERTOECU")) {
-                Log.e("cyfxx","888");
                 ECUagreement.Id = oderString(new JSONObject(inputdata).optString("TESTERTOECU"), 8);
             }
-            Log.e("cyfxx","333");
             // 拼接数据
             msg = ECUagreement.a(new JSONObject(inputdata).optString("DATA"));
             if (new JSONObject(inputdata).has("TESTERTOECU")) {
-                Log.e("cyfxx","777");
                 ECUagreement.Id = oldId;
             }
-            Log.e("cyfxx","444");
             // 清除上一个数据
             if (myDataList.size() > 0) {
-                myDataList.remove(0);
+                // myDataList.remove(0);
+                myDataList.clear();
             }
-            Log.e("cyfxx","555");
             // 发送数据
             if (msgClient != null && msgClient.isConnected()) {
                 Log.e("cyf", "发送信息 : " + msg + "  ");
@@ -1255,10 +1271,9 @@ public class InitClass {
 
                     }
                 });
-                Log.e("cyfxx","666");
                 msgClient.send(StringTools.hex2byte(msg));
             } else {
-                jsonObject.put("DESC", "OBD连接断开，请重新启动软件");
+                jsonObject.put("DESC", "与ECU通信失败");
                 jsonObject.put("RESULT", "FAULT");
             }
         } catch (Exception e) {

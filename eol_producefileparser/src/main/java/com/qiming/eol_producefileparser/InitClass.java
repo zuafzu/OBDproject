@@ -562,4 +562,218 @@ public class InitClass {
         return jsonObject.toString();
     }
 
+    /**
+     * 多段数据计算校验值（只针对EOLFileParserByteInit）
+     *
+     * @param inputdata
+     * @return
+     */
+    public String FileSemgentCheckData(String inputdata) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("RESULT", "SUCCESS");
+            jsonObject.put("DESC", "");
+
+            JSONObject jo = new JSONObject(inputdata);
+            String string = jo.optString("SMGTLIST");
+            String[] strings = string.split(";");
+            byte[] mmByte = null;
+            // 解析每段校验的起始地址和长度，并封装需要校验的字节
+            for (int i = 0; i < strings.length; i++) {
+                String string1 = strings[i];
+                String[] strings1 = string1.split("-");
+                for (int j = 0; j < eolMap.size(); j++) {
+                    if (Long.valueOf(strings1[0], 16).equals(Long.valueOf(eolMap.get("" + j).getAddress(), 16))) {
+                        String mLen = strings1[1];
+                        if (mLen != null && !"".equals(mLen.trim())) {
+                            if (eolMap.get("" + j).getData().length >= Integer.valueOf(mLen, 16)) {
+                                if (mmByte == null) {
+                                    mmByte = ByteTools.subBytes(eolMap.get("" + j).getData(), 0, Integer.valueOf(mLen, 16));
+                                } else {
+                                    mmByte = ByteTools.byteMerger(mmByte,
+                                            ByteTools.subBytes(eolMap.get("" + j).getData(), 0, Integer.valueOf(mLen, 16))
+                                    );
+                                }
+                            } else {
+                                jsonObject.put("RESULT", "FAULT");
+                                jsonObject.put("DESC", "错误信息：校验长度有误");
+                                return jsonObject.toString();
+                            }
+                        } else {
+                            jsonObject.put("RESULT", "FAULT");
+                            jsonObject.put("DESC", "错误信息：校验长度为空");
+                            return jsonObject.toString();
+                        }
+                    }
+                }
+
+            }
+
+            // 判断校验类型
+            String CheckType = jo.optString("CheckType").trim();
+            String OutLen = jo.optString("OutLen").trim();
+            switch (CheckType) {
+                case "CRC32":
+                    // 计算CRC
+                    String crc = StringTools.byte2hex(intToBytes(getCRC32(mmByte)));
+                    if (crc.length() == 1) {
+                        crc = "0000000" + crc;
+                    } else if (crc.length() == 2) {
+                        crc = "000000" + crc;
+                    } else if (crc.length() == 3) {
+                        crc = "00000" + crc;
+                    } else if (crc.length() == 4) {
+                        crc = "0000" + crc;
+                    } else if (crc.length() == 5) {
+                        crc = "000" + crc;
+                    } else if (crc.length() == 6) {
+                        crc = "00" + crc;
+                    } else if (crc.length() == 7) {
+                        crc = "0" + crc;
+                    }
+                    if (OutLen.equals("3")) {
+                        crc = crc.substring(2, crc.length());
+                    }
+                    jsonObject.put("DATA", crc);
+                    break;
+                case "XOR":
+
+                    break;
+                case "SUM":
+
+                    break;
+            }
+        } catch (Exception e) {
+            LogTools.errLog(e);
+            try {
+                jsonObject.put("RESULT", "FAULT");
+                jsonObject.put("DESC", "错误信息：" + e.getMessage());
+            } catch (JSONException e1) {
+                LogTools.errLog(e1);
+            }
+        }
+        return jsonObject.toString();
+    }
+
+    /**
+     * 生产文件数据段排序（只针对EOLFileParserByteInit）
+     *
+     * @param inputdata
+     * @return
+     */
+    public String FileSemgentSort(String inputdata) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("RESULT", "SUCCESS");
+            jsonObject.put("DESC", "");
+
+            JSONObject jo = new JSONObject(inputdata);
+            // 判断排序类型ASC/DESC/CUSTOM/NONE
+            String CheckType = jo.optString("SORTTYPE").trim();
+            Map<String, WriteFileBean> mEolMap = new HashMap<>();
+            switch (CheckType) {
+                case "ASC":
+                    // 升序
+                    ArrayList<String> keys = new ArrayList<>();
+                    for (int i = 0; i < eolMap.size(); i++) {
+                        keys.add(eolMap.get("" + i).getAddress());
+                    }
+                    String temp = "";
+                    int size = keys.size();
+                    for (int i = 0; i < size - 1; i++) {
+                        for (int j = 0; j < size - 1 - i; j++) {
+                            if (Long.valueOf(keys.get(j), 16) > Long.valueOf(keys.get(j + 1), 16)) {
+                                temp = keys.get(j);
+                                keys.set(j, keys.get(j + 1));
+                                keys.set(j + 1, temp);
+                            }
+                        }
+                    }
+                    for (int i = 0; i < keys.size(); i++) {
+                        for (int j = 0; j < eolMap.size(); j++) {
+                            if (keys.get(i).equals(eolMap.get("" + j).getAddress())) {
+                                mEolMap.put("" + i, eolMap.get("" + j));
+                            }
+                        }
+                    }
+                    eolMap = mEolMap;
+                    break;
+                case "DESC":
+                    // 降序
+                    ArrayList<String> keys2 = new ArrayList<>();
+                    for (int i = 0; i < eolMap.size(); i++) {
+                        keys2.add(eolMap.get("" + i).getAddress());
+                    }
+                    String temp2 = "";
+                    int size2 = keys2.size();
+                    for (int i = 0; i < size2 - 1; i++) {
+                        for (int j = 0; j < size2 - 1 - i; j++) {
+                            if (Long.valueOf(keys2.get(j), 16) < Long.valueOf(keys2.get(j + 1), 16)) {
+                                temp2 = keys2.get(j);
+                                keys2.set(j, keys2.get(j + 1));
+                                keys2.set(j + 1, temp2);
+                            }
+                        }
+                    }
+                    for (int i = 0; i < keys2.size(); i++) {
+                        for (int j = 0; j < eolMap.size(); j++) {
+                            if (keys2.get(i).equals(eolMap.get("" + j).getAddress())) {
+                                mEolMap.put("" + i, eolMap.get("" + j));
+                            }
+                        }
+                    }
+                    eolMap = mEolMap;
+                    break;
+                case "CUSTOM":
+                    // 自定义顺序
+                    String string = jo.optString("SMGTLIST");
+                    String[] strings = string.split(";");
+                    //Map<String, String> map = new HashMap<>();// 每段的起始地址和长度
+                    // 解析每段的起始地址和长度
+                    for (int i = 0; i < strings.length; i++) {
+                        String string1 = strings[i];
+                        String[] strings1 = string1.split("-");
+
+                        String BeginAddr = strings1[0];
+                        String Len = strings1[1];
+                        //map.put(BeginAddr, Len);
+
+                        for (int j = 0; j < eolMap.size(); j++) {
+                            WriteFileBean writeFileBean = eolMap.get("" + j);
+                            if (Long.valueOf(writeFileBean.getAddress(), 16).equals(Long.valueOf(BeginAddr, 16))) {
+                                byte[] bytes = writeFileBean.getData();
+                                if (Integer.valueOf(Len, 16) <= bytes.length) {
+                                    byte[] mBytes = new byte[Integer.valueOf(Len, 16)];
+                                    for (int k = 0; k < mBytes.length; k++) {
+                                        mBytes[k] = bytes[k];
+                                    }
+                                    writeFileBean.setData(mBytes);
+                                    mEolMap.put(i + "", writeFileBean);
+                                } else {
+                                    jsonObject.put("RESULT", "FAULT");
+                                    jsonObject.put("DESC", "错误信息：校验长度有误");
+                                    return jsonObject.toString();
+                                }
+                            }
+                        }
+                    }
+                    eolMap = mEolMap;
+                    break;
+                case "NONE":
+                    // 不排序
+
+                    break;
+            }
+        } catch (Exception e) {
+            LogTools.errLog(e);
+            try {
+                jsonObject.put("RESULT", "FAULT");
+                jsonObject.put("DESC", "错误信息：" + e.getMessage());
+            } catch (JSONException e1) {
+                LogTools.errLog(e1);
+            }
+        }
+        return jsonObject.toString();
+    }
+
 }

@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@mipmap/ic_background_top"
     android:orientation="vertical"
     tools:context=".activity.SettingActivity">
 
@@ -11,7 +12,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
-
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -27,7 +27,7 @@
                 android:layout_height="44dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:padding="12dp"
-                android:src="@mipmap/ic_back"
+                android:src="@mipmap/ic_arrow_back"
                 android:tag="iv_back"
                 android:visibility="visible" />
 
@@ -62,12 +62,37 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
+                <!--com.cy.obdproject.view.RoundImageView-->
+                <ImageView
+                    android:id="@+id/iv_head"
+                    android:layout_width="75dp"
+                    android:layout_height="75dp"
+                    android:layout_marginLeft="32dp"
+                    android:layout_marginTop="160dp"
+                    android:src="@mipmap/ic_head" />
+
+                <TextView
+                    android:id="@+id/tv_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="32dp"
+                    android:layout_marginTop="12dp"
+                    android:text=""
+                    android:textColor="#ff716f6f"
+                    android:textSize="20sp" />
+
                 <LinearLayout
                     android:id="@+id/ll_cp"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="75dp"
+                    android:layout_marginLeft="32dp"
+                    android:layout_marginTop="40dp"
+                    android:layout_marginRight="32dp"
+                    android:background="@drawable/shape_corner_gary"
+                    android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:paddingLeft="16dp">
+                    android:paddingLeft="18dp"
+                    android:paddingRight="12dp">
 
                     <TextView
                         android:layout_width="0dp"
@@ -75,27 +100,43 @@
                         android:layout_weight="1"
                         android:gravity="center_vertical"
                         android:text="修改密码"
-                        android:textColor="@android:color/black" />
+                        android:textColor="@color/colorAccent"
+                        android:textSize="15sp" />
+
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="35dp"
+                        android:layout_marginLeft="21dp"
+                        android:layout_marginRight="21dp"
+                        android:background="#716F6F" />
 
                     <ImageView
-                        android:layout_width="44dp"
-                        android:layout_height="44dp"
-                        android:padding="12dp"
-                        android:src="@mipmap/left" />
+                        android:layout_width="8dp"
+                        android:layout_height="14dp"
+                        android:src="@mipmap/ic_arrow_right_red" />
 
                 </LinearLayout>
-
-                <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="1px"
-                    android:background="@android:color/darker_gray" />
 
                 <LinearLayout
                     android:id="@+id/ll_update"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="75dp"
+                    android:layout_marginLeft="32dp"
+                    android:layout_marginTop="21dp"
+                    android:layout_marginRight="32dp"
+                    android:background="@drawable/shape_corner_gary"
+                    android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:paddingLeft="16dp">
+                    android:paddingLeft="18dp"
+                    android:paddingRight="12dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="44dp"
+                        android:gravity="center_vertical"
+                        android:text="检查更新"
+                        android:textColor="@color/colorAccent"
+                        android:textSize="15sp" />
 
                     <TextView
                         android:id="@+id/tv_update"
@@ -103,21 +144,22 @@
                         android:layout_height="44dp"
                         android:layout_weight="1"
                         android:gravity="center_vertical"
-                        android:text="检查更新（当前版本：）"
-                        android:textColor="@android:color/black" />
+                        android:text="（当前版本：）"
+                        android:textSize="15sp" />
+
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="35dp"
+                        android:layout_marginLeft="21dp"
+                        android:layout_marginRight="21dp"
+                        android:background="#716F6F" />
 
                     <ImageView
-                        android:layout_width="44dp"
-                        android:layout_height="44dp"
-                        android:padding="12dp"
-                        android:src="@mipmap/left" />
+                        android:layout_width="8dp"
+                        android:layout_height="14dp"
+                        android:src="@mipmap/ic_arrow_right_red" />
 
                 </LinearLayout>
-
-                <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="1px"
-                    android:background="@android:color/darker_gray" />
 
             </LinearLayout>
 

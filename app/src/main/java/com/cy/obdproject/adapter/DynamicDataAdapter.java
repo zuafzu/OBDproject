@@ -45,7 +45,8 @@ public class DynamicDataAdapter extends BaseAdapter {
             holder = new Holder();
             convertView = LayoutInflater.from(context).inflate(R.layout.list_item_dynamic_data, parent, false);
             holder.tv_name = (TextView) convertView.findViewById(R.id.tv_name);
-            holder.view_line = (View) convertView.findViewById(R.id.view_line);
+            holder.tv_value = (TextView) convertView.findViewById(R.id.tv_value);
+            holder.btn_chart = (TextView) convertView.findViewById(R.id.btn_chart);
             holder.iv_left = (ImageView) convertView.findViewById(R.id.iv_left);
             convertView.setTag(holder);
         } else {
@@ -53,10 +54,10 @@ public class DynamicDataAdapter extends BaseAdapter {
         }
         holder.tv_name.setText(items.get(position).getName());
 
-        if ("1".equals(items.get(position).getIsSelect())){
-            holder.iv_left.setImageResource(R.mipmap.ic_checkbox_checked);
-        }else {
-            holder.iv_left.setImageResource(R.mipmap.ic_checkbox_unchecked);
+        if ("1".equals(items.get(position).getIsSelect())) {
+            holder.iv_left.setImageResource(R.mipmap.ic_check);
+        } else {
+            holder.iv_left.setImageResource(android.R.color.transparent);
         }
 //        if (position != (getCount() - 1)) {
 //            holder.view_line.setVisibility(View.VISIBLE);
@@ -67,8 +68,7 @@ public class DynamicDataAdapter extends BaseAdapter {
     }
 
     public class Holder {
-        public TextView tv_name, tv_value;
-        public View view_line;
+        public TextView tv_name, tv_value, btn_chart;
         public ImageView iv_left;
     }
 

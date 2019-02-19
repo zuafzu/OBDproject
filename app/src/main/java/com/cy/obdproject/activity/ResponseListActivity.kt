@@ -4,6 +4,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.support.v7.app.AlertDialog
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
 import android.widget.TextView
 import com.cy.obdproject.R
@@ -29,6 +31,7 @@ class ResponseListActivity : BaseActivity(), BaseActivity.ClickMethoListener {
     private var mAlertDialog: AlertDialog? = null
     private var mIntent1: Intent? = null
     private var requestList: ArrayList<RequestBean>? = null
+    private var requestAllList: ArrayList<RequestBean>? = null
     private var adapter: SelectRequestAdapter? = null
     private val waitTimeMax = 15
     private var waitTime = 0
@@ -47,11 +50,36 @@ class ResponseListActivity : BaseActivity(), BaseActivity.ClickMethoListener {
         setClickMethod(tv_refresh)
         mIntent1 = Intent(this, WebSocketService::class.java)
         requestList = ArrayList()
+        requestAllList = ArrayList()
         listView!!.setOnItemClickListener { _, _, position, _ ->
             SPTools.put(this, Constant.ZFORUID, "" + requestList!![position].requestId)
             startService(mIntent1)
             showProgressDialog()
         }
+        et_name.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(p0: Editable?) {
+                requestList!!.clear()
+                val key = et_name.text.toString().trim()
+                if (key == "") {
+                    requestList!!.addAll(requestAllList!!)
+                } else {
+                    for (i in 0 until requestAllList!!.size) {
+                        if (requestAllList!![i].requestName.contains(key)) {
+                            requestList!!.add(requestAllList!![i])
+                        }
+                    }
+                }
+                adapter!!.notifyDataSetChanged()
+            }
+
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+
+            }
+
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+
+            }
+        })
     }
 
     override fun doMethod(string: String?) {
@@ -138,6 +166,8 @@ class ResponseListActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                 val beans = Gson().fromJson<List<RequestBean>>(response.data, object : TypeToken<ArrayList<RequestBean>>() {}.type) as ArrayList<RequestBean>?
                 requestList!!.clear()
                 requestList!!.addAll(beans!!)
+                requestAllList!!.clear()
+                requestAllList!!.addAll(beans!!)
                 if (requestList!!.size > 0) {
                     findViewById<TextView>(R.id.tv_notice).visibility = View.GONE
                 } else {

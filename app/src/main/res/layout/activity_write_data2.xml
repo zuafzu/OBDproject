@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@mipmap/ic_background_all"
     android:orientation="vertical">
 
     <LinearLayout
@@ -24,7 +25,7 @@
                 android:layout_height="44dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:padding="12dp"
-                android:src="@mipmap/ic_back"
+                android:src="@mipmap/ic_arrow_back"
                 android:tag="iv_back"
                 android:visibility="visible" />
 
@@ -55,7 +56,9 @@
             style="@style/ProgressBar_Mini"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="1px"
+            android:layout_marginLeft="32dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="32dp"
             android:max="100"
             android:progress="0" />
 
@@ -63,20 +66,27 @@
             android:id="@+id/scrollView"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:layout_marginTop="20dp"
             android:layout_weight="1">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:layout_marginLeft="32dp"
+                android:layout_marginRight="32dp"
+                android:background="#995d5d5d"
+                android:orientation="vertical"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp">
 
                 <TextView
                     android:id="@+id/tv_msg"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginRight="8dp"
-                    android:scrollbars="vertical" />
+                    android:layout_marginTop="16dp"
+                    android:scrollbars="vertical"
+                    android:textColor="@android:color/white"
+                    android:visibility="gone" />
 
             </LinearLayout>
 
@@ -84,18 +94,19 @@
 
         <Button
             android:id="@+id/btn_start"
-            android:layout_width="match_parent"
-            android:layout_height="38dp"
-            android:layout_marginBottom="8dp"
+            android:layout_width="170dp"
+            android:layout_height="44dp"
+            android:layout_gravity="center"
             android:layout_marginLeft="16dp"
+            android:layout_marginTop="16dp"
             android:layout_marginRight="16dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginBottom="16dp"
             android:background="@drawable/shape_btn_colorprimary"
             android:tag="btn_start"
             android:text="@string/write"
             android:textAllCaps="false"
             android:textColor="@android:color/white"
-            android:textSize="14sp" />
+            android:textSize="17sp" />
 
 
     </LinearLayout>

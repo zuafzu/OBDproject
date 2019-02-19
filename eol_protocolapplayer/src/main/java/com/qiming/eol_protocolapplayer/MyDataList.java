@@ -32,4 +32,8 @@ public class MyDataList {
         }
     }
 
+    public synchronized void clear() {
+        myData.clear();
+    }
+
 }

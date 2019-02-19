@@ -6,7 +6,9 @@ import android.os.AsyncTask
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
+import android.text.Editable
 import android.text.Html
+import android.text.TextWatcher
 import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.view.View
@@ -72,6 +74,22 @@ class WriteData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
         isLocal = intent.getStringExtra("isLocal")
         jsonArray = JSONArray()
         tv_msg.movementMethod = ScrollingMovementMethod.getInstance()
+        tv_msg.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(p0: Editable?) {
+                if (tv_msg.text.toString() == "") {
+                    tv_msg.visibility = View.GONE
+                } else {
+                    tv_msg.visibility = View.VISIBLE
+                }
+            }
+
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+
+            }
+
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+            }
+        })
         setClickMethod(btn_start)
         setClickMethod(iv_back)
         progressBar.visibility = View.GONE
@@ -112,7 +130,8 @@ class WriteData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
         }
     }
 
-    @SuppressLint("SetTextI18n")
+
+    @Synchronized
     override fun setData(data: String?) {
         Log.e("cyf88", "data = $data")
         var isD = true

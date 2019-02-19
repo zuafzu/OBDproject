@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@mipmap/ic_background_all"
     android:orientation="vertical">
 
     <LinearLayout
@@ -9,107 +11,109 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="44dp"
-        android:background="@color/colorPrimary"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:translationZ="2dp">
-
-        <ImageView
-            android:id="@+id/iv_back"
-            android:layout_width="44dp"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="44dp"
-            android:background="?android:attr/selectableItemBackground"
-            android:padding="12dp"
-            android:src="@mipmap/ic_back"
-            android:tag="iv_back"
+            android:background="@color/colorPrimary"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:translationZ="2dp">
+
+            <ImageView
+                android:id="@+id/iv_back"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:padding="12dp"
+                android:src="@mipmap/ic_arrow_back"
+                android:tag="iv_back"
+                android:visibility="visible" />
+
+            <TextView
+                android:id="@+id/tv_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="@string/dtsj"
+                android:textColor="@android:color/white"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/tv_refresh"
+                android:layout_width="wrap_content"
+                android:layout_height="44dp"
+                android:padding="12dp"
+                android:tag="tv_refresh"
+                android:text="@string/refresh"
+                android:textColor="@android:color/white"
+                android:visibility="invisible" />
+
+        </LinearLayout>
+
+        <ListView
+            android:id="@+id/listView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="0dp"
+            android:listSelector="@android:color/transparent"
+            android:padding="8dp"
+            android:tag="listView"
             android:visibility="visible" />
 
-        <TextView
-            android:id="@+id/tv_title"
-            android:layout_width="0dp"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="@string/dtsj"
-            android:textColor="@android:color/white"
-            android:textSize="18sp" />
+            android:orientation="horizontal"
+            android:paddingTop="8dp">
 
-        <TextView
-            android:id="@+id/tv_refresh"
-            android:layout_width="wrap_content"
-            android:layout_height="44dp"
-            android:padding="12dp"
-            android:tag="tv_refresh"
-            android:text="@string/refresh"
-            android:textColor="@android:color/white"
-            android:visibility="invisible" />
+            <Button
+                android:id="@+id/btn_lastPage"
+                android:layout_width="0dp"
+                android:layout_height="26dp"
+                android:layout_marginLeft="24dp"
+                android:layout_marginRight="24dp"
+                android:layout_marginBottom="16dp"
+                android:layout_weight="1"
+                android:background="@drawable/shape_btn_colorhint"
+                android:tag="btn_lastPage"
+                android:text="@string/last_page"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white"
+                android:textSize="14sp" />
 
-    </LinearLayout>
+            <Button
+                android:id="@+id/btn_start"
+                android:layout_width="0dp"
+                android:layout_height="26dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginBottom="16dp"
+                android:layout_weight="1"
+                android:background="@drawable/shape_btn_colorprimary"
+                android:tag="btn_start"
+                android:text="停止"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white"
+                android:textSize="14sp" />
 
-    <ListView
-        android:id="@+id/listView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:divider="@android:color/transparent"
-        android:dividerHeight="0dp"
-        android:listSelector="@android:color/transparent"
-        android:tag="listView" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/btn_lastPage"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="38dp"
-            android:layout_marginBottom="8dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
-            android:layout_marginTop="8dp"
-            android:background="@drawable/shape_btn_colorhint"
-            android:tag="btn_lastPage"
-            android:text="@string/last_page"
-            android:textAllCaps="false"
-            android:textColor="@android:color/white"
-            android:textSize="14sp" />
-        <Button
-            android:id="@+id/btn_start"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="38dp"
-            android:layout_marginBottom="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginTop="8dp"
-            android:background="@drawable/shape_btn_colorprimary"
-            android:tag="btn_start"
-            android:text="@string/start"
-            android:textAllCaps="false"
-            android:textColor="@android:color/white"
-            android:textSize="14sp" />
-        <Button
-            android:id="@+id/btn_nextPage"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="38dp"
-            android:layout_marginBottom="8dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
-            android:layout_marginTop="8dp"
-            android:background="@drawable/shape_btn_colorprimary"
-            android:tag="btn_nextPage"
-            android:text="@string/next_page"
-            android:textAllCaps="false"
-            android:textColor="@android:color/white"
-            android:textSize="14sp" />
-    </LinearLayout>
+            <Button
+                android:id="@+id/btn_nextPage"
+                android:layout_width="0dp"
+                android:layout_height="26dp"
+                android:layout_marginLeft="24dp"
+                android:layout_marginRight="24dp"
+                android:layout_marginBottom="16dp"
+                android:layout_weight="1"
+                android:background="@drawable/shape_btn_colorprimary"
+                android:tag="btn_nextPage"
+                android:text="@string/next_page"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white"
+                android:textSize="14sp" />
+        </LinearLayout>
 
     </LinearLayout>
 
@@ -117,5 +121,48 @@
         android:id="@+id/float_window"
         layout="@layout/float_window"
         android:visibility="gone" />
+
+    <RelativeLayout
+        android:id="@+id/rl_Chart"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#99333333"
+        android:padding="8dp"
+        android:tag="rl_Chart"
+        android:visibility="visible">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:layout_centerInParent="true"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/shape_corner_white">
+
+                <com.github.mikephil.charting.charts.LineChart
+                    android:id="@+id/lineChart"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+            </RelativeLayout>
+
+            <ImageView
+                android:id="@+id/iv_close"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_alignParentRight="true"
+                android:src="@mipmap/ic_close"
+                android:tag="iv_close" />
+
+        </RelativeLayout>
+
+    </RelativeLayout>
 
 </RelativeLayout>

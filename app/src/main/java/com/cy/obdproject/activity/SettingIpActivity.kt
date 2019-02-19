@@ -121,6 +121,7 @@ class SettingIpActivity : BaseActivity(), BaseActivity.ClickMethoListener {
             }
             if (intent.hasExtra("isSave")) {
                 if (intent.getBooleanExtra("isSave", false)) {
+                    iv_back.visibility = View.VISIBLE
                     btn_ok.text = "保存"
                 }
             }
