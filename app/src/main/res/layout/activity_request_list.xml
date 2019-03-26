@@ -34,7 +34,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="@string/request_list"
+                android:text="@string/a_qqxzlb"
                 android:textColor="@android:color/white"
                 android:textSize="18sp" />
 

@@ -55,6 +55,7 @@ class WelcomeActivity : BaseActivity() {
         checkFileMkdirs(com.qiming.eol_public.InitClass.pathLiucheng)
         checkFileMkdirs(com.qiming.eol_public.InitClass.pathMokuai)
         checkFileMkdirs(com.qiming.eol_public.InitClass.pathCuowu)
+        checkFileMkdirs(com.qiming.eol_public.InitClass.pathCeshi)
         checkFileMkdirs(com.qiming.eol_public.InitClass.pathShunxu)
         checkFileMkdirs(com.qiming.eol_public.InitClass.pathTongxun)
         // 检查旧版本的apk,有则删除

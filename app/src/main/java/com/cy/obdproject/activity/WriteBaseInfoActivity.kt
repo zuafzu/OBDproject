@@ -17,11 +17,7 @@ import com.cy.obdproject.R
 import com.cy.obdproject.adapter.BaseInfoAdapter
 import com.cy.obdproject.base.BaseActivity
 import com.cy.obdproject.bean.BaseInfoBean
-import com.cy.obdproject.constant.ECUConstant
 import com.cy.obdproject.socket.SocketService
-import com.cy.obdproject.tools.ECUTools
-import com.cy.obdproject.worker.BaseInfoWorker
-import com.cy.obdproject.worker.WriteBaseInfoWorker
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.activity_write_base_info.*
@@ -29,8 +25,8 @@ import org.jetbrains.anko.toast
 
 class WriteBaseInfoActivity : BaseActivity(), BaseActivity.ClickMethoListener, AdapterView.OnItemClickListener, TextWatcher {
 
-    private var readBaseInfoWorker: BaseInfoWorker? = null
-    private var writeBaseInfoWorker: WriteBaseInfoWorker? = null
+    // private var readBaseInfoWorker: BaseInfoWorker? = null
+    // private var writeBaseInfoWorker: WriteBaseInfoWorker? = null
     private var list: ArrayList<BaseInfoBean>? = null
     private var baseInfoAdapter: BaseInfoAdapter? = null
 
@@ -49,21 +45,21 @@ class WriteBaseInfoActivity : BaseActivity(), BaseActivity.ClickMethoListener, A
         list = ArrayList()
 
         list!!.clear()
-        for (i in 0 until ECUConstant.getWriteBaseInfoData1().size) {
-            val bean = BaseInfoBean()
-            bean.name = ECUConstant.getWriteBaseInfoData1()[i].name
-            list!!.add(bean)
-        }
-        setData(Gson().toJson(list))
-
-        readBaseInfoWorker = BaseInfoWorker()
-        readBaseInfoWorker!!.init(this, ECUConstant.getWriteBaseInfoData1()) { data ->
-            setData(data)
-        }
-        writeBaseInfoWorker = WriteBaseInfoWorker()
-        writeBaseInfoWorker!!.init(this) { data ->
-            setData1(data)
-        }
+//        for (i in 0 until ECUConstant.getWriteBaseInfoData1().size) {
+//            val bean = BaseInfoBean()
+//            bean.name = ECUConstant.getWriteBaseInfoData1()[i].name
+//            list!!.add(bean)
+//        }
+//        setData(Gson().toJson(list))
+//
+//        readBaseInfoWorker = BaseInfoWorker()
+//        readBaseInfoWorker!!.init(this, ECUConstant.getWriteBaseInfoData1()) { data ->
+//            setData(data)
+//        }
+//        writeBaseInfoWorker = WriteBaseInfoWorker()
+//        writeBaseInfoWorker!!.init(this) { data ->
+//            setData1(data)
+//        }
         setClickMethod(iv_back)
         setClickMethod(tv_refresh)
     }
@@ -74,14 +70,14 @@ class WriteBaseInfoActivity : BaseActivity(), BaseActivity.ClickMethoListener, A
         } else {
             showProgressDialog()
             if (SocketService.getIntance() != null && SocketService.getIntance()!!.isConnected()) {
-                readBaseInfoWorker!!.start()
+                // readBaseInfoWorker!!.start()
             } else {
                 list!!.clear()
-                for (i in 0 until ECUConstant.getWriteBaseInfoData1().size) {
-                    val bean = BaseInfoBean()
-                    bean.name = ECUConstant.getWriteBaseInfoData1()[i].name
-                    list!!.add(bean)
-                }
+//                for (i in 0 until ECUConstant.getWriteBaseInfoData1().size) {
+//                    val bean = BaseInfoBean()
+//                    bean.name = ECUConstant.getWriteBaseInfoData1()[i].name
+//                    list!!.add(bean)
+//                }
                 setData(Gson().toJson(list))
             }
         }
@@ -172,11 +168,11 @@ class WriteBaseInfoActivity : BaseActivity(), BaseActivity.ClickMethoListener, A
 //            }
             var max = 100
             try {
-                max = if (ECUConstant.getWriteBaseInfoData1()[position].parsingType == "2") {
-                    Integer.valueOf(ECUConstant.getWriteBaseInfoData1()[position].byteLength)
-                } else {
-                    Integer.valueOf(ECUConstant.getWriteBaseInfoData1()[position].byteLength) * 2
-                }
+//                max = if (ECUConstant.getWriteBaseInfoData1()[position].parsingType == "2") {
+//                    Integer.valueOf(ECUConstant.getWriteBaseInfoData1()[position].byteLength)
+//                } else {
+//                    Integer.valueOf(ECUConstant.getWriteBaseInfoData1()[position].byteLength) * 2
+//                }
             } catch (e: Exception) {
 
             }
@@ -191,13 +187,13 @@ class WriteBaseInfoActivity : BaseActivity(), BaseActivity.ClickMethoListener, A
                     // 专家端参数修改，什么都不操作，等待用户反馈，反馈方法需要实现
 
                 } else {
-                    val socketBean = ECUConstant.getWriteBaseInfoData2()[position]
-                    if (ECUConstant.getWriteBaseInfoData1()[position].parsingType == "2") {
-                        socketBean.value = ECUTools.putData(input)
-                    } else {
-                        socketBean.value = input
-                    }
-                    writeBaseInfoWorker!!.start(socketBean)
+//                    val socketBean = ECUConstant.getWriteBaseInfoData2()[position]
+//                    if (ECUConstant.getWriteBaseInfoData1()[position].parsingType == "2") {
+//                        socketBean.value = ECUTools.putData(input)
+//                    } else {
+//                        socketBean.value = input
+//                    }
+//                    writeBaseInfoWorker!!.start(socketBean)
                 }
             }
             dismiss()
@@ -237,11 +233,11 @@ class WriteBaseInfoActivity : BaseActivity(), BaseActivity.ClickMethoListener, A
 //        }
         var max = 100
         try {
-            max = if (ECUConstant.getWriteBaseInfoData1()[position].parsingType == "2") {
-                Integer.valueOf(ECUConstant.getWriteBaseInfoData1()[position].byteLength)
-            } else {
-                Integer.valueOf(ECUConstant.getWriteBaseInfoData1()[position].byteLength) * 2
-            }
+//            max = if (ECUConstant.getWriteBaseInfoData1()[position].parsingType == "2") {
+//                Integer.valueOf(ECUConstant.getWriteBaseInfoData1()[position].byteLength)
+//            } else {
+//                Integer.valueOf(ECUConstant.getWriteBaseInfoData1()[position].byteLength) * 2
+//            }
             edit!!.hint = "输入长度$max"
         } catch (e: Exception) {
             edit!!.hint = "输入长度未知"
@@ -256,7 +252,7 @@ class WriteBaseInfoActivity : BaseActivity(), BaseActivity.ClickMethoListener, A
                 .setTitle(list!![position].name)
                 .setView(view)
                 .setCancelable(false)
-                .setPositiveButton("确定") { _, _ ->
+                .setPositiveButton(getString(R.string.a_ok)) { _, _ ->
                     val input = edit!!.text.toString()
                     sendClick(this@WriteBaseInfoActivity.localClassName, "$input-$position")
                     putData("$input-$position")

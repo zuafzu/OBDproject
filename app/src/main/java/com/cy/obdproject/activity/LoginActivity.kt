@@ -56,11 +56,11 @@ class LoginActivity : BaseActivity(), BaseActivity.ClickMethoListener {
             }
             "btn_login" -> {
                 if (et_name.text.toString() == "") {
-                    toast(R.string.yhmbnwk)
+                    toast(R.string.a_yhmbnwk)
                     return
                 }
                 if (et_pw.text.toString() == "") {
-                    toast(R.string.mmbnwk)
+                    toast(R.string.a_mmbnwk)
                     return
                 }
                 net_login(et_name.text.toString(), et_pw.text.toString())

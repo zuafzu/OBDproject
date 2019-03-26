@@ -37,7 +37,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="@string/ipsetting"
+                android:text="@string/a_ipsz"
                 android:textColor="@android:color/white"
                 android:textSize="18sp" />
 
@@ -47,7 +47,7 @@
                 android:layout_height="44dp"
                 android:padding="12dp"
                 android:tag="tv_refresh"
-                android:text="@string/refresh"
+                android:text="@string/a_sxi"
                 android:textColor="@android:color/white"
                 android:visibility="invisible" />
 
@@ -171,7 +171,7 @@
                         android:layout_weight="1"
                         android:background="@drawable/shape_btn_colorprimary"
                         android:tag="btn_openWifi"
-                        android:text="开启热点"
+                        android:text="@string/a_kqrd"
                         android:textAllCaps="false"
                         android:textColor="@android:color/white"
                         android:textSize="15sp" />
@@ -263,7 +263,7 @@
                     android:layout_marginBottom="16dp"
                     android:background="@drawable/shape_btn_colorprimary"
                     android:tag="btn_ok"
-                    android:text="@string/start_obd"
+                    android:text="@string/a_qdobd"
                     android:textAllCaps="false"
                     android:textColor="@android:color/white"
                     android:textSize="17sp" />

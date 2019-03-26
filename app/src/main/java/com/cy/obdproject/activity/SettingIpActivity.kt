@@ -88,7 +88,7 @@ class SettingIpActivity : BaseActivity(), BaseActivity.ClickMethoListener {
         wifiTools = WifiTools(this)
 
         stopService(mIntent2)
-        btn_ok.text = "下一步"
+        btn_ok.text = getString(R.string.a_xyb)
         iv_back.visibility = View.INVISIBLE
     }
 
@@ -117,7 +117,7 @@ class SettingIpActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                     SocketService.isConnected) {
                 btn_ok.text = "断开OBD"
             } else {
-                btn_ok.text = "下一步"
+                btn_ok.text = getString(R.string.a_xyb)
             }
             if (intent.hasExtra("isSave")) {
                 if (intent.getBooleanExtra("isSave", false)) {
@@ -251,7 +251,7 @@ class SettingIpActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                     if (SocketService.getIntance() != null && SocketService.getIntance()!!.isConnected()) {
                         stopService(mIntent2)
                         Handler().postDelayed({
-                            btn_ok.text = "下一步"
+                            btn_ok.text = getString(R.string.a_xyb)
                             dismissProgressDialog()
                         }, 2000)
                     } else {

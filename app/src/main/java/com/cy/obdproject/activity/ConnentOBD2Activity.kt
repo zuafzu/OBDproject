@@ -51,7 +51,7 @@ class ConnentOBD2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
             btn_ok.text = "断开OBD"
             et_input_ip.setText(Constant.mDstName)
         } else {
-            btn_ok.text = "启动OBD"
+            btn_ok.text = getString(R.string.a_qdobd)
         }
     }
 

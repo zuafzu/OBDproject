@@ -35,7 +35,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="@string/dtsj"
+                android:text="@string/a_dtsj"
                 android:textColor="@android:color/white"
                 android:textSize="18sp" />
 
@@ -45,7 +45,7 @@
                 android:layout_height="44dp"
                 android:padding="12dp"
                 android:tag="tv_refresh"
-                android:text="@string/refresh"
+                android:text="@string/a_sxi"
                 android:textColor="@android:color/white"
                 android:visibility="invisible" />
 
@@ -79,7 +79,7 @@
                 android:layout_weight="1"
                 android:background="@drawable/shape_btn_colorhint"
                 android:tag="btn_lastPage"
-                android:text="@string/last_page"
+                android:text="@string/a_syy"
                 android:textAllCaps="false"
                 android:textColor="@android:color/white"
                 android:textSize="14sp" />
@@ -109,7 +109,7 @@
                 android:layout_weight="1"
                 android:background="@drawable/shape_btn_colorprimary"
                 android:tag="btn_nextPage"
-                android:text="@string/next_page"
+                android:text="@string/a_xyy"
                 android:textAllCaps="false"
                 android:textColor="@android:color/white"
                 android:textSize="14sp" />

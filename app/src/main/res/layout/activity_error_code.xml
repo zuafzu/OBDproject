@@ -35,7 +35,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="@string/gzdm"
+                android:text="@string/a_gzxx"
                 android:textColor="@android:color/white"
                 android:textSize="18sp" />
 
@@ -45,7 +45,7 @@
                 android:layout_height="44dp"
                 android:padding="12dp"
                 android:tag="tv_refresh"
-                android:text="@string/refresh"
+                android:text="@string/a_sxi"
                 android:textColor="@color/colorAccent" />
 
         </LinearLayout>
@@ -73,7 +73,7 @@
             android:layout_marginBottom="8dp"
             android:background="@drawable/shape_btn_colorprimary"
             android:tag="btn_clean"
-            android:text="@string/clean"
+            android:text="@string/a_qgz"
             android:textAllCaps="false"
             android:textColor="@android:color/white"
             android:textSize="17sp" />

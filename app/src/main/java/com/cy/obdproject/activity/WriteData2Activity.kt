@@ -133,6 +133,7 @@ class WriteData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
 
     @Synchronized
     override fun setData(data: String?) {
+        LogTools.myLog("data = $data")
         Log.e("cyf88", "data = $data")
         var isD = true
         runOnUiThread {
@@ -164,7 +165,7 @@ class WriteData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
                         isStart = false
                         progressBar.progress = 0
                         progressBar.visibility = View.GONE
-                        btn_start.text = getString(R.string.write)
+                        btn_start.text = getString(R.string.a_kssx)
                         iv_back.isClickable = true
                         btn_start.isClickable = true
                         btn_start.setBackgroundResource(R.drawable.shape_btn_colorprimary)

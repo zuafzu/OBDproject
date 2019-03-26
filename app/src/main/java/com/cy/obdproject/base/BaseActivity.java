@@ -151,7 +151,7 @@ public class BaseActivity extends AppCompatActivity {
                     setTitle("提示").
                     setMessage(msg).
                     setCancelable(false).
-                    setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    setPositiveButton(getString(R.string.a_ok), new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
                             mDialog.dismiss();

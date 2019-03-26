@@ -14,7 +14,7 @@
         android:paddingTop="21dp"
         android:paddingRight="25dp"
         android:tag="tv_setting"
-        android:text="IP设置"
+        android:text="@string/a_ipsz"
         android:textColor="@android:color/white"
         android:textSize="17sp" />
 
@@ -84,7 +84,7 @@
                     android:drawableLeft="@mipmap/ic_user"
                     android:drawablePadding="8dp"
                     android:gravity="center_vertical"
-                    android:hint="@string/yhm"
+                    android:hint="@string/a_yhm"
                     android:lines="1"
                     android:paddingLeft="8dp"
                     android:paddingRight="8dp"
@@ -109,7 +109,7 @@
                     android:drawableLeft="@mipmap/ic_password"
                     android:drawablePadding="8dp"
                     android:gravity="center_vertical"
-                    android:hint="@string/mm"
+                    android:hint="@string/a_mm"
                     android:inputType="textPassword"
                     android:lines="1"
                     android:paddingLeft="8dp"
@@ -135,7 +135,7 @@
                 android:layout_marginBottom="16dp"
                 android:background="@drawable/shape_btn_colorprimary"
                 android:tag="btn_login"
-                android:text="@string/dl"
+                android:text="@string/a_dl"
                 android:textColor="@android:color/white"
                 android:textSize="17sp" />
 

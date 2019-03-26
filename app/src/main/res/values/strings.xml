@@ -1,53 +1,41 @@
 <resources>
     <string name="app_name">红旗故障诊断系统</string>
 
-    <string name="djbxx">基本信息</string>
-    <string name="xjbxx">参数修改</string>
-    <string name="gzdm">故障信息</string>
-    <string name="djz">冻结帧</string>
-    <string name="dtsj">动态数据</string>
-    <string name="iotest">输入输出控制</string>
-    <string name="ipsetting">IP设置</string>
-    <string name="setting">设置</string>
-    <string name="sxwj">刷写</string>
-    <string name="xgmm">修改密码</string>
-    <string name="vintj">vin提交</string>
-    <string name="connent_obd">连接OBD</string>
-
-    <string name="select_role">选择角色</string>
-    <string name="select_carType">选择车型</string>
-    <string name="select_system">选择系统</string>
-
-    <string name="request_list">请求协助列表</string>
-    <string name="response_list">专家列表</string>
-
-
-    <string name="yhmbnwk">登录名不能为空</string>
-    <string name="mmbnwk">密码不能为空</string>
-
-    <string name="refresh">刷新</string>
-    <string name="clean">清故障</string>
-
-    <string name="write">开始刷写</string>
-
-    <string name="next">下一步</string>
-
-    <string name="start_test">开始测试</string>
-    <string name="stop_test">结束测试</string>
-
-    <string name="last_page">上一页</string>
-    <string name="next_page">下一页</string>
-    <string name="start">开始</string>
-
-    <string name="open_wifi">开启热点</string>
-    <string name="see_ip">查看IP</string>
-    <string name="input_ip">请输入IP地址</string>
-    <string name="ok">确定</string>
-    <string name="start_obd">启动OBD</string>
-
-    <string name="yhm">User Name/用户名</string>
-    <string name="yhm2">用户名</string>
-    <string name="mm">Password/密码</string>
-    <string name="zddl">自动登录</string>
-    <string name="dl">登录</string>
+    <string name="a_jbxx">基本信息</string>
+    <string name="a_csxg">参数修改</string>
+    <string name="a_gzxx">故障信息</string>
+    <string name="a_djz">冻结帧</string>
+    <string name="a_dtsj">动态数据</string>
+    <string name="a_srsckz">输入输出控制</string>
+    <string name="a_ipsz">IP设置</string>
+    <string name="a_sz">设置</string>
+    <string name="a_sx">刷写</string>
+    <string name="a_xgmm">修改密码</string>
+    <string name="a_vintj">vin提交</string>
+    <string name="a_ljobd">连接OBD</string>
+    <string name="a_szjs">选择角色</string>
+    <string name="a_szcx">选择车型</string>
+    <string name="a_szxt">选择系统</string>
+    <string name="a_qqxzlb">请求协助列表</string>
+    <string name="a_zjlb">专家列表</string>
+    <string name="a_yhmbnwk">登录名不能为空</string>
+    <string name="a_mmbnwk">密码不能为空</string>
+    <string name="a_sxi">刷新</string>
+    <string name="a_qgz">清故障</string>
+    <string name="a_kssx">开始刷写</string>
+    <string name="a_xyb">下一步</string>
+    <string name="a_kscs">开始测试</string>
+    <string name="a_jscs">结束测试</string>
+    <string name="a_syy">上一页</string>
+    <string name="a_xyy">下一页</string>
+    <string name="a_ks">开始</string>
+    <string name="a_kqrd">开启热点</string>
+    <string name="a_ckip">查看IP</string>
+    <string name="a_qsripdz">请输入IP地址</string>
+    <string name="a_ok">确定</string>
+    <string name="a_qdobd">启动OBD</string>
+    <string name="a_yhm">User Name/用户名</string>
+    <string name="a_yhm2">用户名</string>
+    <string name="a_mm">Password/密码</string>
+    <string name="a_dl">登录</string>
 </resources>

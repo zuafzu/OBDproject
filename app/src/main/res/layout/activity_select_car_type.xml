@@ -34,7 +34,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="@string/select_carType"
+                android:text="@string/a_szcx"
                 android:textColor="@android:color/white"
                 android:textSize="18sp" />
 
@@ -44,7 +44,7 @@
                 android:layout_height="44dp"
                 android:padding="12dp"
                 android:tag="tv_refresh"
-                android:text="@string/refresh"
+                android:text="@string/a_sxi"
                 android:textColor="@android:color/white"
                 android:visibility="invisible" />
 

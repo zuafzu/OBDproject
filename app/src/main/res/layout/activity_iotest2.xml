@@ -33,7 +33,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="@string/iotest"
+                android:text="@string/a_srsckz"
                 android:textColor="@android:color/white"
                 android:textSize="18sp" />
 
@@ -43,7 +43,7 @@
                 android:layout_height="44dp"
                 android:padding="12dp"
                 android:tag="tv_refresh"
-                android:text="@string/refresh"
+                android:text="@string/a_sxi"
                 android:textColor="@android:color/white"
                 android:visibility="invisible" />
 
@@ -96,7 +96,7 @@
                 android:layout_weight="1"
                 android:background="@drawable/shape_btn_colorprimary"
                 android:tag="btn_startTest"
-                android:text="@string/start_test"
+                android:text="@string/a_kscs"
                 android:textAllCaps="false"
                 android:textColor="@android:color/white"
                 android:textSize="14sp" />
@@ -112,7 +112,7 @@
                 android:layout_weight="1"
                 android:background="@drawable/shape_btn_colorprimary"
                 android:tag="btn_stopTest"
-                android:text="@string/stop_test"
+                android:text="@string/a_jscs"
                 android:textAllCaps="false"
                 android:textColor="@android:color/white"
                 android:textSize="14sp" />

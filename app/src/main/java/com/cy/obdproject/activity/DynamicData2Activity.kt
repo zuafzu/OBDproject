@@ -111,7 +111,7 @@ class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
             toast("数据缺失")
         }
         // 直接开始读取
-        // doMethod("btn_start")
+        doMethod("btn_start")
     }
 
     fun onMyItemClick(p2: Int) {
@@ -417,6 +417,13 @@ class DynamicData2Activity : BaseActivity(), BaseActivity.ClickMethoListener {
             }
             isStart = true
             stop()
+
+            val mIntent = Intent(this@DynamicData2Activity, DynamicDataActivity::class.java)
+            mIntent.putExtra("code", code)
+            mIntent.putExtra("listData", listData)
+            startActivity(mIntent)
+            finish()
+            overridePendingTransition(0, 0)
         }
         super.onBackPressed()
     }

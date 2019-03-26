@@ -12,6 +12,11 @@ import java.util.Date;
 
 public class LogTools {
 
+    /**
+     * 打印错误日志
+     *
+     * @param e
+     */
     public static void errLog(Exception e) {
         e.printStackTrace();
         String filePath = InitClass.pathCuowu;
@@ -29,6 +34,20 @@ public class LogTools {
         } catch (Exception e2) {
             e2.printStackTrace();
         }
+    }
+
+    /**
+     * 打印测试日志
+     *
+     * @param string
+     */
+    public static void myLog(String string) {
+        String filePath = InitClass.pathCeshi;
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy年MM月dd日");
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("HH:mm:ss.SSS");
+        Date date = new Date(System.currentTimeMillis());
+        String fileName = simpleDateFormat.format(date) + "log.txt";
+        FileUtil.writeTxtToFile(simpleDateFormat2.format(date) + "    " + string, filePath, fileName);
     }
 
 }

@@ -99,15 +99,15 @@ public class SigNal {
             sigNal.setValue(val);
         } else if (ParseTypeEnum.StringType.equals(bean.getParseType())) {
             String s = tools_hexString2AsciiString(strHexValue);
-            if(!s.equals("")){
+            if (!s.equals("")) {
                 String unit = bean.getUnit();
                 if (unit == null) {
-                    sigNal.setValue(s.trim());
+                    sigNal.setValue(s);
                 } else {
                     if (unit.equals("-") || unit.equals(" ")) {
                         unit = "";
                     }
-                    sigNal.setValue(s.trim() + unit);
+                    sigNal.setValue(s + unit);
                 }
             }
         } else if (ParseTypeEnum.BCDType.equals(bean.getParseType())) {
@@ -214,7 +214,13 @@ public class SigNal {
                 int n = Integer.parseInt(s, 16);
                 if (n >= 0x20 && n <= 0x7e) {
                     ascii += (char) n;
-                }else{
+                } else if (n == 0x00) {
+                    if (ascii.equals("")) {
+                        return " ";
+                    } else {
+                        return ascii;
+                    }
+                } else {
                     return "";
                 }
             }

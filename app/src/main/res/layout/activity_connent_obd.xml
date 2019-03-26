@@ -33,7 +33,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="@string/connent_obd"
+                android:text="@string/a_ljobd"
                 android:textColor="@android:color/white"
                 android:textSize="18sp" />
 
@@ -43,7 +43,7 @@
                 android:layout_height="44dp"
                 android:padding="12dp"
                 android:tag="tv_refresh"
-                android:text="@string/refresh"
+                android:text="@string/a_sxi"
                 android:textColor="@android:color/white"
                 android:visibility="invisible" />
 
@@ -83,7 +83,7 @@
                     android:layout_marginTop="8dp"
                     android:background="@drawable/shape_btn_colorprimary"
                     android:tag="btn_openWifi"
-                    android:text="@string/open_wifi"
+                    android:text="@string/a_kqrd"
                     android:textAllCaps="false"
                     android:textColor="@android:color/white"
                     android:textSize="14sp" />
@@ -137,7 +137,7 @@
                 android:layout_marginTop="8dp"
                 android:background="@drawable/shape_btn_colorprimary"
                 android:tag="btn_seeIp"
-                android:text="@string/see_ip"
+                android:text="@string/a_ckip"
                 android:textAllCaps="false"
                 android:textColor="@android:color/white"
                 android:textSize="14sp" />
@@ -175,7 +175,7 @@
                 android:layout_marginTop="24dp"
                 android:layout_weight="1"
                 android:drawablePadding="8dp"
-                android:hint="@string/input_ip"
+                android:hint="@string/a_qsripdz"
                 android:lines="1"
                 android:paddingLeft="8dp"
                 android:paddingRight="8dp"
@@ -216,7 +216,7 @@
                 android:layout_marginTop="24dp"
                 android:background="@drawable/shape_btn_colorprimary"
                 android:tag="btn_ok"
-                android:text="@string/start_obd"
+                android:text="@string/a_qdobd"
                 android:textAllCaps="false"
                 android:textColor="@android:color/white"
                 android:textSize="14sp" />

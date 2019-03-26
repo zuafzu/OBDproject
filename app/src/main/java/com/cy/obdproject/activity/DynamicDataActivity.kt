@@ -70,64 +70,68 @@ class DynamicDataActivity : BaseActivity(), BaseActivity.ClickMethoListener, Ada
                 override fun handleMessage(msg: Message) {
                     when (msg.what) {
                         4 -> {
-                            val data = msg.obj.toString()
-                            val jsonObject = JSONObject(data)
-                            val jsonArray = jsonObject.optJSONArray("List")
-                            listData.clear()
-                            for (i in 0 until jsonArray.length()) {
-                                val jsonObject1 = jsonArray.getJSONObject(i)
-                                val bean = DynamicDataBean()
-                                bean.sid = jsonObject1!!.optString("SID")
-                                bean.did = jsonObject1!!.optString("DID")
-                                bean.name = jsonObject1!!.optString("Name")
-                                bean.name_ENG = jsonObject1!!.optString("Name_ENG")
-                                bean.byte_Start = jsonObject1!!.optString("Byte_Start")
-                                bean.byte_Length = jsonObject1!!.optString("Byte_Length")
-                                bean.bit_Start = jsonObject1!!.optString("Bit_Start")
-                                bean.bit_Length = jsonObject1!!.optString("Bit_Length")
-                                bean.coefficient = jsonObject1!!.optString("Coefficient")
-                                bean.offset = jsonObject1!!.optString("Offset")
-                                bean.type = jsonObject1!!.optString("Type")
-                                bean.enum = jsonObject1!!.optString("Enum")
-                                bean.unit = jsonObject1!!.optString("Unit")
-                                bean.unit_ENG = jsonObject1!!.optString("Unit_ENG")
-                                bean.value_Min = jsonObject1!!.optString("Value_Min")
-                                bean.value_Max = jsonObject1!!.optString("Value_Max")
-                                listData.add(bean)
-                            }
+                            try {
+                                val data = msg.obj.toString()
+                                val jsonObject = JSONObject(data)
+                                val jsonArray = jsonObject.optJSONArray("List")
+                                listData.clear()
+                                for (i in 0 until jsonArray.length()) {
+                                    val jsonObject1 = jsonArray.getJSONObject(i)
+                                    val bean = DynamicDataBean()
+                                    bean.sid = jsonObject1!!.optString("SID")
+                                    bean.did = jsonObject1!!.optString("DID")
+                                    bean.name = jsonObject1!!.optString("Name")
+                                    bean.name_ENG = jsonObject1!!.optString("Name_ENG")
+                                    bean.byte_Start = jsonObject1!!.optString("Byte_Start")
+                                    bean.byte_Length = jsonObject1!!.optString("Byte_Length")
+                                    bean.bit_Start = jsonObject1!!.optString("Bit_Start")
+                                    bean.bit_Length = jsonObject1!!.optString("Bit_Length")
+                                    bean.coefficient = jsonObject1!!.optString("Coefficient")
+                                    bean.offset = jsonObject1!!.optString("Offset")
+                                    bean.type = jsonObject1!!.optString("Type")
+                                    bean.enum = jsonObject1!!.optString("Enum")
+                                    bean.unit = jsonObject1!!.optString("Unit")
+                                    bean.unit_ENG = jsonObject1!!.optString("Unit_ENG")
+                                    bean.value_Min = jsonObject1!!.optString("Value_Min")
+                                    bean.value_Max = jsonObject1!!.optString("Value_Max")
+                                    listData.add(bean)
+                                }
 //                            if (adapter == null) {
 //                                adapter = DynamicDataAdapter(listData!!, this@DynamicDataActivity)
 //                                listView!!.adapter = adapter
 //                            } else {
 //                                adapter!!.notifyDataSetChanged()
 //                            }
-                            if (intent.hasExtra("listData")) {
-                                val list = intent.getSerializableExtra("listData") as ArrayList<DynamicDataBean>?
-                                for (i in 0 until list!!.size) {
-                                    if (list!![i].isSelect == "1") {
-                                        for (j in 0 until listData.size) {
-                                            if (list!![i].name == listData[j].name) {
-                                                listData[j].isSelect = "1"
+                                if (intent.hasExtra("listData")) {
+                                    val list = intent.getSerializableExtra("listData") as ArrayList<DynamicDataBean>?
+                                    for (i in 0 until list!!.size) {
+                                        if (list!![i].isSelect == "1") {
+                                            for (j in 0 until listData.size) {
+                                                if (list!![i].name == listData[j].name) {
+                                                    listData[j].isSelect = "1"
+                                                }
                                             }
                                         }
                                     }
                                 }
-                            }
-                            if (listData!!.size > 0) {
-                                pageCount = (listData!!.size - 1) / pageSize + 1
+                                if (listData!!.size > 0) {
+                                    pageCount = (listData!!.size - 1) / pageSize + 1
 
-                                if (pageCount == 1) {
-                                    btn_lastPage.isEnabled = false
-                                    btn_nextPage.isEnabled = false
-                                    btn_lastPage.setBackgroundResource(R.drawable.shape_btn_colorhint)
-                                    btn_nextPage.setBackgroundResource(R.drawable.shape_btn_colorhint)
+                                    if (pageCount == 1) {
+                                        btn_lastPage.isEnabled = false
+                                        btn_nextPage.isEnabled = false
+                                        btn_lastPage.setBackgroundResource(R.drawable.shape_btn_colorhint)
+                                        btn_nextPage.setBackgroundResource(R.drawable.shape_btn_colorhint)
+                                    }
+                                    if (adapter == null) {
+                                        adapter = ControlDynamicDataAdapter(listData!!, this@DynamicDataActivity)
+                                        listView!!.adapter = adapter
+                                    } else {
+                                        adapter!!.notifyDataSetChanged()
+                                    }
                                 }
-                                if (adapter == null) {
-                                    adapter = ControlDynamicDataAdapter(listData!!, this@DynamicDataActivity)
-                                    listView!!.adapter = adapter
-                                } else {
-                                    adapter!!.notifyDataSetChanged()
-                                }
+                            } catch (e: java.lang.Exception) {
+                                LogTools.myLog("DynamicDataActivity initView 134行异常： ${e.message}")
                             }
                         }
                     }
@@ -179,7 +183,7 @@ class DynamicDataActivity : BaseActivity(), BaseActivity.ClickMethoListener, Ada
                         var intent = Intent(this@DynamicDataActivity, DynamicData2Activity::class.java)
                         intent.putExtra("listData", mListData)
                         intent.putExtra("code", code)
-                        intent.putExtra("pageSize",pageSize)
+                        intent.putExtra("pageSize", pageSize)
                         startActivity(intent)
                         finish()
                         overridePendingTransition(0, 0)

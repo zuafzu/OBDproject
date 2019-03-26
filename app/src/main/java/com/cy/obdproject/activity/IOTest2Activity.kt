@@ -12,7 +12,6 @@ import com.cy.obdproject.R
 import com.cy.obdproject.base.BaseActivity
 import com.cy.obdproject.bean.IOTestBean
 import com.cy.obdproject.socket.SocketService
-import com.cy.obdproject.worker.BaseInfoWorker
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_iotest2.*
 import org.jetbrains.anko.toast
@@ -30,11 +29,11 @@ class IOTest2Activity : BaseActivity(), BaseActivity.ClickMethoListener, TextWat
         initView()
     }
 
-    private var readBaseInfoWorker: BaseInfoWorker? = null
+    // private var readBaseInfoWorker: BaseInfoWorker? = null
 
     private fun initView() {
         //worker待更改
-        readBaseInfoWorker = BaseInfoWorker()
+        // readBaseInfoWorker = BaseInfoWorker()
 //        readBaseInfoWorker!!.init(this, ECUConstant.getDynamicData()) { data ->
 //            setData(data)
 //        }
@@ -130,7 +129,7 @@ class IOTest2Activity : BaseActivity(), BaseActivity.ClickMethoListener, TextWat
         } else {
             showProgressDialog()
             if (SocketService.getIntance() != null && SocketService.getIntance()!!.isConnected()) {
-                readBaseInfoWorker!!.start()
+                // readBaseInfoWorker!!.start()
             } else {
                 workData = datas.get(spinnerItem!!)
             }

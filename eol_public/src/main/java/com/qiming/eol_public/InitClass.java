@@ -23,6 +23,7 @@ public class InitClass {
     public static final String pathShunxu = path2 + "/顺序日志/";
     public static final String pathTongxun = path2 + "/通讯日志/";
     public static final String pathCuowu = path2 + "/错误日志/";
+    public static final String pathCeshi = path2 + "/测试日志/";
 
     public static class ClassUnit {
         public ClassUnit() {

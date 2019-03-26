@@ -100,7 +100,15 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:gravity="center_vertical"
-                            android:text="车型："
+                            android:text="车型"
+                            android:textColor="@android:color/white"
+                            android:textSize="17sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:gravity="center_vertical"
+                            android:text="："
                             android:textColor="@android:color/white"
                             android:textSize="17sp" />
 
@@ -127,7 +135,15 @@
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:gravity="center_vertical"
-                            android:text="用户名："
+                            android:text="@string/a_yhm2"
+                            android:textColor="@android:color/white"
+                            android:textSize="17sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:gravity="center_vertical"
+                            android:text="："
                             android:textColor="@android:color/white"
                             android:textSize="17sp" />
 
@@ -154,7 +170,15 @@
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:gravity="center_vertical"
-                            android:text="OBD连接状态："
+                            android:text="OBD连接状态"
+                            android:textColor="@android:color/white"
+                            android:textSize="17sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:gravity="center_vertical"
+                            android:text="："
                             android:textColor="@android:color/white"
                             android:textSize="17sp" />
 

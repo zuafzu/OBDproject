@@ -129,7 +129,7 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
             tv_connnect_obd.text = "断开OBD"
         } else {
             tv_obd_state.text = "未连接"
-            tv_connnect_obd.text = "连接OBD"
+            tv_connnect_obd.text = getString(R.string.a_ljobd)
         }
     }
 
@@ -175,21 +175,21 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                                 val name = mJsonObject.optString("name")
                                 val code = mJsonObject.optString("init_code")
                                 when (name) {
-                                    "基本信息" -> {
+                                    getString(R.string.a_jbxx) -> {
                                         val refresh_code = mJsonObject.optString("refresh_code")
                                         if (code != "" && refresh_code != "") {
                                             items += "221,"
                                             modeMap["221"] = "$code,$refresh_code"
                                         }
                                     }
-                                    "参数修改" -> {
+                                    getString(R.string.a_csxg) -> {
                                         val refresh_code = mJsonObject.optString("refresh_code")
                                         if (code != "" && refresh_code != "") {
                                             items += "222,"
                                             modeMap["222"] = "$code,$refresh_code"
                                         }
                                     }
-                                    "故障信息" -> {
+                                    getString(R.string.a_gzxx) -> {
                                         val refresh_code = mJsonObject.optString("refresh_code")
                                         val read_freeze_code = mJsonObject.optString("read_freeze_code")
                                         val clear_dtc_code = mJsonObject.optString("clear_dtc_code")
@@ -198,7 +198,7 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                                             modeMap["223"] = "$code,$refresh_code,$read_freeze_code,$clear_dtc_code"
                                         }
                                     }
-                                    "动态数据" -> {
+                                    getString(R.string.a_dtsj) -> {
                                         val start_read_code = mJsonObject.optString("start_read_code")
                                         val stop_read_code = mJsonObject.optString("stop_read_code")
                                         if (code != "" && start_read_code != "" && stop_read_code != "") {
@@ -206,7 +206,7 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                                             modeMap["224"] = "$code,$start_read_code,$stop_read_code"
                                         }
                                     }
-                                    "刷写" -> {
+                                    getString(R.string.a_sx) -> {
                                         val flush_code = mJsonObject.optString("flush_code")
                                         if (flush_code != "") {
                                             items += "226,"
@@ -361,7 +361,7 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                     holder.ll_main!!.setOnClickListener {
                         click("ll_main1")
                     }
-                    holder.textView!!.text = getString(R.string.djbxx)
+                    holder.textView!!.text = getString(R.string.a_jbxx)
                     holder.imageView!!.setImageResource(R.mipmap.ic_file)
                     // holder.imageView!!.setBackgroundColor(Color.parseColor("#4f5d73"))
                 }
@@ -369,7 +369,7 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                     holder.ll_main!!.setOnClickListener {
                         click("ll_main2")
                     }
-                    holder.textView!!.text = getString(R.string.xjbxx)
+                    holder.textView!!.text = getString(R.string.a_csxg)
                     holder.imageView!!.setImageResource(R.mipmap.ic_card2)//4f5d73
                     // holder.imageView!!.setBackgroundColor(Color.parseColor("#77b3d4"))
                 }
@@ -377,7 +377,7 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                     holder.ll_main!!.setOnClickListener {
                         click("ll_main3")
                     }
-                    holder.textView!!.text = getString(R.string.gzdm)
+                    holder.textView!!.text = getString(R.string.a_gzxx)
                     holder.imageView!!.setImageResource(R.mipmap.alert)
                     // holder.imageView!!.setBackgroundColor(Color.parseColor("#77b3d4"))
                 }
@@ -385,7 +385,7 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                     holder.ll_main!!.setOnClickListener {
                         click("ll_main4")
                     }
-                    holder.textView!!.text = getString(R.string.dtsj)
+                    holder.textView!!.text = getString(R.string.a_dtsj)
                     holder.imageView!!.setImageResource(R.mipmap.ic_graph_chart)
                     // holder.imageView!!.setBackgroundColor(Color.parseColor("#4f5d73"))
                 }
@@ -393,7 +393,7 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                     holder.ll_main!!.setOnClickListener {
                         click("ll_main5")
                     }
-                    holder.textView!!.text = getString(R.string.iotest)
+                    holder.textView!!.text = getString(R.string.a_srsckz)
                     holder.imageView!!.setImageResource(R.mipmap.ic_card5)
                     // holder.imageView!!.setBackgroundColor(Color.parseColor("#4f5d73"))
                 }
@@ -401,7 +401,7 @@ class MainActivity : BaseActivity(), BaseActivity.ClickMethoListener {
                     holder.ll_main!!.setOnClickListener {
                         click("ll_main6")
                     }
-                    holder.textView!!.text = getString(R.string.sxwj)
+                    holder.textView!!.text = getString(R.string.a_sx)
                     holder.imageView!!.setImageResource(R.mipmap.ic_inbox_outgoing)
                     // holder.imageView!!.setBackgroundColor(Color.parseColor("#77b3d4"))
                 }
